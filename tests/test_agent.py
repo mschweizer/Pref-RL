@@ -1,14 +1,14 @@
-from unittest.mock import patch, Mock
+from unittest.mock import Mock
 
 import gym
 
-from agent import Agent, LearningAgent
+from agent import LearningAgent
 from experience import ExperienceBuffer, Experience
 
 
 def test_choose_action(env):
     obs = env.reset()
-    agent = Agent(env)
+    agent = LearningAgent(env)
     action = agent.choose_action(obs)
     assert action is not None
 
@@ -17,8 +17,8 @@ def test_choose_valid_action(env):
     cartpole_env = env
     mountaincar_env = gym.make('MountainCar-v0')
 
-    cartpole_agent = Agent(cartpole_env)
-    mountaincar_agent = Agent(mountaincar_env)
+    cartpole_agent = LearningAgent(cartpole_env)
+    mountaincar_agent = LearningAgent(mountaincar_env)
 
     cartpole_observation = cartpole_env.reset()
     mountaincar_observation = mountaincar_env.reset()
@@ -28,14 +28,6 @@ def test_choose_valid_action(env):
 
     assert cartpole_env.action_space.contains(cartpole_action[0])
     assert mountaincar_env.action_space.contains(mountaincar_action[0])
-
-
-def test_agent_learns(env, reward_predictor):
-    with patch('agent.PPO'):
-        agent = LearningAgent(env, frame_stack_depth=4)
-        agent.learn(1000)
-
-        agent.policy_model.learn.assert_called()
 
 
 def test_agent_trains_reward_model_every_training_interval(learning_agent):
@@ -50,21 +42,9 @@ def test_agent_trains_reward_model_every_training_interval(learning_agent):
     learning_agent.train_reward_model.assert_called()
 
 
-def test_agent_samples_trajectory_every_sampling_interval(learning_agent):
-    interval_length = 10
-
-    learning_agent.trajectory_sampler.sampling_interval = interval_length
-
-    learning_agent.sample_trajectory = Mock(spec_set=LearningAgent.sample_trajectory)
-
-    learning_agent.learn(total_time_steps=interval_length)
-
-    learning_agent.sample_trajectory.assert_called()
-
-
 def test_samples_subsegment(learning_agent):
     buffer = learning_agent.trajectory_sampler.trajectory_buffer
-    learning_agent.trajectory_sampler.trajectory_length = 2
+    learning_agent.trajectory_sampler.segment_length = 2
 
     buffer.append(1)
     buffer.append(2)
@@ -90,40 +70,22 @@ def test_sampled_segment_has_correct_length(learning_agent):
     buffer.append(2)
     buffer.append(3)
 
-    reward_learning_env = learning_agent.environment
     trajectory_sampler = learning_agent.trajectory_sampler
 
     trajectory_sampler.trajectory_buffer = buffer
-    trajectory_sampler.trajectory_length = 1
+    trajectory_sampler.segment_length = 1
 
     segment_len_1 = trajectory_sampler.get_sampled_trajectory()
 
-    trajectory_sampler.trajectory_length = 2
+    trajectory_sampler.segment_length = 2
     segment_len_2 = trajectory_sampler.get_sampled_trajectory()
 
-    trajectory_sampler.trajectory_length = 0
+    trajectory_sampler.segment_length = 0
     segment_len_0 = trajectory_sampler.get_sampled_trajectory()
 
     assert len(segment_len_0) == 0
     assert len(segment_len_1) == 1
     assert len(segment_len_2) == 2
-
-
-def test_all_experiences_are_saved_in_sampling_buffer(learning_agent):
-    buffer_size = learning_agent.trajectory_sampler.trajectory_buffer.size
-
-    last_observation = learning_agent.environment.reset()
-    last_done = False
-
-    experiences = []
-
-    for i in range(buffer_size):
-        action = learning_agent.environment.action_space.sample()
-        new_observation, reward, new_done, info = learning_agent.environment.step(action)
-        experiences.append(Experience(last_observation, action, reward, last_done, info))
-        last_observation, last_done = new_observation, new_done
-
-    assert learning_agent.environment.trajectory_buffer.experiences == experiences
 
 
 def test_trajectories_contain_samples(learning_agent):
@@ -132,7 +94,7 @@ def test_trajectories_contain_samples(learning_agent):
 
     learning_agent.learn(total_time_steps=learning_agent.trajectory_sampler.sampling_interval)
 
-    assert learning_agent.trajectory_sampler.trajectories[0] == trajectory
+    assert learning_agent.trajectory_sampler.samples[0] == trajectory
 
 # def test_agent(env):
 #     experience_buffer = ExperienceBuffer(size=4)

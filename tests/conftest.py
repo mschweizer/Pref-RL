@@ -24,4 +24,5 @@ def reward_wrapper(env, reward_predictor):
 
 @pytest.fixture()
 def learning_agent(reward_wrapper):
-    return LearningAgent(reward_wrapper, sampling_interval=10, segment_length=4, frame_stack_depth=4)
+    return LearningAgent(reward_wrapper, sampling_interval=10, segment_length=4, frame_stack_depth=4,
+                         simulation_steps_per_update=10)

@@ -8,23 +8,19 @@ from trajectory_sampling import TrajectorySegmentSampler
 from wrapper import RewardWrapper
 
 
-class Agent:
-    def __init__(self, env):
-        self.policy_model = PPO('MlpPolicy', env)
-
-    def choose_action(self, state):
-        return self.policy_model.predict(state)
-
-
-class LearningAgent(Agent):
-    def __init__(self, environment, sampling_interval=None, segment_length=None, frame_stack_depth=None):
-        self.trajectory_buffer = ExperienceBuffer(size=10)
+class LearningAgent:
+    def __init__(self, environment, sampling_interval=None, segment_length=None, frame_stack_depth=4,
+                 simulation_steps_per_update=2048, trajectory_buffer_size=10):
+        self.trajectory_buffer = ExperienceBuffer(size=trajectory_buffer_size)
         self.reward_predictor = RewardPredictor(environment=environment, trajectory_buffer=self.trajectory_buffer,
                                                 frame_stack_depth=frame_stack_depth, training_interval=10)
         self.trajectory_sampler = TrajectorySegmentSampler(self.trajectory_buffer, sampling_interval, segment_length)
         self.environment = RewardWrapper(env=environment, reward_predictor=self.reward_predictor,
                                          trajectory_buffer=self.trajectory_buffer)
-        super().__init__(self.environment)
+        self.policy_model = PPO('MlpPolicy', self.environment, n_steps=simulation_steps_per_update)
+
+    def choose_action(self, state):
+        return self.policy_model.predict(state)
 
     def learn(self, total_time_steps):
         callbacks = []
