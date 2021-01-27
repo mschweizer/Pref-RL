@@ -5,11 +5,10 @@ from reward_net import RewardNet
 
 
 class RewardPredictor:
-    def __init__(self, environment, trajectory_buffer, frame_stack_depth=None, training_interval=None,
-                 model_parameters=None):
-        self.environment = environment
-        self.trajectory_buffer = trajectory_buffer
-        self.frame_stack_depth = frame_stack_depth
+    def __init__(self, env, trajectory_buffer, num_stacked_frames, training_interval, model_parameters=None):
+        self.environment = env
+        self.prediction_buffer = trajectory_buffer.prediction_context
+        self.num_stacked_frames = num_stacked_frames
         self.training_interval = training_interval
         self.reward_net = RewardNet(self.get_flattened_input_length())
         if model_parameters:
@@ -21,7 +20,7 @@ class RewardPredictor:
 
     def prepare_data(self):
         data = self.create_empty_data_array()
-        for i, experience in enumerate(reversed(self.get_last_n_experiences())):
+        for i, experience in enumerate(reversed(self.prediction_buffer)):
             experience = self.convert_experience_to_array(experience)
             data = self.add_experience(data, experience, i)
         return data
@@ -58,7 +57,7 @@ class RewardPredictor:
         return torch.from_numpy(np.hstack((observation, action)))
 
     def get_flattened_input_length(self):
-        return self.frame_stack_depth * self.get_flattened_experience_length()
+        return self.num_stacked_frames * self.get_flattened_experience_length()
 
     def get_flattened_experience_length(self):
         return self.get_flattened_action_space_length() + self.get_flattened_observation_space_length()
@@ -68,6 +67,3 @@ class RewardPredictor:
 
     def get_flattened_action_space_length(self):
         return int(np.prod(self.environment.action_space.shape))
-
-    def get_last_n_experiences(self):
-        return self.trajectory_buffer.experiences[-self.frame_stack_depth:]

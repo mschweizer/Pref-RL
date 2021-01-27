@@ -6,7 +6,7 @@ from experience import Experience
 
 def test_agent_learns_policy_for_given_environment(env):
     with patch('agent.PPO'):
-        agent = LearningAgent(env, frame_stack_depth=4)
+        agent = LearningAgent(env, num_stacked_frames=4)
         agent.learn(1000)
 
         agent.policy_model.learn.assert_called()
@@ -34,8 +34,7 @@ def test_agent_samples_trajectory_segment_every_sampling_interval(reward_wrapper
     interval_length = 10
 
     learning_agent = LearningAgent(reward_wrapper, sampling_interval=interval_length, segment_length=4,
-                                   frame_stack_depth=4,
-                                   simulation_steps_per_update=interval_length)
+                                   num_stacked_frames=4, simulation_steps_per_update=interval_length)
 
     learning_agent.sample_trajectory = Mock(spec_set=LearningAgent.sample_trajectory)
 
@@ -55,10 +54,42 @@ def test_agent_saves_sampled_trajectory_segment(learning_agent):
 
 def test_agent_sets_sufficient_trajectory_buffer_length(reward_wrapper):
     segment_length = 3
-    frame_stack_depth = 5
+    num_stacked_frames = 5
     buffer_size = 10
 
-    learning_agent = LearningAgent(reward_wrapper, segment_length=segment_length, frame_stack_depth=frame_stack_depth,
+    learning_agent = LearningAgent(reward_wrapper, segment_length=segment_length, num_stacked_frames=num_stacked_frames,
                                    trajectory_buffer_size=buffer_size)
 
-    assert learning_agent.trajectory_buffer.size >= min(segment_length, frame_stack_depth)
+    assert learning_agent.trajectory_buffer.size >= min(segment_length, num_stacked_frames)
+
+
+def test_agent_queries_preference_every_query_interval(reward_wrapper, segment_samples):
+    interval_length = 10
+
+    learning_agent = LearningAgent(reward_wrapper,
+                                   sampling_interval=interval_length,
+                                   segment_length=4,
+                                   num_stacked_frames=4,
+                                   simulation_steps_per_update=10,
+                                   query_interval=10)
+
+    learning_agent.query_preference = Mock(spec_set=LearningAgent.query_preference)
+
+    learning_agent.segment_samples = segment_samples
+
+    learning_agent.learn(total_time_steps=interval_length)
+
+    learning_agent.query_preference.assert_called_once()
+
+
+def test_agent_saves_queried_preference(reward_wrapper, segment_samples):
+    interval_length = 10
+
+    learning_agent = LearningAgent(reward_wrapper, sampling_interval=interval_length, segment_length=4,
+                                   num_stacked_frames=4, simulation_steps_per_update=interval_length)
+
+    learning_agent.segment_samples.extend(segment_samples)
+
+    learning_agent.learn(total_time_steps=interval_length)
+
+    assert len(learning_agent.training_data) == 1

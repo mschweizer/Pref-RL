@@ -4,17 +4,17 @@ import gym
 import numpy as np
 import torch
 
-from experience import Experience, ExperienceBuffer
+from experience import Experience, ExperienceBuffer, PredictionBuffer
 from reward_predictor import RewardPredictor
 
 
 def test_predict_utility(env, reward_predictor):
-    frame_stack_depth = 4
-    prediction_buffer = ExperienceBuffer(size=frame_stack_depth)
+    num_stacked_frames = 4
+    prediction_buffer = ExperienceBuffer(size=num_stacked_frames)
 
     env.reset()
 
-    for i in range(frame_stack_depth):
+    for i in range(num_stacked_frames):
         action = env.action_space.sample()
         observation, reward, done, info = env.step(action)
         prediction_buffer.append(Experience(observation, action, reward, done, info))
@@ -33,7 +33,7 @@ def test_prepare_data(reward_predictor):
     action2 = 2
     experience2 = Experience(observation=observation2, action=action2)
 
-    reward_predictor.get_last_n_experiences = Mock(return_value=[experience1, experience2])
+    reward_predictor.prediction_buffer = [experience1, experience2]
     reward_predictor.environment.observation_space.shape = tuple([2, 3])
     reward_predictor.environment.action_space.shape = tuple()
 
@@ -48,8 +48,10 @@ def test_get_flattened_lengths():
     env.observation_space.shape = 4
 
     with patch('reward_predictor.RewardNet'):
-        reward_predictor = RewardPredictor(environment=env, trajectory_buffer=ExperienceBuffer(size=2),
-                                           frame_stack_depth=2)
+        reward_predictor = RewardPredictor(env=env,
+                                           trajectory_buffer=PredictionBuffer(size=2, prediction_stack_depth=4),
+                                           num_stacked_frames=2,
+                                           training_interval=10)
         assert reward_predictor.get_flattened_action_space_length() == 1
         assert reward_predictor.get_flattened_observation_space_length() == 4
         assert reward_predictor.get_flattened_experience_length() == 5

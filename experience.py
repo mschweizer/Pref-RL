@@ -1,6 +1,5 @@
 class ExperienceBuffer:
     def __init__(self, size):
-        super().__init__()
         self.size = size
         self.experiences = []
 
@@ -10,14 +9,14 @@ class ExperienceBuffer:
             del self.experiences[0]
 
 
-# TODO: what is the "correct" way to do this?
-class LastNExperiences:
-    def __init__(self, n, experience_buffer):
-        self.n = n
-        self.experience_buffer = experience_buffer
+class PredictionBuffer(ExperienceBuffer):
+    def __init__(self, size, prediction_stack_depth):
+        super().__init__(size)
+        self.prediction_stack_depth = prediction_stack_depth
 
-    def view(self):
-        return self.experience_buffer.experiences[-self.n:]
+    @property
+    def prediction_context(self):
+        return self.experiences[-self.prediction_stack_depth:]
 
 
 class Experience:
@@ -34,3 +33,16 @@ class Experience:
                self.reward is other.reward and \
                self.done is other.done and \
                self.info is other.info
+
+    def __str__(self):
+        if self.action is not None and self.reward is not None and self.done is not None and self.info is not None:
+            string_rep = "Obs: {o}; Act: {a}; Rew: {r}; Done: {d}; ORew: {orew}".format(o=self.observation,
+                                                                                        a=self.action,
+                                                                                        r=self.reward,
+                                                                                        d=self.done,
+                                                                                        orew=self.info[
+                                                                                            "original_reward"])
+        else:
+            string_rep = "Obs: {}".format(self.observation)
+
+        return string_rep

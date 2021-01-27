@@ -2,11 +2,11 @@ import numpy as np
 
 
 class TrajectorySegmentSampler:
-    def __init__(self, trajectory_buffer, sampling_interval, segment_length):
+    def __init__(self, trajectory_buffer, sampling_interval, segment_length, segment_samples):
         self.trajectory_buffer = trajectory_buffer
         self.sampling_interval = sampling_interval
         self.segment_length = segment_length
-        self.samples = []
+        self.samples = segment_samples
 
     def sample_trajectory(self):
         sampled_trajectory = self.get_sampled_trajectory()
