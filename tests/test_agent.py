@@ -92,9 +92,9 @@ def test_trajectories_contain_samples(learning_agent):
     trajectory = [Experience(1), Experience(2), Experience(3), Experience(4)]
     learning_agent.trajectory_sampler.get_sampled_trajectory = Mock(return_value=trajectory)
 
-    learning_agent.learn(total_time_steps=learning_agent.trajectory_sampler.sampling_interval)
+    learning_agent.learn(total_time_steps=learning_agent.sampling_interval)
 
-    assert learning_agent.trajectory_sampler.samples[0] == trajectory
+    assert learning_agent.segment_samples[0] == trajectory
 
 # def test_agent(env):
 #     experience_buffer = ExperienceBuffer(size=4)

@@ -24,13 +24,12 @@ class LearningAgent:
         self.trajectory_buffer = PredictionBuffer(size=trajectory_buffer_size,
                                                   prediction_stack_depth=num_stacked_frames)
 
+        self.sampling_interval = sampling_interval
         self.query_interval = query_interval
         self.training_interval = None
 
         self.trajectory_sampler = TrajectorySegmentSampler(trajectory_buffer=self.trajectory_buffer,
-                                                           sampling_interval=sampling_interval,
-                                                           segment_length=segment_length,
-                                                           segment_samples=self.segment_samples)
+                                                           segment_length=segment_length)
 
         self.training_data_generator = PreferenceDataGenerator(query_collector=RewardMaximizingPreferenceCollector(),
                                                                preference_data=self.training_data,
@@ -61,7 +60,7 @@ class LearningAgent:
 
         if self.trajectory_sampler:
             sample_trajectory = SampleTrajectoryCallback(agent=self)
-            sample_callback = EveryNTimesteps(n_steps=self.trajectory_sampler.sampling_interval,
+            sample_callback = EveryNTimesteps(n_steps=self.sampling_interval,
                                               callback=sample_trajectory)
             callbacks.append(sample_callback)
 
@@ -77,7 +76,7 @@ class LearningAgent:
         pass
 
     def sample_trajectory(self):
-        self.trajectory_sampler.sample_trajectory()
+        self.segment_samples.append(self.trajectory_sampler.get_sampled_trajectory())
 
     def query_preference(self):
         self.training_data_generator.collect_preference()

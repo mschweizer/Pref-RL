@@ -47,9 +47,9 @@ def test_agent_saves_sampled_trajectory_segment(learning_agent):
     trajectory_segment = [Experience(1), Experience(2)]
     learning_agent.trajectory_sampler.get_sampled_trajectory = Mock(return_value=trajectory_segment)
 
-    learning_agent.trajectory_sampler.sample_trajectory()
+    learning_agent.sample_trajectory()
 
-    assert trajectory_segment in learning_agent.trajectory_sampler.samples
+    assert trajectory_segment in learning_agent.segment_samples
 
 
 def test_agent_sets_sufficient_trajectory_buffer_length(reward_wrapper):
