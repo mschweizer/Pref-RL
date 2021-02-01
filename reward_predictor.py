@@ -5,11 +5,10 @@ from reward_net import RewardNet
 
 
 class RewardPredictor:
-    def __init__(self, env, trajectory_buffer, num_stacked_frames, training_interval, model_parameters=None):
+    def __init__(self, env, trajectory_buffer, num_stacked_frames, model_parameters=None):
         self.environment = env
         self.prediction_buffer = trajectory_buffer.prediction_context
         self.num_stacked_frames = num_stacked_frames
-        self.training_interval = training_interval
         self.reward_net = RewardNet(self.get_flattened_input_length())
         if model_parameters:
             self.reward_net.load_state_dict(model_parameters)

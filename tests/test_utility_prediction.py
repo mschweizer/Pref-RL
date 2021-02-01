@@ -50,8 +50,7 @@ def test_get_flattened_lengths():
     with patch('reward_predictor.RewardNet'):
         reward_predictor = RewardPredictor(env=env,
                                            trajectory_buffer=PredictionBuffer(size=2, prediction_stack_depth=4),
-                                           num_stacked_frames=2,
-                                           training_interval=10)
+                                           num_stacked_frames=2)
         assert reward_predictor.get_flattened_action_space_length() == 1
         assert reward_predictor.get_flattened_observation_space_length() == 4
         assert reward_predictor.get_flattened_experience_length() == 5

@@ -1,15 +1,16 @@
-from experience import Experience
+from experience import Experience, ExperienceBuffer
 from preference_query import PreferenceDataGenerator, RewardMaximizingPreferenceCollector
 
 
 def test_agent_generates_valid_preference_query():
     segment_samples = ["segment1", "segment2", "segment3"]
 
-    preference_data_generator = PreferenceDataGenerator(query_collector=None,
-                                                        trajectory_segment_samples=segment_samples,
-                                                        preference_data=[])
+    preference_data_generator = PreferenceDataGenerator(trajectory_buffer=ExperienceBuffer(size=10))
 
-    query = preference_data_generator.generate_query()
+    preference_data_generator.segment_samples = segment_samples
+
+    preference_data_generator.generate_query()
+    query = preference_data_generator.queries[0]
 
     assert type(query) is list
     assert len(query) is 2
@@ -21,10 +22,10 @@ def test_higher_reward_is_preferred():
                  Experience(observation=1, action=1, done=1, reward=1, info={"original_reward": 0})]
     segment_2 = [Experience(observation=1, action=1, done=1, reward=1, info={"original_reward": 25}),
                  Experience(observation=1, action=1, done=1, reward=1, info={"original_reward": 25})]
-    query = [segment_1, segment_2]
+    queries = [[segment_1, segment_2]]
 
     preference_collector = RewardMaximizingPreferenceCollector()
 
-    preference = preference_collector.query_answer(query)
+    preference = preference_collector.collect_preference(queries)
 
     assert preference[0] == segment_2 and preference[1] == segment_1

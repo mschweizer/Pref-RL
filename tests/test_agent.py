@@ -31,26 +31,27 @@ def test_choose_valid_action(env):
 
 
 def test_agent_trains_reward_model_every_training_interval(learning_agent):
-    interval_length = 10
+    interval_length = 5
 
-    learning_agent.reward_predictor.training_interval = interval_length
+    learning_agent.learning_orchestrator.training_interval = interval_length
 
-    learning_agent.train_reward_model = Mock(spec_set=LearningAgent.train_reward_model)
+    learning_agent.learning_orchestrator.reward_learner.learn = Mock()
+    # TODO: add spec_set=LearningAgent.learning_orchestrator.reward_learner.learn to mock
 
     learning_agent.learn(total_time_steps=interval_length)
 
-    learning_agent.train_reward_model.assert_called()
+    learning_agent.learning_orchestrator.reward_learner.learn.assert_called()
 
 
 def test_samples_subsegment(learning_agent):
-    buffer = learning_agent.trajectory_sampler.trajectory_buffer
-    learning_agent.trajectory_sampler.segment_length = 2
+    buffer = learning_agent.learning_orchestrator.preference_data_generator.segment_sampler.trajectory_buffer
+    learning_agent.learning_orchestrator.preference_data_generator.segment_sampler.segment_length = 2
 
     buffer.append(1)
     buffer.append(2)
     buffer.append(3)
 
-    segment = learning_agent.trajectory_sampler.get_sampled_trajectory()
+    segment = learning_agent.learning_orchestrator.preference_data_generator.segment_sampler.generate_sample()
 
     def segment_is_subsegment_of_buffered_experiences(sample_segment):
         first_experience = sample_segment[0]
@@ -70,18 +71,18 @@ def test_sampled_segment_has_correct_length(learning_agent):
     buffer.append(2)
     buffer.append(3)
 
-    trajectory_sampler = learning_agent.trajectory_sampler
+    segment_sampler = learning_agent.learning_orchestrator.preference_data_generator.segment_sampler
 
-    trajectory_sampler.trajectory_buffer = buffer
-    trajectory_sampler.segment_length = 1
+    segment_sampler.trajectory_buffer = buffer
+    segment_sampler.segment_length = 1
 
-    segment_len_1 = trajectory_sampler.get_sampled_trajectory()
+    segment_len_1 = segment_sampler.generate_sample()
 
-    trajectory_sampler.segment_length = 2
-    segment_len_2 = trajectory_sampler.get_sampled_trajectory()
+    segment_sampler.segment_length = 2
+    segment_len_2 = segment_sampler.generate_sample()
 
-    trajectory_sampler.segment_length = 0
-    segment_len_0 = trajectory_sampler.get_sampled_trajectory()
+    segment_sampler.segment_length = 0
+    segment_len_0 = segment_sampler.generate_sample()
 
     assert len(segment_len_0) == 0
     assert len(segment_len_1) == 1
@@ -90,11 +91,12 @@ def test_sampled_segment_has_correct_length(learning_agent):
 
 def test_trajectories_contain_samples(learning_agent):
     trajectory = [Experience(1), Experience(2), Experience(3), Experience(4)]
-    learning_agent.trajectory_sampler.get_sampled_trajectory = Mock(return_value=trajectory)
+    learning_agent.learning_orchestrator.preference_data_generator.segment_sampler.generate_sample = \
+        Mock(return_value=trajectory)
 
-    learning_agent.learn(total_time_steps=learning_agent.sampling_interval)
+    learning_agent.learn(total_time_steps=learning_agent.learning_orchestrator.sampling_interval)
 
-    assert learning_agent.segment_samples[0] == trajectory
+    assert learning_agent.learning_orchestrator.preference_data_generator.segment_samples[0] == trajectory
 
 # def test_agent(env):
 #     experience_buffer = ExperienceBuffer(size=4)

@@ -14,22 +14,19 @@ def env():
 
 @pytest.fixture()
 def reward_predictor(env):
-    return RewardPredictor(env,
-                           trajectory_buffer=PredictionBuffer(size=2, prediction_stack_depth=4),
-                           num_stacked_frames=2,
-                           training_interval=10)
+    return RewardPredictor(env, trajectory_buffer=PredictionBuffer(size=2, prediction_stack_depth=4),
+                           num_stacked_frames=2)
 
 
 @pytest.fixture()
 def reward_wrapper(env, reward_predictor):
-    return RewardWrapper(env=env, reward_predictor=reward_predictor,
-                         trajectory_buffer=PredictionBuffer(size=10, prediction_stack_depth=4))
+    return RewardWrapper(env=env)
 
 
 @pytest.fixture()
 def learning_agent(reward_wrapper):
     return LearningAgent(reward_wrapper, sampling_interval=10, segment_length=4, num_stacked_frames=4,
-                         simulation_steps_per_update=10)
+                         simulation_steps_per_policy_update=5)
 
 
 @pytest.fixture()
