@@ -8,7 +8,7 @@ def main():
 
     agent = LearningAgent(env, sampling_interval=30, query_interval=50, segment_length=10, num_stacked_frames=4,
                           simulation_steps_per_policy_update=2048, trajectory_buffer_size=100)
-    agent.learn(total_time_steps=10000)
+    agent.learn(total_timesteps=10000)
 
     obs = env.reset()
     for i in range(100):

@@ -1,4 +1,4 @@
-from experience import ExperienceBuffer, Experience
+from data_generation.experience import ExperienceBuffer, Experience
 
 
 def test_buffer_removes_oldest():

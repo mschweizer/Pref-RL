@@ -1,25 +1,15 @@
 import numpy as np
 import torch
 
-from reward_net import RewardNet
 
-
-class RewardPredictor:
-    def __init__(self, env, trajectory_buffer, num_stacked_frames, model_parameters=None):
-        self.environment = env
-        self.prediction_buffer = trajectory_buffer.prediction_context
+class Preprocessor:
+    def __init__(self, env, num_stacked_frames):
+        self.env = env
         self.num_stacked_frames = num_stacked_frames
-        self.reward_net = RewardNet(self.get_flattened_input_length())
-        if model_parameters:
-            self.reward_net.load_state_dict(model_parameters)
 
-    def predict_utility(self):
-        input_data = self.prepare_data()
-        return self.reward_net(input_data)
-
-    def prepare_data(self):
+    def prepare_data(self, prediction_buffer):
         data = self.create_empty_data_array()
-        for i, experience in enumerate(reversed(self.prediction_buffer)):
+        for i, experience in enumerate(reversed(prediction_buffer)):
             experience = self.convert_experience_to_array(experience)
             data = self.add_experience(data, experience, i)
         return data
@@ -42,12 +32,12 @@ class RewardPredictor:
         return self.combine_arrays(observation, action)
 
     def convert_observation_to_array(self, observation):
-        if len(self.environment.observation_space.shape) > 1:
+        if len(self.env.observation_space.shape) > 1:
             observation = observation.ravel()
         return observation
 
     def convert_action_to_array(self, action):
-        if len(self.environment.action_space.shape) > 1:
+        if len(self.env.action_space.shape) > 1:
             action = action.ravel()
         return np.array(action)
 
@@ -62,7 +52,7 @@ class RewardPredictor:
         return self.get_flattened_action_space_length() + self.get_flattened_observation_space_length()
 
     def get_flattened_observation_space_length(self):
-        return int(np.prod(self.environment.observation_space.shape))
+        return int(np.prod(self.env.observation_space.shape))
 
     def get_flattened_action_space_length(self):
-        return int(np.prod(self.environment.action_space.shape))
+        return int(np.prod(self.env.action_space.shape))

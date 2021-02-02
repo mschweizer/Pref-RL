@@ -1,9 +1,9 @@
 from stable_baselines3.common.callbacks import EveryNTimesteps
 
-from callbacks import TrainRewardModelCallback, SampleTrajectoryCallback, CollectPreferenceCallback, \
+from data_generation.preference_data_generator import PreferenceDataGenerator
+from orchestration.callbacks import TrainRewardModelCallback, SampleTrajectoryCallback, CollectPreferenceCallback, \
     GenerateQueryCallback
-from preference_query import PreferenceDataGenerator
-from reward_learner import RewardLearner
+from reward_modeling.reward_learner import RewardLearner
 
 
 class LearningOrchestrator:

@@ -1,6 +1,6 @@
 from stable_baselines3 import PPO
 
-from wrapper import RewardWrapper
+from reward_modeling.reward_wrapper import RewardWrapper
 
 
 class Policy:

@@ -1,8 +1,8 @@
 import torch
 from gym import Wrapper
 
-from experience import Experience, PredictionBuffer
-from reward_predictor import RewardPredictor
+from data_generation.experience import Experience, PredictionBuffer
+from reward_modeling.reward_predictor import RewardPredictor
 
 
 class RewardWrapper(Wrapper):
