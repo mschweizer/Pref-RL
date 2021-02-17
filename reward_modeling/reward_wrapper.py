@@ -6,11 +6,11 @@ from reward_modeling.reward_predictor import RewardPredictor
 
 
 class RewardWrapper(Wrapper):
-    def __init__(self, env):
+    def __init__(self, env, reward_model, trajectory_buffer_size, num_stacked_frames):
         super().__init__(env)
-        self.trajectory_buffer = PredictionBuffer(size=100, prediction_stack_depth=4)  # TODO: add params to init
-        self.reward_predictor = \
-            RewardPredictor(env=env, num_stacked_frames=4, trajectory_buffer=self.trajectory_buffer)  # TODO: add params
+        self.trajectory_buffer = PredictionBuffer(size=trajectory_buffer_size, num_stacked_frames=num_stacked_frames)
+        self.reward_predictor = RewardPredictor(env=env, trajectory_buffer=self.trajectory_buffer,
+                                                num_stacked_frames=num_stacked_frames, reward_model=reward_model)
         self._last_observation = None
         self._last_done = False
 

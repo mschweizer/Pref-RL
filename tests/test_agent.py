@@ -46,11 +46,11 @@ def test_agent_chooses_valid_action(env):
 
 
 def test_agent_learns_policy_for_given_environment(env):
-    with patch('policy.PPO'):
+    with patch('agent.PPO'):
         agent = LearningAgent(env, num_stacked_frames=4)
-        agent.learn(1000)
+        agent.learn_policy(1000)
 
-        agent.policy.model.learn.assert_called()
+        agent.policy_model.learn.assert_called()
 
 
 def test_agent_sets_sufficient_trajectory_buffer_length(reward_wrapper):
@@ -61,4 +61,4 @@ def test_agent_sets_sufficient_trajectory_buffer_length(reward_wrapper):
     learning_agent = LearningAgent(reward_wrapper, segment_length=segment_length, num_stacked_frames=num_stacked_frames,
                                    trajectory_buffer_size=buffer_size)
 
-    assert learning_agent.policy.environment.trajectory_buffer.size >= min(segment_length, num_stacked_frames)
+    assert learning_agent.env.trajectory_buffer.size >= min(segment_length, num_stacked_frames)

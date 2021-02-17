@@ -5,6 +5,11 @@ class TrajectorySegmentSampler:
     def __init__(self, trajectory_buffer, segment_length):
         self.trajectory_buffer = trajectory_buffer
         self.segment_length = segment_length
+        self.segment_samples = []
+
+    def save_sample(self):
+        sample = self.generate_sample()
+        self.segment_samples.append(sample)
 
     def generate_sample(self):
         start_idx = self._get_start_index()

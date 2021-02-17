@@ -1,31 +1,29 @@
+import sys
+
 from data_generation.preference_collector import RewardMaximizingPreferenceCollector
 from data_generation.query_generator import RandomQueryGenerator
-from data_generation.query_selector import RandomQuerySelector
-from data_generation.trajectory_sampling import TrajectorySegmentSampler
+from data_generation.segment_sampler import TrajectorySegmentSampler
+from orchestration.generation_orchestrator import GenerationOrchestrator
 
 
 class PreferenceDataGenerator:
 
-    def __init__(self, trajectory_buffer, segment_length=10):
-        self.segment_sampler = \
-            TrajectorySegmentSampler(trajectory_buffer=trajectory_buffer, segment_length=segment_length)
-        self.query_generator = RandomQueryGenerator()
-        self.query_selector = RandomQuerySelector()
-        self.preference_collector = RewardMaximizingPreferenceCollector()
+    def __init__(self, policy_model, segment_length=10):
+        self.segment_sampler = TrajectorySegmentSampler(policy_model.env.envs[0].trajectory_buffer, segment_length)
+        self.query_generator = RandomQueryGenerator(self.segment_sampler.segment_samples)
+        self.preference_collector = RewardMaximizingPreferenceCollector(self.query_generator.queries)
 
-        self.segment_samples = []
-        self.queries = []
-        self.preferences = []
+        self.policy_model = policy_model
+        self.orchestrator = GenerationOrchestrator(self.segment_sampler, self.query_generator,
+                                                   self.preference_collector)
 
-    def generate_sample(self):
-        sample = self.segment_sampler.generate_sample()
-        self.segment_samples.append(sample)
+    def generate(self, k, sampling_interval, query_interval):
+        self.clear_generated_data()
+        callbacks = self.orchestrator.create_callbacks(k, sampling_interval, query_interval)
+        self.policy_model.learn(total_timesteps=sys.maxsize, callback=callbacks)
+        return self.preference_collector.preferences
 
-    def generate_query(self):
-        query = self.query_generator.generate_query(self.segment_samples)
-        self.queries.append(query)
-
-    def collect_preference(self):
-        query = self.query_selector.select_query(self.queries)
-        preference = self.preference_collector.collect_preference(query)
-        self.preferences.append(preference)
+    def clear_generated_data(self):
+        self.segment_sampler.segment_samples.clear()
+        self.query_generator.queries.clear()
+        self.preference_collector.preferences.clear()

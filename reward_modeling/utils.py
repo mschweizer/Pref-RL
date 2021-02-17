@@ -2,29 +2,37 @@ import numpy as np
 import torch
 
 
+def get_flattened_input_length(num_stacked_frames, env):
+    return num_stacked_frames * get_flattened_experience_length(env)
+
+
+def get_flattened_experience_length(env):
+    return get_flattened_action_space_length(env) + get_flattened_observation_space_length(env)
+
+
+def get_flattened_observation_space_length(env):
+    return int(np.prod(env.observation_space.shape))
+
+
+def get_flattened_action_space_length(env):
+    return int(np.prod(env.action_space.shape))
+
+
 class Preprocessor:
     def __init__(self, env, num_stacked_frames):
         self.env = env
         self.num_stacked_frames = num_stacked_frames
 
-    def prepare_data(self, prediction_buffer):
+    def prepare_data(self, prediction_context):
         data = self.create_empty_data_array()
-        for i, experience in enumerate(reversed(prediction_buffer)):
+        for i, experience in enumerate(reversed(prediction_context)):
             experience = self.convert_experience_to_array(experience)
             data = self.add_experience(data, experience, i)
         return data
 
     def create_empty_data_array(self):
-        return torch.zeros(self.get_flattened_input_length(), dtype=torch.float32)
-
-    def add_experience(self, data, experience_array, i):
-        experience_length = self.get_flattened_experience_length()
-        if i == 0:
-            data[-experience_length:] = experience_array
-        else:
-            data[-(i + 1) * experience_length:-i * experience_length] = experience_array
-
-        return data
+        return torch.zeros(get_flattened_input_length(num_stacked_frames=self.num_stacked_frames, env=self.env),
+                           dtype=torch.float32)
 
     def convert_experience_to_array(self, experience):
         observation = self.convert_observation_to_array(experience.observation)
@@ -45,14 +53,11 @@ class Preprocessor:
     def combine_arrays(observation, action):
         return torch.from_numpy(np.hstack((observation, action)))
 
-    def get_flattened_input_length(self):
-        return self.num_stacked_frames * self.get_flattened_experience_length()
+    def add_experience(self, data, experience_array, i):
+        experience_length = get_flattened_experience_length(env=self.env)
+        if i == 0:
+            data[-experience_length:] = experience_array
+        else:
+            data[-(i + 1) * experience_length:-i * experience_length] = experience_array
 
-    def get_flattened_experience_length(self):
-        return self.get_flattened_action_space_length() + self.get_flattened_observation_space_length()
-
-    def get_flattened_observation_space_length(self):
-        return int(np.prod(self.env.observation_space.shape))
-
-    def get_flattened_action_space_length(self):
-        return int(np.prod(self.env.action_space.shape))
+        return data

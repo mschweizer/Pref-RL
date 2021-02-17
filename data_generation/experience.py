@@ -10,9 +10,9 @@ class ExperienceBuffer:
 
 
 class PredictionBuffer(ExperienceBuffer):
-    def __init__(self, size, prediction_stack_depth):
+    def __init__(self, size, num_stacked_frames):
         super().__init__(size)
-        self.prediction_stack_depth = prediction_stack_depth
+        self.prediction_stack_depth = num_stacked_frames
 
     @property
     def prediction_context(self):

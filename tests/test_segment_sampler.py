@@ -1,15 +1,17 @@
-from data_generation.experience import ExperienceBuffer
+from unittest.mock import Mock
+
+from data_generation.experience import ExperienceBuffer, Experience
 
 
-def test_segment_sampler_samples_subsegment(learning_agent):
-    buffer = learning_agent.learning_orchestrator.preference_data_generator.segment_sampler.trajectory_buffer
-    learning_agent.learning_orchestrator.preference_data_generator.segment_sampler.segment_length = 2
+def test_samples_subsegment(segment_sampler):
+    buffer = segment_sampler.trajectory_buffer
+    segment_sampler.segment_length = 2
 
     buffer.append(1)
     buffer.append(2)
     buffer.append(3)
 
-    segment = learning_agent.learning_orchestrator.preference_data_generator.segment_sampler.generate_sample()
+    segment = segment_sampler.generate_sample()
 
     def segment_is_subsegment_of_buffered_experiences(sample_segment):
         first_experience = sample_segment[0]
@@ -23,13 +25,11 @@ def test_segment_sampler_samples_subsegment(learning_agent):
     assert segment_is_subsegment_of_buffered_experiences(segment)
 
 
-def test_sampled_segment_has_correct_length(learning_agent):
+def test_sampled_segment_has_correct_length(segment_sampler):
     buffer = ExperienceBuffer(size=3)
     buffer.append(1)
     buffer.append(2)
     buffer.append(3)
-
-    segment_sampler = learning_agent.learning_orchestrator.preference_data_generator.segment_sampler
 
     segment_sampler.trajectory_buffer = buffer
     segment_sampler.segment_length = 1
@@ -45,3 +45,13 @@ def test_sampled_segment_has_correct_length(learning_agent):
     assert len(segment_len_0) == 0
     assert len(segment_len_1) == 1
     assert len(segment_len_2) == 2
+
+
+def test_saves_sampled_trajectory_segment(segment_sampler):
+    trajectory_segment = [Experience(1), Experience(2)]
+
+    segment_sampler.generate_sample = Mock(return_value=trajectory_segment)
+
+    segment_sampler.save_sample()
+
+    assert trajectory_segment in segment_sampler.segment_samples

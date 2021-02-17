@@ -29,19 +29,6 @@ def test_prepare_data(env):
     assert np.array_equal(prepared_data, np.hstack([observation1.ravel(), action1, observation2.ravel(), action2]))
 
 
-def test_get_flattened_lengths():
-    env = Mock()
-    env.action_space.shape = ()
-    env.observation_space.shape = 4
-
-    preprocessor = Preprocessor(env, num_stacked_frames=2)
-
-    assert preprocessor.get_flattened_action_space_length() == 1
-    assert preprocessor.get_flattened_observation_space_length() == 4
-    assert preprocessor.get_flattened_experience_length() == 5
-    assert preprocessor.get_flattened_input_length() == 10
-
-
 def test_combine_arrays(preprocessor):
     observation = np.array([1, 2, 3, 4])
     action = 5

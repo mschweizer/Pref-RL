@@ -1,28 +1,47 @@
-import random
 from abc import ABC, abstractmethod
+
+from data_generation.preference_label import PreferenceLabel
+from data_generation.query_selector import RandomQuerySelector
 
 
 class PreferenceCollector(ABC):
 
+    def __init__(self, queries):
+        self.queries = queries
+        self.query_selector = RandomQuerySelector()
+        self.preferences = []
+
+    def save_preference(self):
+        query = self.query_selector.select_query(self.queries)
+        preference = self.collect_preference(query)
+        self.preferences.append((query, preference))
+
     @abstractmethod
     def collect_preference(self, query):
-        """Returns query elements in preferred order (from most to least preferred)."""
+        """Returns preference (enum)"""
 
 
 class RandomPreferenceCollector(PreferenceCollector):
 
     def collect_preference(self, query):
-        random.shuffle(query)
-        return query
+        return PreferenceLabel.random()
 
 
 class RewardMaximizingPreferenceCollector(PreferenceCollector):
 
     def collect_preference(self, query):
-        segment_1 = query[0]
-        segment_2 = query[1]
+        reward_1, reward_2 = self.compute_total_rewards(query)
+        return self.compute_preference(reward_1, reward_2)
 
-        reward_1 = sum(experience.info["original_reward"] for experience in segment_1)
-        reward_2 = sum(experience.info["original_reward"] for experience in segment_2)
+    @staticmethod
+    def compute_total_rewards(query):
+        return (sum(experience.info["original_reward"] for experience in segment) for segment in query)
 
-        return [segment_1, segment_2] if reward_1 >= reward_2 else [segment_2, segment_1]
+    @staticmethod
+    def compute_preference(reward_1, reward_2):
+        if reward_1 > reward_2:
+            return PreferenceLabel.LEFT
+        elif reward_1 < reward_2:
+            return PreferenceLabel.RIGHT
+        else:
+            return PreferenceLabel.INDIFFERENT
