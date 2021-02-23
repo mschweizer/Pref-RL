@@ -1,4 +1,4 @@
-from stable_baselines3 import PPO
+from stable_baselines3 import A2C
 
 from data_generation.preference_data_generator import PreferenceDataGenerator
 from reward_modeling.preference_dataset import PreferenceDataset
@@ -16,7 +16,7 @@ class LearningAgent:
             self.reward_model.load_state_dict(model_parameters)
         self.env = RewardWrapper(env=env, reward_model=self.reward_model, trajectory_buffer_size=trajectory_buffer_size,
                                  num_stacked_frames=num_stacked_frames)
-        self.policy_model = PPO('MlpPolicy', env=self.env, n_steps=simulation_steps_per_policy_update)
+        self.policy_model = A2C('MlpPolicy', env=self.env, n_steps=simulation_steps_per_policy_update)
         self.preference_data_generator = PreferenceDataGenerator(policy_model=self.policy_model,
                                                                  segment_length=segment_length)
         self.reward_learner = RewardTrainer(reward_model=self.reward_model)
