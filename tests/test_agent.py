@@ -46,7 +46,7 @@ def test_agent_chooses_valid_action(env):
 
 
 def test_agent_learns_policy_for_given_environment(env):
-    with patch('agent.PPO'):
+    with patch('agent.A2C'):
         agent = LearningAgent(env, num_stacked_frames=4)
         agent.learn_policy(1000)
 
