@@ -1,8 +1,15 @@
 from unittest.mock import Mock
 
+import pytest
+
 from data_generation.experience import Experience
 from data_generation.preference_collector import RewardMaximizingPreferenceCollector
 from data_generation.preference_label import PreferenceLabel
+
+
+@pytest.fixture()
+def preference_collector():
+    return RewardMaximizingPreferenceCollector(queries=[])
 
 
 def test_reward_maximizing_collector_prefers_higher_reward():

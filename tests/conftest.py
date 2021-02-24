@@ -1,16 +1,12 @@
 import gym
 import pytest
 import torch.utils.data
-from stable_baselines3 import PPO
+from stable_baselines3 import A2C
 
 from agent import LearningAgent
-from data_generation.experience import Experience, PredictionBuffer, ExperienceBuffer
-from data_generation.preference_collector import RewardMaximizingPreferenceCollector
+from data_generation.experience import Experience, PredictionBuffer
 from data_generation.preference_data_generator import PreferenceDataGenerator
 from data_generation.preference_label import PreferenceLabel
-from data_generation.query_generator import RandomQueryGenerator
-from data_generation.segment_sampler import TrajectorySegmentSampler
-from orchestration.generation_orchestrator import GenerationOrchestrator
 from reward_modeling.preference_dataset import PreferenceDataset
 from reward_modeling.reward_model import RewardModel, ChoiceModel
 from reward_modeling.reward_predictor import RewardPredictor
@@ -66,12 +62,6 @@ def segment_samples():
 
 
 @pytest.fixture()
-def generation_orchestrator(segment_sampler, query_generator, preference_collector):
-    return GenerationOrchestrator(segment_sampler=segment_sampler, query_generator=query_generator,
-                                  preference_collector=preference_collector)
-
-
-@pytest.fixture()
 def preference_data_generator(policy_model):
     return PreferenceDataGenerator(policy_model=policy_model, segment_length=3)
 
@@ -82,23 +72,8 @@ def preprocessor(env):
 
 
 @pytest.fixture()
-def segment_sampler():
-    return TrajectorySegmentSampler(ExperienceBuffer(size=10), segment_length=5)
-
-
-@pytest.fixture()
-def query_generator():
-    return RandomQueryGenerator(segment_samples=[])
-
-
-@pytest.fixture()
-def preference_collector():
-    return RewardMaximizingPreferenceCollector(queries=[])
-
-
-@pytest.fixture()
 def policy_model(reward_wrapper):
-    return PPO('MlpPolicy', env=reward_wrapper, n_steps=10)
+    return A2C('MlpPolicy', env=reward_wrapper, n_steps=10)
 
 
 @pytest.fixture()

@@ -1,6 +1,13 @@
 from unittest.mock import Mock
 
+import pytest
+
 from data_generation.query_generator import RandomQueryGenerator
+
+
+@pytest.fixture()
+def query_generator():
+    return RandomQueryGenerator(segment_samples=[])
 
 
 def test_query_generator_generates_valid_preference_query():
