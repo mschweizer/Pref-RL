@@ -2,7 +2,14 @@ import torch
 
 
 def test_training_has_effect_on_all_model_parameters(reward_trainer, preference_dataset):
+    """
+    Testing whether parameters change uses code from  / is based on
+    https://github.com/suriyadeepan/torchtest/blob/66a2c8b669aa23601f64e208463e9449ffc135da/torchtest/torchtest.py#L106
+    """
+
+    # TODO: Clarify if the following modifications to torch have an effect on other tests
     torch.manual_seed(42)
+    torch.set_deterministic(d=True)
 
     params = [param for param in reward_trainer.choice_model.named_parameters() if param[1].requires_grad]
     initial_params = [(name, param.clone()) for (name, param) in params]

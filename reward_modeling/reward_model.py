@@ -32,7 +32,8 @@ class ChoiceModel(nn.Module):
         return self.compute_choice_probability(total_rewards)
 
     def sum_segment_rewards(self, query):
-        rewards = self.reward_model(query.reshape(-1, 20))
+        input_dimension = query.shape[3]
+        rewards = self.reward_model(query.reshape(-1, input_dimension))
         original_shape = query.shape[:3]  # only first three dimensions of original shape because rewards are scalar
         return rewards.reshape(original_shape).sum(axis=2)
 

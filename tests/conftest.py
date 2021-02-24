@@ -19,9 +19,10 @@ from reward_modeling.reward_wrapper import RewardWrapper
 from reward_modeling.utils import Preprocessor, get_flattened_input_length
 
 
-@pytest.fixture()
-def env():
-    return gym.make('CartPole-v1')
+@pytest.fixture(params=('CartPole-v1', 'Pong-v0'))
+def env(request):
+    env_id = request.param
+    return gym.make(env_id)
 
 
 @pytest.fixture()
@@ -121,7 +122,7 @@ def preference_dataset(preferences, env):
 
 
 @pytest.fixture()
-def preference_data_loader(preference_dataset, env):
+def preference_data_loader(preference_dataset):
     return torch.utils.data.DataLoader(dataset=preference_dataset, batch_size=2)
 
 

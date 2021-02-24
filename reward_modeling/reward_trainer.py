@@ -9,7 +9,7 @@ from reward_modeling.reward_model import ChoiceModel
 class RewardTrainer:
     def __init__(self, reward_model):
         self.choice_model = ChoiceModel(reward_model)
-        self.optimizer = optim.Adam(self.choice_model.parameters())
+        self.optimizer = optim.Adam(self.choice_model.parameters(), lr=100000)  # TODO: Make learning rate a param
         self.criterion = F.binary_cross_entropy
 
     def train(self, preference_dataset):
