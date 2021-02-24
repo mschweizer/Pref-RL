@@ -19,6 +19,11 @@ from reward_modeling.reward_wrapper import RewardWrapper
 from reward_modeling.utils import Preprocessor, get_flattened_input_length
 
 
+@pytest.fixture()
+def cartpole_env():
+    return gym.make('CartPole-v1')
+
+
 @pytest.fixture(params=('CartPole-v1', 'Pong-v0'))
 def env(request):
     env_id = request.param

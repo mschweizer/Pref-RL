@@ -1,14 +1,8 @@
 from unittest.mock import patch
 
 import gym
-import pytest
 
 from agent import LearningAgent
-
-
-@pytest.fixture()
-def cartpole_env():
-    return gym.make('CartPole-v1')
 
 
 def test_agent_chooses_action(cartpole_env):
