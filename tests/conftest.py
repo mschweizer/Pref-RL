@@ -1,18 +1,14 @@
 import gym
 import pytest
-import torch.utils.data
 from stable_baselines3 import A2C
 
 from agent import LearningAgent
-from data_generation.experience import Experience, PredictionBuffer
+from data_generation.experience import Experience
 from data_generation.preference_data_generator import PreferenceDataGenerator
 from data_generation.preference_label import PreferenceLabel
-from reward_modeling.preference_dataset import PreferenceDataset
 from reward_modeling.reward_model import RewardModel, ChoiceModel
-from reward_modeling.reward_predictor import RewardPredictor
-from reward_modeling.reward_trainer import RewardTrainer
 from reward_modeling.reward_wrapper import RewardWrapper
-from reward_modeling.utils import Preprocessor, get_flattened_input_length
+from reward_modeling.utils import get_flattened_input_length
 
 
 @pytest.fixture()
@@ -27,22 +23,13 @@ def env(request):
 
 
 @pytest.fixture()
-def reward_predictor(env):
-    num_stacked_frames = 2
-    reward_model = RewardModel(get_flattened_input_length(num_stacked_frames, env))
-
-    return RewardPredictor(env, trajectory_buffer=PredictionBuffer(size=2, num_stacked_frames=4),
-                           num_stacked_frames=num_stacked_frames, reward_model=reward_model)
+def reward_model(cartpole_env):
+    return RewardModel(get_flattened_input_length(num_stacked_frames=4, env=cartpole_env))
 
 
 @pytest.fixture()
-def reward_model(env):
-    return RewardModel(get_flattened_input_length(num_stacked_frames=4, env=env))
-
-
-@pytest.fixture()
-def reward_wrapper(env, reward_model):
-    return RewardWrapper(env=env, reward_model=reward_model, trajectory_buffer_size=100, num_stacked_frames=4)
+def reward_wrapper(cartpole_env, reward_model):
+    return RewardWrapper(env=cartpole_env, reward_model=reward_model, trajectory_buffer_size=100, num_stacked_frames=4)
 
 
 @pytest.fixture()
@@ -67,50 +54,24 @@ def preference_data_generator(policy_model):
 
 
 @pytest.fixture()
-def preprocessor(env):
-    return Preprocessor(env, num_stacked_frames=4)
-
-
-@pytest.fixture()
 def policy_model(reward_wrapper):
     return A2C('MlpPolicy', env=reward_wrapper, n_steps=10)
 
 
 @pytest.fixture()
-def trajectory_segment(reward_wrapper):
-    reward_wrapper.reset()
-    for i in range(15):
-        reward_wrapper.step(reward_wrapper.action_space.sample())
-
-    return reward_wrapper.trajectory_buffer.experiences[-12:]
-
-
-@pytest.fixture()
-def preference(trajectory_segment):
-    query = [trajectory_segment[:6], trajectory_segment[6:]]
+def preference(env):
+    # TODO: Return a fixed segment (without running the env!) to make it faster and deterministic
+    segment_length = 6
+    experiences = []
+    env.reset()
+    for i in range(segment_length * 2):
+        action = env.action_space.sample()
+        observation, reward, done, info = env.step(action)
+        experiences.append(Experience(observation, action, reward, done, info))
+    query = [experiences[:segment_length], experiences[segment_length:]]
     return query, PreferenceLabel.LEFT
-
-
-@pytest.fixture()
-def preferences(preference):
-    return [preference, preference, preference]
-
-
-@pytest.fixture()
-def preference_dataset(preferences, env):
-    return PreferenceDataset(preferences=preferences, env=env, num_stacked_frames=4)
-
-
-@pytest.fixture()
-def preference_data_loader(preference_dataset):
-    return torch.utils.data.DataLoader(dataset=preference_dataset, batch_size=2)
 
 
 @pytest.fixture()
 def choice_model(reward_model):
     return ChoiceModel(reward_model)
-
-
-@pytest.fixture()
-def reward_trainer(reward_model):
-    return RewardTrainer(reward_model)

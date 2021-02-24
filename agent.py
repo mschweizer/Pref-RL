@@ -28,7 +28,8 @@ class LearningAgent:
         self.policy_model.learn(total_timesteps)
 
     def learn_reward_model(self, sampling_interval=30, query_interval=50):
-        preferences = self.preference_data_generator.generate(k=1000, sampling_interval=sampling_interval,
+        preferences = self.preference_data_generator.generate(generation_volume=1000,
+                                                              sampling_interval=sampling_interval,
                                                               query_interval=query_interval)
         preference_dataset = PreferenceDataset(preferences=preferences, env=self.env, num_stacked_frames=4)
         self.reward_learner.train(preference_dataset)

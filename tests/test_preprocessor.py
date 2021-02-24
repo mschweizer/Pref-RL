@@ -2,13 +2,23 @@ from unittest.mock import Mock
 
 import gym
 import numpy as np
+import pytest
 import torch
 
 from data_generation.experience import Experience
 from reward_modeling.utils import Preprocessor
 
 
-def test_prepare_data(env):
+@pytest.fixture()
+def preprocessor(cartpole_env):
+    return Preprocessor(cartpole_env, num_stacked_frames=4)
+
+
+def test_prepare_data():
+    env = Mock(spec_set=gym.Env)
+    env.observation_space.shape = tuple([2, 3])
+    env.action_space.shape = tuple()
+
     preprocessor = Preprocessor(env, num_stacked_frames=2)
 
     observation1 = np.array([(111., 112., 113.), (121., 122., 123.)])
@@ -20,9 +30,6 @@ def test_prepare_data(env):
     experience2 = Experience(observation=observation2, action=action2)
 
     prediction_buffer = [experience1, experience2]
-
-    preprocessor.env.observation_space.shape = tuple([2, 3])
-    preprocessor.env.action_space.shape = tuple()
 
     prepared_data = preprocessor.prepare_data(prediction_buffer)
 
