@@ -17,9 +17,9 @@ class PreferenceDataGenerator:
         self.orchestrator = GenerationOrchestrator(self.segment_sampler, self.query_generator,
                                                    self.preference_collector)
 
-    def generate(self, k, sampling_interval, query_interval):
+    def generate(self, generation_volume, sampling_interval, query_interval):
         self.clear_generated_data()
-        callbacks = self.orchestrator.create_callbacks(k, sampling_interval, query_interval)
+        callbacks = self.orchestrator.create_callbacks(generation_volume, sampling_interval, query_interval)
         self.policy_model.learn(total_timesteps=sys.maxsize, callback=callbacks)
         return self.preference_collector.preferences
 

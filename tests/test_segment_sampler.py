@@ -1,6 +1,14 @@
 from unittest.mock import Mock
 
+import pytest
+
 from data_generation.experience import ExperienceBuffer, Experience
+from data_generation.segment_sampler import TrajectorySegmentSampler
+
+
+@pytest.fixture()
+def segment_sampler():
+    return TrajectorySegmentSampler(ExperienceBuffer(size=10), segment_length=5)
 
 
 def test_samples_subsegment(segment_sampler):

@@ -1,5 +1,29 @@
 from unittest.mock import Mock
 
+import pytest
+from stable_baselines3 import A2C
+
+from data_generation.experience import ExperienceBuffer
+from data_generation.preference_collector import RewardMaximizingPreferenceCollector
+from data_generation.query_generator import RandomQueryGenerator
+from data_generation.segment_sampler import TrajectorySegmentSampler
+from orchestration.generation_orchestrator import GenerationOrchestrator
+
+
+@pytest.fixture()
+def generation_orchestrator():
+    segment_sampler = TrajectorySegmentSampler(ExperienceBuffer(size=10), segment_length=5)
+    query_generator = RandomQueryGenerator(segment_samples=[])
+    preference_collector = RewardMaximizingPreferenceCollector(queries=[])
+
+    return GenerationOrchestrator(segment_sampler=segment_sampler, query_generator=query_generator,
+                                  preference_collector=preference_collector)
+
+
+@pytest.fixture()
+def policy_model(cartpole_env):
+    return A2C('MlpPolicy', env=cartpole_env, n_steps=10)
+
 
 def test_samples_trajectory_segment_every_sampling_interval(generation_orchestrator, policy_model):
     sample_mock = Mock()

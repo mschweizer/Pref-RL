@@ -32,10 +32,10 @@ class SampleTrajectoryCallback(BaseCallback):
 
 class CollectPreferenceCallback(BaseCallback):
 
-    def __init__(self, preference_collector, k=None, verbose=1):
+    def __init__(self, preference_collector, generation_volume=None, verbose=1):
         super().__init__(verbose)
         self.preference_collector = preference_collector
-        self.k = k
+        self.generation_volume = generation_volume
 
     def _on_step(self) -> bool:
         try:
@@ -43,7 +43,7 @@ class CollectPreferenceCallback(BaseCallback):
         except IndexError as e:
             logging.warning("Preference collection failed. There are currently no preference queries available. "
                             "Original error message: " + str(e))
-        if self.k and len(self.preference_collector.preferences) >= self.k:
+        if self.generation_volume and len(self.preference_collector.preferences) >= self.generation_volume:
             return False
         else:
             return True

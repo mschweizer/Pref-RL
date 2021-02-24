@@ -9,7 +9,7 @@ class GenerationOrchestrator:
         self.query_generator = query_generator
         self.preference_collector = preference_collector
 
-    def create_callbacks(self, k=None, sampling_interval=30, query_interval=50):
+    def create_callbacks(self, generation_volume=None, sampling_interval=30, query_interval=50):
         callbacks = []
 
         sample_trajectory = SampleTrajectoryCallback(self.segment_sampler)
@@ -21,7 +21,7 @@ class GenerationOrchestrator:
         # TODO: create separate "generate query interval"
         callbacks.append(query_callback)
 
-        collect_preference = CollectPreferenceCallback(self.preference_collector, k)
+        collect_preference = CollectPreferenceCallback(self.preference_collector, generation_volume)
         collection_callback = EveryNTimesteps(n_steps=query_interval, callback=collect_preference)
         callbacks.append(collection_callback)
 
