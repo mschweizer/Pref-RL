@@ -3,7 +3,7 @@ import torch.nn.functional as F
 import torch.optim as optim
 import torch.utils.data
 
-from reward_modeling.reward_model import ChoiceModel
+from reward_modeling.choice_model import ChoiceModel
 
 
 class RewardTrainer:

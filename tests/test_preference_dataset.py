@@ -1,7 +1,7 @@
+import numpy as np
 import torch.utils.data
 
 from reward_modeling.preference_dataset import PreferenceDataset
-from reward_modeling.utils import get_flattened_input_length
 
 
 def test_has_correct_format(preference, env):
@@ -13,15 +13,12 @@ def test_has_correct_format(preference, env):
     segment = query_set[0]
     segment_length = len(segment)
 
-    num_stacked_frames = 4
-    input_length = get_flattened_input_length(num_stacked_frames, env)
-
     preferences = [preference, preference, preference]
 
-    data = PreferenceDataset(preferences=preferences, env=env, num_stacked_frames=num_stacked_frames)
+    data = PreferenceDataset(preferences=preferences)
     loader = torch.utils.data.DataLoader(dataset=data, batch_size=batch_size)
 
     batch_iterator = iter(loader)
     queries, _ = next(batch_iterator)
 
-    assert queries.shape == (batch_size, query_set_size, segment_length, input_length)
+    assert np.all(queries.shape == np.hstack([batch_size, query_set_size, segment_length, env.observation_space.shape]))
