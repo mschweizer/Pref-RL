@@ -18,6 +18,7 @@ def reward_trainer(env):
     return RewardTrainer(reward_model)
 
 
+@pytest.mark.skip(reason="Behavior is currently not deterministic. See issue #26")
 def test_training_has_effect_on_all_model_parameters(reward_trainer, preference_dataset):
     """
     Testing whether parameters change uses code from  / is based on
