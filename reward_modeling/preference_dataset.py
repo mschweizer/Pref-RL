@@ -1,13 +1,9 @@
 import numpy as np
 import torch.utils.data
 
-from reward_modeling.utils import Preprocessor
-
 
 class PreferenceDataset(torch.utils.data.Dataset):
-    def __init__(self, preferences, env, num_stacked_frames):
-        self.num_stacked_frames = num_stacked_frames
-        self.preprocessor = Preprocessor(env, num_stacked_frames=num_stacked_frames)
+    def __init__(self, preferences):
         self.queries = self.prepare_queries(preferences)
         self.answers = self.prepare_answers(preferences)
 
@@ -31,22 +27,6 @@ class PreferenceDataset(torch.utils.data.Dataset):
     def prepare_query(self, query):
         return [self.prepare_segment(query[0]), self.prepare_segment(query[1])]
 
-    def prepare_segment(self, segment):
-        frame_stacks = []
-
-        for i in range(len(segment)):
-            frame_stack = self.get_frames(segment, i)
-            frame_stacks.append(self.prepare_frame_stack(frame_stack))
-
-        return frame_stacks
-
-    def get_frames(self, segment, i):
-        segment_length = len(segment)
-
-        start_idx = -(segment_length - 1 + self.num_stacked_frames) + i
-        end_idx = -(segment_length - 1) + i
-
-        return segment[start_idx:end_idx]
-
-    def prepare_frame_stack(self, frame_stack):
-        return self.preprocessor.prepare_data(frame_stack).numpy()
+    @staticmethod
+    def prepare_segment(segment):
+        return [experience.observation for experience in segment]

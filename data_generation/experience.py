@@ -9,16 +9,6 @@ class ExperienceBuffer:
             del self.experiences[0]
 
 
-class PredictionBuffer(ExperienceBuffer):
-    def __init__(self, size, num_stacked_frames):
-        super().__init__(size)
-        self.prediction_stack_depth = num_stacked_frames
-
-    @property
-    def prediction_context(self):
-        return self.experiences[-self.prediction_stack_depth:]
-
-
 class Experience:
     def __init__(self, observation, action=None, reward=None, done=None, info=None):
         self.action = action

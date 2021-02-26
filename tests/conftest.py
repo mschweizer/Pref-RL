@@ -1,4 +1,3 @@
-import gym
 import pytest
 from stable_baselines3 import A2C
 
@@ -6,36 +5,35 @@ from agent import LearningAgent
 from data_generation.experience import Experience
 from data_generation.preference_data_generator import PreferenceDataGenerator
 from data_generation.preference_label import PreferenceLabel
-from reward_modeling.reward_model import RewardModel, ChoiceModel
+from environment import create_env
+from reward_modeling.choice_model import ChoiceModel
+from reward_modeling.reward_model import RewardModel
 from reward_modeling.reward_wrapper import RewardWrapper
-from reward_modeling.utils import get_flattened_input_length
 
 
 @pytest.fixture()
 def cartpole_env():
-    return gym.make('CartPole-v1')
+    return create_env('CartPole-v1')
 
 
 @pytest.fixture(params=('CartPole-v1', 'Pong-v0'))
 def env(request):
-    env_id = request.param
-    return gym.make(env_id)
+    return create_env(env_id=request.param)
 
 
 @pytest.fixture()
 def reward_model(cartpole_env):
-    return RewardModel(get_flattened_input_length(num_stacked_frames=4, env=cartpole_env))
+    return RewardModel(cartpole_env)
 
 
 @pytest.fixture()
 def reward_wrapper(cartpole_env, reward_model):
-    return RewardWrapper(env=cartpole_env, reward_model=reward_model, trajectory_buffer_size=100, num_stacked_frames=4)
+    return RewardWrapper(env=cartpole_env, reward_model=reward_model, trajectory_buffer_size=100)
 
 
 @pytest.fixture()
 def learning_agent(reward_wrapper):
-    return LearningAgent(reward_wrapper, segment_length=4, num_stacked_frames=4,
-                         simulation_steps_per_policy_update=5)
+    return LearningAgent(reward_wrapper, segment_length=4, simulation_steps_per_policy_update=5)
 
 
 @pytest.fixture()
