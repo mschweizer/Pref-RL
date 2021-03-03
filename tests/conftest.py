@@ -5,7 +5,7 @@ from agent import LearningAgent
 from data_generation.experience import Experience
 from data_generation.preference_data_generator import PreferenceDataGenerator
 from data_generation.preference_label import PreferenceLabel
-from environment import create_env
+from environment.utils import create_env
 from reward_modeling.choice_model import ChoiceModel
 from reward_modeling.reward_model import RewardModel
 from reward_modeling.reward_wrapper import RewardWrapper
@@ -13,12 +13,12 @@ from reward_modeling.reward_wrapper import RewardWrapper
 
 @pytest.fixture()
 def cartpole_env():
-    return create_env('CartPole-v1')
+    return create_env('CartPole-v1', termination_penalty=0)
 
 
 @pytest.fixture(params=('CartPole-v1', 'Pong-v0'))
 def env(request):
-    return create_env(env_id=request.param)
+    return create_env(env_id=request.param, termination_penalty=0)
 
 
 @pytest.fixture()

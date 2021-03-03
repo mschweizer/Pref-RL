@@ -17,8 +17,8 @@ class GenerationOrchestrator:
         callbacks.append(sample_callback)
 
         generate_query = GenerateQueryCallback(self.query_generator)
-        query_callback = EveryNTimesteps(n_steps=query_interval, callback=generate_query)
         # TODO: create separate "generate query interval"
+        query_callback = EveryNTimesteps(n_steps=query_interval, callback=generate_query)
         callbacks.append(query_callback)
 
         collect_preference = CollectPreferenceCallback(self.preference_collector, generation_volume)
