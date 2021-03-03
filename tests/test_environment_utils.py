@@ -2,7 +2,7 @@ import gym
 import numpy as np
 from stable_baselines3.common.atari_wrappers import AtariWrapper
 
-from environment import wrap_env, is_atari_env, is_wrapped, create_env
+from environment.utils import wrap_env, create_env, is_atari_env, is_wrapped
 
 
 def test_converts_to_stacked_env():

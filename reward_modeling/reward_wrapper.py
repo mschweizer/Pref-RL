@@ -5,6 +5,8 @@ from gym import Wrapper
 from data_generation.experience import Experience, ExperienceBuffer
 
 
+# TODO: Use gym.core.RewardWrapper instead of custom reward wrapper
+# TODO: Use deque instead of custom experience buffer
 class RewardWrapper(Wrapper):
     def __init__(self, env, reward_model, trajectory_buffer_size):
         super().__init__(env)

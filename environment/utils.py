@@ -22,10 +22,16 @@ def is_atari_env(env):
 
 
 def is_wrapped(env, wrapper_class):
+    # Credit: Based on https://github.com/DLR-RM/stable-baselines3/blob/
+    # 65100a4b040201035487363a396b84ea721eb027/stable_baselines3/common/env_util.py#L27
+    # needed to copy this because original only works with vectorized envs
     return unwrap_wrapper(env, wrapper_class) is not None
 
 
 def unwrap_wrapper(env, wrapper_class):
+    # Credit: Based on https://github.com/DLR-RM/stable-baselines3/blob/
+    # 65100a4b040201035487363a396b84ea721eb027/stable_baselines3/common/env_util.py#L11
+    # needed to copy this because original only works with vectorized envs
     env_tmp = env
     while isinstance(env_tmp, Wrapper):
         if isinstance(env_tmp, wrapper_class):
