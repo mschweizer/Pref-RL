@@ -2,7 +2,7 @@ from unittest.mock import Mock
 
 from gym import Env
 
-from environment.never_done_wrapper import NoIndirectFeedbackWrapper
+from environment.no_indirect_feedback_wrapper import NoIndirectFeedbackWrapper
 from environment.utils import create_env
 
 
@@ -73,7 +73,7 @@ def test_does_not_reset_env_when_episode_continues():
 
 
 def test_does_not_include_life_info():
-    atari_env = create_env('Pong-v0')
+    atari_env = create_env('Pong-v0', termination_penalty=0)
     wrapped_env = NoIndirectFeedbackWrapper(atari_env)
 
     wrapped_env.reset()

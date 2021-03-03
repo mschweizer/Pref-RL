@@ -3,16 +3,19 @@ from gym import Wrapper
 from gym.envs.atari import AtariEnv
 from stable_baselines3.common.atari_wrappers import AtariWrapper
 
+from environment.no_indirect_feedback_wrapper import NoIndirectFeedbackWrapper
 
-def create_env(env_id):
+
+def create_env(env_id, termination_penalty):
     env = gym.make(env_id)
-    env = wrap_env(env)
+    env = wrap_env(env, termination_penalty)
     return env
 
 
-def wrap_env(env, frame_stack_depth=4):
+def wrap_env(env, termination_penalty, frame_stack_depth=4):
     if is_atari_env(env):
         env = AtariWrapper(env, frame_skip=4)
+    env = NoIndirectFeedbackWrapper(env, termination_penalty)
     env = gym.wrappers.FrameStack(env, num_stack=frame_stack_depth)
     return env
 

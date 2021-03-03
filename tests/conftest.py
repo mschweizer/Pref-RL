@@ -13,12 +13,12 @@ from reward_modeling.reward_wrapper import RewardWrapper
 
 @pytest.fixture()
 def cartpole_env():
-    return create_env('CartPole-v1')
+    return create_env('CartPole-v1', termination_penalty=0)
 
 
 @pytest.fixture(params=('CartPole-v1', 'Pong-v0'))
 def env(request):
-    return create_env(env_id=request.param)
+    return create_env(env_id=request.param, termination_penalty=0)
 
 
 @pytest.fixture()
