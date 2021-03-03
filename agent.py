@@ -8,7 +8,7 @@ from reward_modeling.reward_wrapper import RewardWrapper
 
 
 class LearningAgent:
-    def __init__(self, env, segment_length=10, simulation_steps_per_policy_update=2048, trajectory_buffer_size=10,
+    def __init__(self, env, segment_length=25, simulation_steps_per_policy_update=2048, trajectory_buffer_size=10,
                  model_parameters=None):
         self.reward_model = RewardModel(env)
         if model_parameters:

@@ -8,7 +8,7 @@ from orchestration.generation_orchestrator import GenerationOrchestrator
 
 class PreferenceDataGenerator:
 
-    def __init__(self, policy_model, segment_length=10):
+    def __init__(self, policy_model, segment_length=25):
         self.segment_sampler = TrajectorySegmentSampler(policy_model.env.envs[0].trajectory_buffer, segment_length)
         self.query_generator = RandomQueryGenerator(self.segment_sampler.segment_samples)
         self.preference_collector = RewardMaximizingPreferenceCollector(self.query_generator.queries)
