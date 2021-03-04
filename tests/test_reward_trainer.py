@@ -9,7 +9,7 @@ from reward_modeling.reward_trainer import RewardTrainer
 @pytest.fixture()
 def preference_dataset(preference, env):
     preferences = [preference, preference, preference]
-    return PreferenceDataset(preferences=preferences)
+    return PreferenceDataset(capacity=3000, preferences=preferences)
 
 
 @pytest.fixture()
