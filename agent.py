@@ -29,5 +29,5 @@ class LearningAgent:
         preferences = self.preference_data_generator.generate(generation_volume=1000,
                                                               sampling_interval=sampling_interval,
                                                               query_interval=query_interval)
-        preference_dataset = PreferenceDataset(preferences=preferences)
+        preference_dataset = PreferenceDataset(capacity=3000, preferences=preferences)
         self.reward_learner.train(preference_dataset)
