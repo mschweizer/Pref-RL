@@ -6,7 +6,7 @@ from stable_baselines3.common.atari_wrappers import AtariWrapper
 from environment.no_indirect_feedback_wrapper import NoIndirectFeedbackWrapper
 
 
-def create_env(env_id, termination_penalty):
+def create_env(env_id, termination_penalty=0.):
     env = gym.make(env_id)
     env = wrap_env(env, termination_penalty)
     return env

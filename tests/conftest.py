@@ -52,8 +52,8 @@ def preference_data_generator(policy_model):
 
 
 @pytest.fixture()
-def policy_model(reward_wrapper):
-    return A2C('MlpPolicy', env=reward_wrapper, n_steps=10)
+def policy_model(cartpole_env):
+    return A2C('MlpPolicy', env=cartpole_env, n_steps=10)
 
 
 @pytest.fixture()

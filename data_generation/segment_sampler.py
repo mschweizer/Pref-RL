@@ -1,3 +1,5 @@
+import logging
+
 import numpy as np
 
 
@@ -6,6 +8,12 @@ class TrajectorySegmentSampler:
         self.trajectory_buffer = trajectory_buffer
         self.segment_length = segment_length
         self.segment_samples = []
+
+    def try_save_sample(self):
+        try:
+            self.save_sample()
+        except AssertionError as e:
+            logging.warning("Trajectory segment sampling failed. " + str(e))
 
     def save_sample(self):
         sample = self.generate_sample()

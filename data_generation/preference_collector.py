@@ -1,3 +1,4 @@
+import logging
 from abc import ABC, abstractmethod
 
 from data_generation.preference_label import PreferenceLabel
@@ -10,6 +11,13 @@ class PreferenceCollector(ABC):
         self.queries = queries
         self.query_selector = RandomQuerySelector()
         self.preferences = []
+
+    def try_save_preference(self):
+        try:
+            self.save_preference()
+        except IndexError as e:
+            logging.warning("Preference collection failed. There are no preference queries available. "
+                            "Original error message: " + str(e))
 
     def save_preference(self):
         query = self.query_selector.select_query(self.queries)
