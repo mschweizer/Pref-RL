@@ -22,8 +22,7 @@ def test_generates_k_preferences(preference_data_generator, training):
         preference_data_generator.policy_model.learn = Mock()
 
     generation_volume = 2
-    preferences = preference_data_generator.generate(generation_volume=generation_volume, sampling_interval=2,
-                                                     query_interval=2, with_training=training)
+    preferences = preference_data_generator.generate(generation_volume=generation_volume, with_training=training)
     if not training:
         preference_data_generator.policy_model.learn.assert_not_called()
 

@@ -25,10 +25,7 @@ def test_fill_dataset(reward_wrapper):
     reward_trainer = RewardModelTrainer(policy_model=policy_model, reward_model=reward_wrapper.reward_model,
                                         segment_length=1)
 
-    reward_trainer.fill_dataset(generation_volume=generation_volume,
-                                sampling_interval=1,
-                                query_interval=1,
-                                with_training=False)
+    reward_trainer.fill_dataset(generation_volume=generation_volume, with_training=False)
 
     assert len(reward_trainer.preference_dataset) == generation_volume
 
