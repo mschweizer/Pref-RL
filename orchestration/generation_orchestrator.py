@@ -9,7 +9,7 @@ class GenerationOrchestrator:
         self.query_generator = query_generator
         self.preference_collector = preference_collector
 
-    def create_callbacks(self, generation_volume=None, sampling_interval=30, query_interval=50):
+    def create_callbacks(self, generation_volume=3000, sampling_interval=30, query_interval=50):
         callbacks = []
 
         sample_trajectory = SampleTrajectoryCallback(self.segment_sampler)

@@ -10,6 +10,8 @@ class PreferenceDataGenerator:
 
     def __init__(self, policy_model, segment_length=25):
         trajectory_buffer = policy_model.env.envs[0].trajectory_buffer
+        assert segment_length <= trajectory_buffer.size, \
+            "Desired segment sample length is longer than trajectory buffer."
         self.segment_sampler = TrajectorySegmentSampler(trajectory_buffer, segment_length)
         self.query_generator = RandomQueryGenerator(self.segment_sampler.segment_samples)
         self.preference_collector = RewardMaximizingPreferenceCollector(self.query_generator.queries)
@@ -34,7 +36,7 @@ class PreferenceDataGenerator:
         num_timesteps = 0
 
         obs = self.policy_model.env.reset()
-        while num_timesteps < sys.maxsize:
+        while True:
             action, _states = self.policy_model.predict(obs)
             _, _, done, _ = self.policy_model.env.step(action)
             if done:
@@ -46,6 +48,7 @@ class PreferenceDataGenerator:
                 self.preference_collector.try_save_preference()
             if generation_volume and len(self.preference_collector.preferences) >= generation_volume:
                 break
+            num_timesteps += 1
 
     def clear(self):
         self.segment_sampler.segment_samples.clear()

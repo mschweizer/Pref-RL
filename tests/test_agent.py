@@ -1,5 +1,3 @@
-from unittest.mock import patch
-
 import gym
 
 from agent import LearningAgent
@@ -26,14 +24,6 @@ def test_agent_chooses_valid_action(cartpole_env):
 
     assert cartpole_env.action_space.contains(cartpole_action[0])
     assert mountaincar_env.action_space.contains(mountaincar_action[0])
-
-
-def test_agent_learns_policy_for_given_environment(cartpole_env):
-    with patch('agent.A2C'):
-        agent = LearningAgent(cartpole_env)
-        agent.learn_policy(1000)
-
-        agent.policy_model.learn.assert_called()
 
 
 def test_agent_sets_sufficient_trajectory_buffer_length(cartpole_env):
