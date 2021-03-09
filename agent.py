@@ -22,16 +22,12 @@ class LearningAgent:
     def learn_policy(self, total_timesteps):
         self.policy_model.learn(total_timesteps)
 
-    def learn_reward_model(self, sampling_interval=30, query_interval=50, num_pretraining_data=0,
-                           num_pretraining_epochs=0):
+    def learn_reward_model(self, num_pretraining_data=0, num_pretraining_epochs=0):
         if self._pretraining_is_configured(num_pretraining_data, num_pretraining_epochs):
-            self._pretrain_reward_model(num_pretraining_data, num_pretraining_epochs, sampling_interval, query_interval)
+            self._pretrain_reward_model(num_pretraining_data, num_pretraining_epochs)
 
-    def _pretrain_reward_model(self, num_pretraining_data, num_pretraining_epochs, sampling_interval, query_interval):
-        self.reward_model_trainer.fill_dataset(generation_volume=num_pretraining_data,
-                                               sampling_interval=sampling_interval,
-                                               query_interval=query_interval,
-                                               with_training=False)
+    def _pretrain_reward_model(self, num_pretraining_data, num_pretraining_epochs):
+        self.reward_model_trainer.fill_dataset(generation_volume=num_pretraining_data, with_training=False)
         self.reward_model_trainer.train(num_epochs=num_pretraining_epochs)
 
     @staticmethod

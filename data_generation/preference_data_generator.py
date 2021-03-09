@@ -20,19 +20,19 @@ class PreferenceDataGenerator:
         self.orchestrator = GenerationOrchestrator(self.segment_sampler, self.query_generator,
                                                    self.preference_collector)
 
-    def generate(self, generation_volume, sampling_interval, query_interval, with_training=True):
+    def generate(self, generation_volume, with_training=True):
         self.clear()
         if with_training:
-            self._generate_with_training(generation_volume, sampling_interval, query_interval)
+            self._generate_with_training(generation_volume)
         else:
-            self._generate_without_training(generation_volume, sampling_interval, query_interval)
+            self._generate_without_training(generation_volume)
         return self.preference_collector.preferences
 
-    def _generate_with_training(self, generation_volume, sampling_interval, query_interval):
-        callbacks = self.orchestrator.create_callbacks(generation_volume, sampling_interval, query_interval)
+    def _generate_with_training(self, generation_volume):
+        callbacks = self.orchestrator.create_callbacks(generation_volume)
         self.policy_model.learn(total_timesteps=sys.maxsize, callback=callbacks)
 
-    def _generate_without_training(self, generation_volume, sampling_interval, query_interval):
+    def _generate_without_training(self, generation_volume):
         num_timesteps = 0
 
         obs = self.policy_model.env.reset()
@@ -41,9 +41,9 @@ class PreferenceDataGenerator:
             _, _, done, _ = self.policy_model.env.step(action)
             if done:
                 assert False, "Env should never return Done=True because of the wrapper that should prevent this."
-            if num_timesteps % sampling_interval == 0:
+            if self.orchestrator.is_sampling_step(num_timesteps):
                 self.segment_sampler.try_save_sample()
-            if num_timesteps % query_interval == 0:
+            if self.orchestrator.is_query_step(num_timesteps):
                 self.query_generator.try_save_query()
                 self.preference_collector.try_save_preference()
             if generation_volume and len(self.preference_collector.preferences) >= generation_volume:

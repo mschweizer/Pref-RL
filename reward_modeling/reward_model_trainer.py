@@ -33,9 +33,7 @@ class RewardModelTrainer:
                 loss.backward()
                 self.optimizer.step()
 
-    def fill_dataset(self, generation_volume, sampling_interval, query_interval, with_training=True):
+    def fill_dataset(self, generation_volume, with_training=True):
         preferences = self.preference_data_generator.generate(generation_volume=generation_volume,
-                                                              sampling_interval=sampling_interval,
-                                                              query_interval=query_interval,
                                                               with_training=with_training)
         self.preference_dataset.extend(preferences)
