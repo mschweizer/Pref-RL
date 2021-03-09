@@ -3,10 +3,10 @@ from unittest.mock import Mock
 
 import pytest
 
+from data_generation.generation_orchestrator import GenerationOrchestrator
 from data_generation.preference_collector import RewardMaximizingPreferenceCollector
 from data_generation.query_generator import RandomQueryGenerator
 from data_generation.segment_sampler import TrajectorySegmentSampler
-from orchestration.generation_orchestrator import GenerationOrchestrator
 
 
 @pytest.fixture()
