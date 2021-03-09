@@ -33,7 +33,9 @@ def reward_wrapper(cartpole_env, reward_model):
 
 @pytest.fixture()
 def learning_agent(reward_wrapper):
-    return LearningAgent(reward_wrapper, segment_length=4, simulation_steps_per_policy_update=5)
+    return LearningAgent(reward_wrapper, segment_length=5,
+                         simulation_steps_per_policy_update=5,
+                         trajectory_buffer_size=10)
 
 
 @pytest.fixture()
