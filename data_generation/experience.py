@@ -1,14 +1,3 @@
-class ExperienceBuffer:
-    def __init__(self, size):
-        self.size = size
-        self.experiences = []
-
-    def append(self, experience):
-        self.experiences.append(experience)
-        if len(self.experiences) > self.size:
-            del self.experiences[0]
-
-
 class Experience:
     def __init__(self, observation, action=None, reward=None, done=None, info=None):
         self.action = action

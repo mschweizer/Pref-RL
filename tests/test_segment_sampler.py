@@ -1,14 +1,15 @@
+from collections import deque
 from unittest.mock import Mock
 
 import pytest
 
-from data_generation.experience import ExperienceBuffer, Experience
+from data_generation.experience import Experience
 from data_generation.segment_sampler import TrajectorySegmentSampler
 
 
 @pytest.fixture()
 def segment_sampler():
-    return TrajectorySegmentSampler(ExperienceBuffer(size=10), segment_length=5)
+    return TrajectorySegmentSampler(deque(maxlen=10), segment_length=5)
 
 
 def test_samples_subsegment(segment_sampler):
@@ -34,7 +35,7 @@ def test_samples_subsegment(segment_sampler):
 
 
 def test_sampled_segment_has_correct_length(segment_sampler):
-    buffer = ExperienceBuffer(size=3)
+    buffer = deque(maxlen=3)
     buffer.append(1)
     buffer.append(2)
     buffer.append(3)

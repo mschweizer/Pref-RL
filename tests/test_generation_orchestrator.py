@@ -1,8 +1,8 @@
+from collections import deque
 from unittest.mock import Mock
 
 import pytest
 
-from data_generation.experience import ExperienceBuffer
 from data_generation.preference_collector import RewardMaximizingPreferenceCollector
 from data_generation.query_generator import RandomQueryGenerator
 from data_generation.segment_sampler import TrajectorySegmentSampler
@@ -11,7 +11,7 @@ from orchestration.generation_orchestrator import GenerationOrchestrator
 
 @pytest.fixture()
 def generation_orchestrator():
-    segment_sampler = TrajectorySegmentSampler(ExperienceBuffer(size=10), segment_length=5)
+    segment_sampler = TrajectorySegmentSampler(deque(maxlen=10), segment_length=5)
     query_generator = RandomQueryGenerator(segment_samples=[])
     preference_collector = RewardMaximizingPreferenceCollector(queries=[])
 

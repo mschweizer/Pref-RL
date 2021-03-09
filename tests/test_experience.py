@@ -1,13 +1,4 @@
-from data_generation.experience import ExperienceBuffer, Experience
-
-
-def test_buffer_removes_oldest():
-    buffer = ExperienceBuffer(size=2)
-    buffer.append(1)
-    buffer.append(2)
-    buffer.append(3)
-
-    assert buffer.experiences == [2, 3]
+from data_generation.experience import Experience
 
 
 def test_experience_equals(cartpole_env):

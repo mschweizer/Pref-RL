@@ -1,8 +1,10 @@
+from collections import deque
+
 import numpy as np
 import torch
 from gym import Wrapper
 
-from data_generation.experience import Experience, ExperienceBuffer
+from data_generation.experience import Experience
 
 
 # TODO: Use gym.core.RewardWrapper instead of custom reward wrapper
@@ -10,7 +12,7 @@ from data_generation.experience import Experience, ExperienceBuffer
 class RewardWrapper(Wrapper):
     def __init__(self, env, reward_model, trajectory_buffer_size):
         super().__init__(env)
-        self.trajectory_buffer = ExperienceBuffer(size=trajectory_buffer_size)
+        self.trajectory_buffer = deque(maxlen=trajectory_buffer_size)
         self.reward_model = reward_model
         self._last_observation = None
         self._last_done = False

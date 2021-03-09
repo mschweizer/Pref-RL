@@ -33,4 +33,4 @@ def test_agent_sets_sufficient_trajectory_buffer_length(cartpole_env):
 
     learning_agent = LearningAgent(cartpole_env, segment_length=segment_length, trajectory_buffer_size=buffer_size)
 
-    assert learning_agent.env.trajectory_buffer.size >= min(segment_length, num_stacked_frames)
+    assert learning_agent.env.trajectory_buffer.maxlen >= min(segment_length, num_stacked_frames)

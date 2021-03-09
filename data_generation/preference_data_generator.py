@@ -10,7 +10,7 @@ class PreferenceDataGenerator:
 
     def __init__(self, policy_model, segment_length=25):
         trajectory_buffer = policy_model.env.envs[0].trajectory_buffer
-        assert segment_length <= trajectory_buffer.size, \
+        assert segment_length <= trajectory_buffer.maxlen, \
             "Desired segment sample length is longer than trajectory buffer."
         self.segment_sampler = TrajectorySegmentSampler(trajectory_buffer, segment_length)
         self.query_generator = RandomQueryGenerator(self.segment_sampler.segment_samples)
