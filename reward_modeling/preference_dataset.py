@@ -47,7 +47,7 @@ class PreferenceDataset(torch.utils.data.Dataset):
 
     @staticmethod
     def prepare_choice(preference):
-        return preference[1].value
+        return float(preference[1].value)
 
     def prepare_queries(self, preferences):
         return [self.prepare_query(preference) for preference in preferences]

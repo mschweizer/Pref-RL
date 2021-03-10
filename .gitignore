@@ -1,1 +1,3 @@
 /tests/pytest.ini
+/tests/runs/
+/runs/
