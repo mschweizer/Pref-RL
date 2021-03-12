@@ -4,7 +4,10 @@ import pytest
 from stable_baselines3.common.atari_wrappers import AtariWrapper
 
 from environment.no_indirect_feedback_wrapper import NoIndirectFeedbackWrapper
-from environment.utils import wrap_env, create_env, is_atari_env, is_wrapped
+from environment.utils import add_external_env_wrappers, create_env, is_atari_env, is_wrapped, add_internal_env_wrappers
+from reward_modeling.reward_model import RewardModel
+from reward_modeling.reward_standardization_wrapper import RewardStandardizationWrapper
+from reward_modeling.reward_wrapper import RewardWrapper
 
 
 @pytest.fixture()
@@ -18,7 +21,7 @@ def test_converts_to_stacked_env():
     env = gym.make('CartPole-v1')
     frame_stack_depth = 5
     shp = env.observation_space.shape
-    env = wrap_env(env, frame_stack_depth=frame_stack_depth, termination_penalty=0.)
+    env = add_external_env_wrappers(env, frame_stack_depth=frame_stack_depth, termination_penalty=0.)
 
     assert len(env.observation_space.shape) == len(np.hstack([frame_stack_depth, shp]))
     assert np.all(env.observation_space.shape == np.hstack([frame_stack_depth, shp]))
@@ -36,11 +39,20 @@ def test_is_wrapped(envs):
     assert is_wrapped(pong_env, AtariWrapper)
 
 
-def test_adds_atari_wrapper(envs):
+def test_wrap_external_environment(envs):
     _, pong_env = envs
     assert is_wrapped(pong_env, AtariWrapper)
-
-
-def test_adds_no_indirect_feedback_wrapper(envs):
-    _, pong_env = envs
     assert is_wrapped(pong_env, NoIndirectFeedbackWrapper)
+
+
+def test_wrap_internal_environment(cartpole_env, ):
+    reward_model = RewardModel(cartpole_env)
+
+    wrapped_env = add_internal_env_wrappers(cartpole_env,
+                                            reward_model=reward_model,
+                                            desired_std=1.,
+                                            trajectory_buffer_size=1,
+                                            standardization_buffer_size=1,
+                                            standardization_params_update_interval=1)
+
+    assert is_wrapped(wrapped_env, RewardWrapper) and is_wrapped(wrapped_env, RewardStandardizationWrapper)

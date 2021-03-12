@@ -1,7 +1,7 @@
 import pytest
 from stable_baselines3 import A2C
 
-from agent import LearningAgent
+from agent.agent import LearningAgent
 from data_generation.experience import Experience
 from data_generation.preference_data_generator import PreferenceDataGenerator
 from data_generation.preference_label import PreferenceLabel
