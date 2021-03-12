@@ -1,6 +1,6 @@
 import gym
 
-from agent import LearningAgent
+from agent.agent import LearningAgent
 
 
 def test_agent_chooses_action(cartpole_env):

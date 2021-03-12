@@ -4,15 +4,17 @@ from gym.envs.atari import AtariEnv
 from stable_baselines3.common.atari_wrappers import AtariWrapper
 
 from environment.no_indirect_feedback_wrapper import NoIndirectFeedbackWrapper
+from reward_modeling.reward_standardization_wrapper import RewardStandardizationWrapper
+from reward_modeling.reward_wrapper import RewardWrapper
 
 
 def create_env(env_id, termination_penalty=0.):
     env = gym.make(env_id)
-    env = wrap_env(env, termination_penalty)
+    env = add_external_env_wrappers(env, termination_penalty)
     return env
 
 
-def wrap_env(env, termination_penalty, frame_stack_depth=4):
+def add_external_env_wrappers(env, termination_penalty, frame_stack_depth=4):
     if is_atari_env(env):
         env = AtariWrapper(env, frame_skip=4)
     env = NoIndirectFeedbackWrapper(env, termination_penalty)
@@ -22,6 +24,15 @@ def wrap_env(env, termination_penalty, frame_stack_depth=4):
 
 def is_atari_env(env):
     return isinstance(env.unwrapped, AtariEnv)
+
+
+def add_internal_env_wrappers(env, reward_model, trajectory_buffer_size, standardization_buffer_size,
+                              desired_std, standardization_params_update_interval):
+    env = RewardWrapper(env, reward_model, trajectory_buffer_size)
+    env = RewardStandardizationWrapper(env, desired_std=desired_std,
+                                       update_interval=standardization_params_update_interval,
+                                       buffer_size=standardization_buffer_size)
+    return env
 
 
 def is_wrapped(env, wrapper_class):
