@@ -1,28 +1,17 @@
-import logging
 from abc import ABC, abstractmethod
 
 from data_generation.preference_label import PreferenceLabel
-from data_generation.query_selector import RandomQuerySelector
+from reward_modeling.preference_dataset import PreferenceDataset
 
 
 class PreferenceCollector(ABC):
 
-    def __init__(self, queries):
+    def __init__(self, queries, num_preferences=3000):
         self.queries = queries
-        self.query_selector = RandomQuerySelector()
-        self.preferences = []
+        self.preferences = PreferenceDataset(capacity=num_preferences)
 
-    def try_save_preference(self):
-        try:
-            self.save_preference()
-        except IndexError as e:
-            logging.warning("Preference collection failed. There are no preference queries available. "
-                            "Original error message: " + str(e))
-
-    def save_preference(self):
-        query = self.query_selector.select_query(self.queries)
-        preference = self.collect_preference(query)
-        self.preferences.append((query, preference))
+    def collect_preferences(self, queries):
+        self.preferences.extend([(query, self.collect_preference(query)) for query in queries])
 
     @abstractmethod
     def collect_preference(self, query):

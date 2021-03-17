@@ -25,6 +25,9 @@ class TrajectorySegmentSampler:
             "Fewer elements in buffer than sample size."
         return list(self.trajectory_buffer)[start_idx: start_idx + self.segment_length]
 
+    def clear(self):
+        self.segment_samples.clear()
+
     def _get_start_index(self):
         low = 0
         high = max(len(self.trajectory_buffer) - self.segment_length + 1, low + 1)

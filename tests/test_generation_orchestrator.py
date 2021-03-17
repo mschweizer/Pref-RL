@@ -4,7 +4,6 @@ from unittest.mock import Mock
 import pytest
 
 from data_generation.generation_orchestrator import GenerationOrchestrator
-from data_generation.preference_collector import RewardMaximizingPreferenceCollector
 from data_generation.query_generator import RandomQueryGenerator
 from data_generation.segment_sampler import TrajectorySegmentSampler
 
@@ -13,46 +12,34 @@ from data_generation.segment_sampler import TrajectorySegmentSampler
 def generation_orchestrator():
     segment_sampler = TrajectorySegmentSampler(deque(maxlen=10), segment_length=5)
     query_generator = RandomQueryGenerator(segment_samples=[])
-    preference_collector = RewardMaximizingPreferenceCollector(queries=[])
 
-    return GenerationOrchestrator(segment_sampler=segment_sampler, query_generator=query_generator,
-                                  preference_collector=preference_collector)
+    return GenerationOrchestrator(segment_sampler=segment_sampler, query_generator=query_generator)
 
 
 def test_samples_trajectory_segment_every_sampling_interval(generation_orchestrator, policy_model):
     sample_mock = Mock()
+    interval = 10
 
     generation_orchestrator.segment_sampler.save_sample = sample_mock
-    generation_orchestrator.sampling_interval = 10
+    generation_orchestrator.sampling_interval = interval
 
     callbacks = generation_orchestrator.create_callbacks()
-    policy_model.learn(total_timesteps=10, callback=callbacks)
+    policy_model.learn(total_timesteps=interval, callback=callbacks)
 
     sample_mock.assert_called_once()
 
 
 def test_generates_query_every_query_interval(generation_orchestrator, policy_model):
     query_mock = Mock()
+    interval = 10
 
     generation_orchestrator.query_generator.save_query = query_mock
-    generation_orchestrator.query_interval = 10
+    generation_orchestrator.query_interval = interval
 
     callbacks = generation_orchestrator.create_callbacks()
-    policy_model.learn(total_timesteps=10, callback=callbacks)
+    policy_model.learn(total_timesteps=interval, callback=callbacks)
 
     query_mock.assert_called_once()
-
-
-def test_collects_preference_every_query_interval(generation_orchestrator, policy_model):
-    collection_mock = Mock()
-
-    generation_orchestrator.preference_collector.save_preference = collection_mock
-    generation_orchestrator.query_interval = 10
-
-    callbacks = generation_orchestrator.create_callbacks()
-    policy_model.learn(total_timesteps=10, callback=callbacks)
-
-    collection_mock.assert_called_once()
 
 
 def test_is_sampling_step(generation_orchestrator):

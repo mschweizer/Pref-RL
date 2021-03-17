@@ -3,7 +3,7 @@ from unittest.mock import Mock
 import pytest
 from stable_baselines3 import A2C
 
-from data_generation.preference_data_generator import PreferenceDataGenerator
+from data_generation.data_generator import DataGenerator
 
 
 @pytest.fixture()
@@ -13,7 +13,7 @@ def policy_model_with_reward_wrapper(reward_wrapper):
 
 @pytest.fixture()
 def preference_data_generator(policy_model_with_reward_wrapper):
-    return PreferenceDataGenerator(policy_model=policy_model_with_reward_wrapper, segment_length=3)
+    return DataGenerator(policy_model=policy_model_with_reward_wrapper, segment_length=3)
 
 
 @pytest.mark.parametrize('training', [True, False])

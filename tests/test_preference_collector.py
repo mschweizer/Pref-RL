@@ -26,13 +26,14 @@ def test_reward_maximizing_collector_prefers_higher_reward():
     assert preference == PreferenceLabel.RIGHT
 
 
-def test_saves_collected_preference(preference_collector):
-    query = [1, 2]
+def test_collects_preferences(preference_collector, segment_samples):
+    query = segment_samples
     preference = PreferenceLabel.INDIFFERENT
 
-    preference_collector.query_selector.select_query = Mock(return_value=query)
+    num_preferences = len(preference_collector.preferences)
+
     preference_collector.collect_preference = Mock(return_value=preference)
 
-    preference_collector.save_preference()
+    preference_collector.collect_preferences(queries=[query])
 
-    assert (query, preference) in preference_collector.preferences
+    assert len(preference_collector.preferences) == num_preferences + 1

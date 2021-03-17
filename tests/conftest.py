@@ -2,8 +2,8 @@ import pytest
 from stable_baselines3 import A2C
 
 from agent.agent import LearningAgent
+from data_generation.data_generator import DataGenerator
 from data_generation.experience import Experience
-from data_generation.preference_data_generator import PreferenceDataGenerator
 from data_generation.preference_label import PreferenceLabel
 from environment.utils import create_env
 from reward_modeling.choice_model import ChoiceModel
@@ -33,9 +33,7 @@ def reward_wrapper(cartpole_env, reward_model):
 
 @pytest.fixture()
 def learning_agent(reward_wrapper):
-    return LearningAgent(reward_wrapper, segment_length=5,
-                         simulation_steps_per_policy_update=5,
-                         trajectory_buffer_size=10)
+    return LearningAgent(reward_wrapper)
 
 
 @pytest.fixture()
@@ -50,7 +48,7 @@ def segment_samples():
 
 @pytest.fixture()
 def preference_data_generator(policy_model):
-    return PreferenceDataGenerator(policy_model=policy_model, segment_length=3)
+    return DataGenerator(policy_model=policy_model, segment_length=3)
 
 
 @pytest.fixture()

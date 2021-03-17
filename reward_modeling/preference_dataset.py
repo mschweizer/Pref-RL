@@ -38,6 +38,9 @@ class PreferenceDataset(torch.utils.data.Dataset):
         self.choices.extend(self.prepare_choices(preferences))
         self.queries.extend(self.prepare_queries(preferences))
 
+        assert len(self.queries) == len(self.choices), "Dataset is corrupt. Unequal number of data (queries) " \
+                                                       "and labels (choices)."
+
     def append(self, preference):
         self.choices.append(self.prepare_choice(preference))
         self.queries.append(self.prepare_query(preference))

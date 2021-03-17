@@ -25,3 +25,6 @@ class RandomQueryGenerator:
 
     def generate_query(self):
         return random.sample(self.segment_samples, self.query_set_size)
+
+    def clear(self):
+        self.queries.clear()
