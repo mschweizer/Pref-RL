@@ -1,14 +1,14 @@
 import pytest
 from stable_baselines3 import A2C
 
-from agent.agent import LearningAgent
-from data_generation.data_generator import DataGenerator
-from data_generation.experience import Experience
-from data_generation.preference_label import PreferenceLabel
-from environment.utils import create_env
-from reward_modeling.choice_model import ChoiceModel
-from reward_modeling.reward_model import RewardModel
-from reward_modeling.reward_wrapper import RewardWrapper
+from agent.agent import Agent
+from preference_data.generation.generator import Generator
+from preference_data.preference.experience import Experience
+from preference_data.preference.label import Label
+from reward_modeling.models.choice import Choice
+from reward_modeling.models.reward import Reward
+from wrappers.internal.reward_predictor import RewardPredictor
+from wrappers.utils import create_env
 
 
 @pytest.fixture()
@@ -23,17 +23,17 @@ def env(request):
 
 @pytest.fixture()
 def reward_model(cartpole_env):
-    return RewardModel(cartpole_env)
+    return Reward(cartpole_env)
 
 
 @pytest.fixture()
 def reward_wrapper(cartpole_env, reward_model):
-    return RewardWrapper(env=cartpole_env, reward_model=reward_model, trajectory_buffer_size=100)
+    return RewardPredictor(env=cartpole_env, reward_model=reward_model, trajectory_buffer_size=100)
 
 
 @pytest.fixture()
 def learning_agent(reward_wrapper):
-    return LearningAgent(reward_wrapper)
+    return Agent(reward_wrapper)
 
 
 @pytest.fixture()
@@ -48,7 +48,7 @@ def segment_samples():
 
 @pytest.fixture()
 def preference_data_generator(policy_model):
-    return DataGenerator(policy_model=policy_model, segment_length=3)
+    return Generator(policy_model=policy_model, segment_length=3)
 
 
 @pytest.fixture()
@@ -67,9 +67,9 @@ def preference(env):
         observation, reward, done, info = env.step(action)
         experiences.append(Experience(observation, action, reward, done, info))
     query = [experiences[:segment_length], experiences[segment_length:]]
-    return query, PreferenceLabel.LEFT
+    return query, Label.LEFT
 
 
 @pytest.fixture()
 def choice_model(reward_model):
-    return ChoiceModel(reward_model)
+    return Choice(reward_model)

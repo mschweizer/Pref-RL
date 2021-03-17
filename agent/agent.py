@@ -1,19 +1,19 @@
 from stable_baselines3 import A2C
 
-from environment.utils import add_internal_env_wrappers
-from reward_modeling.reward_learner import RewardLearner
-from reward_modeling.reward_model import RewardModel
+from reward_modeling.learner import Learner
+from reward_modeling.models.reward import Reward
+from wrappers.utils import add_internal_env_wrappers
 
 
-class LearningAgent:
+class Agent:
     def __init__(self, env, segment_length=25):
-        self.reward_model = RewardModel(env)
+        self.reward_model = Reward(env)
         wrapped_env = add_internal_env_wrappers(env=env, reward_model=self.reward_model,
                                                 trajectory_buffer_size=100,
                                                 desired_std=.05, standardization_buffer_size=3000,
                                                 standardization_params_update_interval=30000)
         self.policy_model = A2C('MlpPolicy', env=wrapped_env, n_steps=100)
-        self.reward_learner = RewardLearner(self.policy_model, self.reward_model, segment_length)
+        self.reward_learner = Learner(self.policy_model, self.reward_model, segment_length)
 
     def choose_action(self, state):
         return self.policy_model.predict(state)
@@ -26,8 +26,7 @@ class LearningAgent:
             self._pretrain_reward_model(num_pretraining_data, num_pretraining_epochs)
 
     def _pretrain_reward_model(self, num_pretraining_data, num_pretraining_epochs):
-        self.reward_learner.learn(500)
-        self.reward_model_trainer.train(num_epochs=num_pretraining_epochs)
+        self.reward_learner.learn(generation_volume=num_pretraining_data, with_training=False)
 
     @staticmethod
     def _pretraining_is_configured(num_pretraining_data, num_pretraining_epochs):

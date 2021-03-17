@@ -1,5 +1,6 @@
-from agent import LearningAgent
 from environment.utils import create_env
+
+from agent import LearningAgent
 
 
 def main():
@@ -14,7 +15,7 @@ def main():
     # obs = env.reset()
     # for i in range(100):
     #     action, _states = agent.choose_action(state=obs)
-    #     obs, reward, done, info = env.step(action)
+    #     obs, reward_modeling, done, info = env.step(action)
     #     env.render()
     #     if done:
     #         obs = env.reset()
