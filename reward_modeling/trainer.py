@@ -8,19 +8,20 @@ from reward_modeling.models.choice import Choice
 
 
 class Trainer:
-    def __init__(self, reward_model):
+    def __init__(self, reward_model, learning_rate=1e-3, summary_writing_interval=100, batch_size=16):
         self.choice_model = Choice(reward_model)
-        self.optimizer = optim.Adam(self.choice_model.parameters(), lr=100000)  # TODO: Make learning rate a param
+        self.optimizer = optim.Adam(self.choice_model.parameters(), lr=learning_rate)
         self.criterion = F.binary_cross_entropy
+        self.batch_size = batch_size
         self.writer = SummaryWriter()
-        self.writing_interval = 10  # TODO: Make writing interval a param
+        self.writing_interval = summary_writing_interval
 
-    def train(self, preference_dataset, num_epochs=1):
+    def train(self, preference_dataset, epochs=1):
         # TODO: Set sensible batch size value, possibly as param
-        train_loader = torch.utils.data.DataLoader(dataset=preference_dataset, batch_size=2)
+        train_loader = torch.utils.data.DataLoader(dataset=preference_dataset, batch_size=self.batch_size)
 
         running_loss = 0.
-        for epoch in range(num_epochs):
+        for epoch in range(epochs):
 
             for i, data in enumerate(train_loader, 0):
                 queries, choices = data

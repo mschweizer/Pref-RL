@@ -1,3 +1,5 @@
+import sys
+
 from preference_data.generation.orchestrator import Orchestrator
 from preference_data.generation.query_generator import RandomQueryGenerator
 from preference_data.generation.segment_sampler import SegmentSampler
@@ -5,14 +7,18 @@ from preference_data.generation.segment_sampler import SegmentSampler
 
 class Generator:
 
-    def __init__(self, policy_model, segment_length=25):
+    def __init__(self, policy_model, segment_length=25, segment_sampling_interval=30, query_generation_interval=50):
+        # TODO: Wrap policy model to make this nicer (with @property wrapped_env)
         trajectory_buffer = policy_model.env.envs[0].trajectory_buffer
         assert segment_length <= trajectory_buffer.maxlen, \
             "Desired segment sample length is longer than trajectory buffer."
         self.trajectory_segment_sampler = SegmentSampler(trajectory_buffer, segment_length)
         self.query_generator = RandomQueryGenerator(self.trajectory_segment_sampler.segment_samples)
         self.policy_model = policy_model
-        self.generation_orchestrator = Orchestrator(self.trajectory_segment_sampler, self.query_generator)
+        self.generation_orchestrator = Orchestrator(segment_sampler=self.trajectory_segment_sampler,
+                                                    query_generator=self.query_generator,
+                                                    segment_sampling_interval=segment_sampling_interval,
+                                                    query_generation_interval=query_generation_interval)
 
     def generate(self, generation_volume, with_training=True):
         self.clear()
@@ -24,7 +30,7 @@ class Generator:
 
     def _generate_with_training(self, generation_volume):
         callbacks = self.generation_orchestrator.create_callbacks(generation_volume)
-        self.policy_model.learn(total_timesteps=500, callback=callbacks)
+        self.policy_model.learn(total_timesteps=sys.maxsize, callback=callbacks)
 
     def _generate_without_training(self, generation_volume):
         num_timesteps = 0

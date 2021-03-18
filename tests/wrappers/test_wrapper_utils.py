@@ -27,6 +27,14 @@ def test_converts_to_stacked_env():
     assert np.all(env.observation_space.shape == np.hstack([frame_stack_depth, shp]))
 
 
+def test_does_not_convert_to_stacked_env():
+    env = gym.make('CartPole-v1')
+    frame_stack_depth = 0
+    env = add_external_env_wrappers(env, frame_stack_depth=frame_stack_depth, termination_penalty=0.)
+
+    assert not is_wrapped(env, gym.wrappers.FrameStack)
+
+
 def test_is_atari_env(envs):
     cartpole_env, pong_env = envs
     assert not is_atari_env(cartpole_env)
@@ -50,9 +58,9 @@ def test_wrap_internal_environment(cartpole_env, ):
 
     wrapped_env = add_internal_env_wrappers(cartpole_env,
                                             reward_model=reward_model,
-                                            desired_std=1.,
-                                            trajectory_buffer_size=1,
-                                            standardization_buffer_size=1,
-                                            standardization_params_update_interval=1)
+                                            reward_standardization_std=1.,
+                                            segment_sampling_buffer_size=1,
+                                            reward_standardization_buffer_size=1,
+                                            reward_standardization_update_interval=1)
 
     assert is_wrapped(wrapped_env, RewardPredictor) and is_wrapped(wrapped_env, RewardStandardizer)

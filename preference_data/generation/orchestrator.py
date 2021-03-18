@@ -2,11 +2,11 @@ from stable_baselines3.common.callbacks import EveryNTimesteps, BaseCallback
 
 
 class Orchestrator:
-    def __init__(self, segment_sampler, query_generator, sampling_interval=30, query_interval=50):
+    def __init__(self, segment_sampler, query_generator, segment_sampling_interval=30, query_generation_interval=50):
         self.segment_sampler = segment_sampler
         self.query_generator = query_generator
-        self.sampling_interval = sampling_interval
-        self.query_interval = query_interval
+        self.sampling_interval = segment_sampling_interval
+        self.query_generation_interval = query_generation_interval
 
     def create_callbacks(self, generation_volume=3000):
         callbacks = []
@@ -17,7 +17,7 @@ class Orchestrator:
 
         generate_query = GenerateQueryCallback(self.query_generator, generation_volume=generation_volume)
         # TODO: create separate "generate query interval"
-        query_callback = EveryNTimesteps(n_steps=self.query_interval, callback=generate_query)
+        query_callback = EveryNTimesteps(n_steps=self.query_generation_interval, callback=generate_query)
         callbacks.append(query_callback)
 
         return callbacks
@@ -26,7 +26,7 @@ class Orchestrator:
         return step_num % self.sampling_interval == 0
 
     def is_query_step(self, step_num):
-        return step_num % self.query_interval == 0
+        return step_num % self.query_generation_interval == 0
 
 
 class SampleTrajectoryCallback(BaseCallback):

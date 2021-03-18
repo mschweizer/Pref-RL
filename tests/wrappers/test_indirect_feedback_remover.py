@@ -37,7 +37,7 @@ def test_does_not_apply_penalty_when_episode_continues():
     done = False
 
     env = Mock(spec_set=Env, step=Mock(return_value=("obs", reward, done, None)))
-    wrapped_env = IndirectFeedbackRemover(env, penalty=3.)
+    wrapped_env = IndirectFeedbackRemover(env, termination_penalty=3.)
 
     wrapped_env.reset()
     action = env.action_space.sample()
