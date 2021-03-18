@@ -24,7 +24,7 @@ def test_samples_trajectory_segment_every_sampling_interval(generation_orchestra
     generation_orchestrator.sampling_interval = interval
 
     callbacks = generation_orchestrator.create_callbacks()
-    policy_model.learn(total_timesteps=interval, callback=callbacks)
+    policy_model.learn(total_timesteps=10, callback=callbacks)
 
     sample_mock.assert_called_once()
 
@@ -34,10 +34,10 @@ def test_generates_query_every_query_interval(generation_orchestrator, policy_mo
     interval = 10
 
     generation_orchestrator.query_generator.save_query = query_mock
-    generation_orchestrator.query_interval = interval
+    generation_orchestrator.query_generation_interval = interval
 
     callbacks = generation_orchestrator.create_callbacks()
-    policy_model.learn(total_timesteps=interval, callback=callbacks)
+    policy_model.learn(total_timesteps=10, callback=callbacks)
 
     query_mock.assert_called_once()
 
@@ -49,6 +49,6 @@ def test_is_sampling_step(generation_orchestrator):
 
 
 def test_is_query_step(generation_orchestrator):
-    generation_orchestrator.query_interval = 2
+    generation_orchestrator.query_generation_interval = 2
     assert generation_orchestrator.is_query_step(4)
     assert not generation_orchestrator.is_query_step(5)

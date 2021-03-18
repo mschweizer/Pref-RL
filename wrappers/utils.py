@@ -8,9 +8,9 @@ from wrappers.internal.reward_predictor import RewardPredictor
 from wrappers.internal.reward_standardizer import RewardStandardizer
 
 
-def create_env(env_id, termination_penalty=0.):
+def create_env(env_id, termination_penalty=0., frame_stack_depth=4):
     env = gym.make(env_id)
-    env = add_external_env_wrappers(env, termination_penalty)
+    env = add_external_env_wrappers(env, termination_penalty, frame_stack_depth)
     return env
 
 
@@ -18,7 +18,8 @@ def add_external_env_wrappers(env, termination_penalty, frame_stack_depth=4):
     if is_atari_env(env):
         env = AtariWrapper(env, frame_skip=4)
     env = IndirectFeedbackRemover(env, termination_penalty)
-    env = gym.wrappers.FrameStack(env, num_stack=frame_stack_depth)
+    if frame_stack_depth:
+        env = gym.wrappers.FrameStack(env, num_stack=frame_stack_depth)
     return env
 
 
@@ -26,12 +27,12 @@ def is_atari_env(env):
     return isinstance(env.unwrapped, AtariEnv)
 
 
-def add_internal_env_wrappers(env, reward_model, trajectory_buffer_size, standardization_buffer_size,
-                              desired_std, standardization_params_update_interval):
-    env = RewardPredictor(env, reward_model, trajectory_buffer_size)
-    env = RewardStandardizer(env, desired_std=desired_std,
-                             update_interval=standardization_params_update_interval,
-                             buffer_size=standardization_buffer_size)
+def add_internal_env_wrappers(env, reward_model, segment_sampling_buffer_size, reward_standardization_buffer_size,
+                              reward_standardization_std, reward_standardization_update_interval):
+    env = RewardPredictor(env, reward_model, segment_sampling_buffer_size)
+    env = RewardStandardizer(env, desired_std=reward_standardization_std,
+                             update_interval=reward_standardization_update_interval,
+                             buffer_size=reward_standardization_buffer_size)
     return env
 
 
