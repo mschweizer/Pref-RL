@@ -21,9 +21,9 @@ class Agent:
     def learn_policy(self, total_timesteps):
         self.policy_model.learn(total_timesteps)
 
-    def learn_reward_model(self, num_pretraining_data=0, num_pretraining_epochs=0):
-        if self._pretraining_is_configured(num_pretraining_data, num_pretraining_epochs):
-            self._pretrain_reward_model(num_pretraining_data, num_pretraining_epochs)
+    def learn_reward_model(self, num_pretraining_data=0, pretraining_epochs=0):
+        if self._pretraining_is_configured(num_pretraining_data, pretraining_epochs):
+            self._pretrain_reward_model(num_pretraining_data, pretraining_epochs)
 
     def _pretrain_reward_model(self, num_pretraining_data, num_pretraining_epochs):
         self.reward_learner.learn(generation_volume=num_pretraining_data, with_training=False)

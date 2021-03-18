@@ -28,6 +28,7 @@ class RewardStandardizer(RewardWrapper):
         self.std = numpy_buffer.std()
 
     def _standardize(self, reward):
+        assert self.mean is not None and self.std is not None, "Reward standardization parameters have not been set."
         if self.std > 0:
             return (reward - self.mean) / (self.std / self.desired_std)
         else:

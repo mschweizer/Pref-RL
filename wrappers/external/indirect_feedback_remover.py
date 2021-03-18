@@ -4,9 +4,9 @@ from gym.envs.atari import AtariEnv
 
 # TODO: Remove also visual feedback in the form of e.g. scores in atari games (issue reward_modeling-learner#28)
 class IndirectFeedbackRemover(Wrapper):
-    def __init__(self, env, penalty=0.):
+    def __init__(self, env, episode_done_penalty=0.):
         super(IndirectFeedbackRemover, self).__init__(env)
-        self.penalty = penalty
+        self.penalty = episode_done_penalty
 
     def reset(self, **kwargs):
         return self.env.reset(**kwargs)
