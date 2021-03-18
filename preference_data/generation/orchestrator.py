@@ -16,7 +16,6 @@ class Orchestrator:
         callbacks.append(sample_callback)
 
         generate_query = GenerateQueryCallback(self.query_generator, generation_volume=generation_volume)
-        # TODO: create separate "generate query interval"
         query_callback = EveryNTimesteps(n_steps=self.query_generation_interval, callback=generate_query)
         callbacks.append(query_callback)
 

@@ -4,9 +4,6 @@ import random
 PREFERENCE_QUERYSET_SIZE = 2
 
 
-# TODO: Refactor - QueryGenerator vs Generator
-
-
 class RandomQueryGenerator:
     def __init__(self, segment_samples):
         self.segment_samples = segment_samples
