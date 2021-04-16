@@ -56,11 +56,6 @@ def test_wrap_external_environment(envs):
 def test_wrap_internal_environment(cartpole_env, ):
     reward_model = Reward(cartpole_env)
 
-    wrapped_env = add_internal_env_wrappers(cartpole_env,
-                                            reward_model=reward_model,
-                                            reward_standardization_std=1.,
-                                            segment_sampling_buffer_size=1,
-                                            reward_standardization_buffer_size=1,
-                                            reward_standardization_update_interval=1)
+    wrapped_env = add_internal_env_wrappers(cartpole_env, reward_model=reward_model)
 
     assert is_wrapped(wrapped_env, RewardPredictor) and is_wrapped(wrapped_env, RewardStandardizer)
