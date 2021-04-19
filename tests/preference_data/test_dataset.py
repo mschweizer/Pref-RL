@@ -3,6 +3,7 @@ import pytest
 import torch.utils.data
 
 from preference_data.dataset import PreferenceDataset, make_discard_warning
+from preference_data.preference.label import Label
 
 
 @pytest.fixture
@@ -57,6 +58,16 @@ def test_warns_when_discarding_records_from_batch(preferences):
 def test_append_single_record(preferences, preference):
     capacity = len(preferences) + 1
     dataset = PreferenceDataset(capacity=capacity, preferences=preferences)
+
     dataset.append(preference)
 
     assert len(dataset) == capacity
+
+
+def test_discards_oldest_records_when_capacity_is_reached(preference):
+    dataset = PreferenceDataset(capacity=1, preferences=[preference])
+    new_preference = (preference[0], Label.RIGHT)
+
+    dataset.extend([new_preference])
+
+    assert dataset[0][1] == Label.RIGHT.value
