@@ -5,7 +5,7 @@ from gym import RewardWrapper
 
 
 class RewardStandardizer(RewardWrapper):
-    def __init__(self, env, desired_std=1., update_interval=30000, buffer_size=3000):
+    def __init__(self, env, desired_std=.05, update_interval=30000, buffer_size=3000):
         super().__init__(env)
         self.update_interval = update_interval
         self.buffer = deque(maxlen=buffer_size)

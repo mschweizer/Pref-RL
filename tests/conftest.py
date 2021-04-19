@@ -1,14 +1,13 @@
 import pytest
 from stable_baselines3 import A2C
 
-from agent.agent import Agent
-from preference_data.generation.generator import Generator
+from agent.rl_agent import RLAgent
 from preference_data.preference.experience import Experience
 from preference_data.preference.label import Label
 from reward_modeling.models.choice import Choice
 from reward_modeling.models.reward import Reward
 from wrappers.internal.reward_predictor import RewardPredictor
-from wrappers.utils import create_env
+from wrappers.utils import create_env, add_internal_env_wrappers
 
 
 @pytest.fixture()
@@ -33,7 +32,7 @@ def reward_wrapper(cartpole_env, reward_model):
 
 @pytest.fixture()
 def learning_agent(reward_wrapper):
-    return Agent(reward_wrapper)
+    return RLAgent(reward_wrapper)
 
 
 @pytest.fixture()
@@ -47,13 +46,8 @@ def segment_samples():
 
 
 @pytest.fixture()
-def preference_data_generator(policy_model):
-    return Generator(policy_model=policy_model, segment_length=3)
-
-
-@pytest.fixture()
 def policy_model(cartpole_env):
-    return A2C('MlpPolicy', env=cartpole_env, n_steps=10)
+    return A2C('MlpPolicy', env=add_internal_env_wrappers(cartpole_env, Reward(cartpole_env)), n_steps=10)
 
 
 @pytest.fixture()

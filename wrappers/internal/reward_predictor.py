@@ -9,7 +9,7 @@ from preference_data.preference.experience import Experience
 
 # TODO: Use gym.core.RewardWrapper instead of custom reward_modeling wrapper
 class RewardPredictor(Wrapper):
-    def __init__(self, env, reward_model, trajectory_buffer_size):
+    def __init__(self, env, reward_model, trajectory_buffer_size=128):
         super().__init__(env)
         self.trajectory_buffer = deque(maxlen=trajectory_buffer_size)
         self.reward_model = reward_model
@@ -42,7 +42,7 @@ class RewardPredictor(Wrapper):
 
     def reward(self, observation):
         input_data = self._prepare_for_model(observation)
-        return self.reward_model(input_data)
+        return float(self.reward_model(input_data))
 
     @staticmethod
     def _prepare_for_model(observation):

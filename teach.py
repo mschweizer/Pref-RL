@@ -1,6 +1,6 @@
 import argparse
 
-from agent.agent import Agent
+from agent.rl_agent import RLAgent
 from wrappers.utils import create_env
 
 
@@ -10,7 +10,7 @@ def main():
 
     env = create_env(args.env_id)
 
-    agent = Agent(env, segment_length=10)
+    agent = RLAgent(env)
 
     agent.learn_reward_model(num_pretraining_data=args.num_pretrain_data, pretraining_epochs=args.pretrain_epochs)
 
