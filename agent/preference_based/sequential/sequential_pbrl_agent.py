@@ -17,10 +17,9 @@ class AbstractSequentialPbRLAgent(AbstractPbRLAgent, ABC):
         self.num_pretraining_preferences = num_pretraining_preferences
         self.preferences_per_iteration = preferences_per_iteration
 
-    def learn_reward_model(self, total_timesteps):
+    def learn_reward_model(self, num_training_timesteps):
         self._pretrain()
-        self._train(total_timesteps)
-        return self
+        self._train(num_training_timesteps)
 
     def _pretrain(self):
         self.collect_preferences(self.num_pretraining_preferences, with_policy_training=False)
