@@ -27,12 +27,10 @@ def is_atari_env(env):
     return isinstance(env.unwrapped, AtariEnv)
 
 
-def add_internal_env_wrappers(env, reward_model, segment_sampling_buffer_size, reward_standardization_buffer_size,
-                              reward_standardization_std, reward_standardization_update_interval):
-    env = RewardPredictor(env, reward_model, segment_sampling_buffer_size)
-    env = RewardStandardizer(env, desired_std=reward_standardization_std,
-                             update_interval=reward_standardization_update_interval,
-                             buffer_size=reward_standardization_buffer_size)
+# TODO: Make this function a static method of the pbrl agent ("_wrap_env", see stable baselines base class)
+def add_internal_env_wrappers(env, reward_model):
+    env = RewardPredictor(env, reward_model)
+    env = RewardStandardizer(env)
     return env
 
 

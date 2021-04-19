@@ -1,3 +1,5 @@
 /tests/pytest.ini
 /tests/runs/
 /runs/
+/tests/.coveragerc
+/tests/htmlcov/
