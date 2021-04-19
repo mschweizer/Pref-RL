@@ -6,7 +6,7 @@ import torch.optim as optim
 import torch.utils.data
 from torch.utils.tensorboard import SummaryWriter
 
-from reward_modeling.models.choice import Choice
+from reward_modeling.models.choice import ChoiceModel
 
 
 class AbstractRewardTrainer(ABC):
@@ -19,7 +19,7 @@ class AbstractRewardTrainer(ABC):
 class RewardTrainer(AbstractRewardTrainer):
     def __init__(self, reward_model, batch_size=64, learning_rate=1e-3, summary_writing_interval=64):
         super(AbstractRewardTrainer, self).__init__()
-        self.choice_model = Choice(reward_model)
+        self.choice_model = ChoiceModel(reward_model)
         self.optimizer = optim.Adam(self.choice_model.parameters(), lr=learning_rate)
         self.criterion = F.binary_cross_entropy
         self.batch_size = batch_size

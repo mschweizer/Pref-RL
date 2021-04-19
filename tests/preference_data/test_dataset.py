@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 import torch.utils.data
 
-from preference_data.dataset import Dataset, make_discard_warning
+from preference_data.dataset import PreferenceDataset, make_discard_warning
 
 
 @pytest.fixture
@@ -19,7 +19,7 @@ def test_has_correct_format(preferences, env):
     segment = query_set[0]
     segment_length = len(segment)
 
-    data = Dataset(3000, preferences=preferences)
+    data = PreferenceDataset(3000, preferences=preferences)
     loader = torch.utils.data.DataLoader(dataset=data, batch_size=batch_size)
 
     batch_iterator = iter(loader)
@@ -31,7 +31,7 @@ def test_has_correct_format(preferences, env):
 def test_initializes_with_data(preference):
     preferences = [preference]
 
-    dataset = Dataset(capacity=len(preferences), preferences=preferences)
+    dataset = PreferenceDataset(capacity=len(preferences), preferences=preferences)
 
     assert len(dataset) == len(preferences)
     assert dataset.choices[0] == dataset.prepare_choices(preferences)[0]
@@ -39,7 +39,7 @@ def test_initializes_with_data(preference):
 
 
 def test_initializes_without_data():
-    dataset = Dataset(capacity=2)
+    dataset = PreferenceDataset(capacity=2)
     assert len(dataset) == 0
 
 
@@ -48,7 +48,7 @@ def test_warns_when_discarding_records_from_batch(preferences):
     capacity = num_elements - 1
 
     with pytest.warns(None) as record:
-        Dataset(capacity=capacity, preferences=preferences)
+        PreferenceDataset(capacity=capacity, preferences=preferences)
 
     assert len(record) == 1
     assert str(record[0].message) == make_discard_warning(num_elements=num_elements, capacity=capacity)
@@ -56,7 +56,7 @@ def test_warns_when_discarding_records_from_batch(preferences):
 
 def test_append_single_record(preferences, preference):
     capacity = len(preferences) + 1
-    dataset = Dataset(capacity=capacity, preferences=preferences)
+    dataset = PreferenceDataset(capacity=capacity, preferences=preferences)
     dataset.append(preference)
 
     assert len(dataset) == capacity

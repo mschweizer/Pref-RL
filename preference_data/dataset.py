@@ -12,7 +12,7 @@ def make_discard_warning(num_elements, capacity):
                               diff=num_elements - capacity)
 
 
-class Dataset(torch.utils.data.Dataset):
+class PreferenceDataset(torch.utils.data.Dataset):
     def __init__(self, capacity=3000, preferences=None):
         self.queries = deque(maxlen=capacity)
         self.choices = deque(maxlen=capacity)

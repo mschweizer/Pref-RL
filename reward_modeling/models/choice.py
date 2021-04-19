@@ -3,7 +3,7 @@ from torch import nn
 from torch.nn import functional as F
 
 
-class Choice(nn.Module):
+class ChoiceModel(nn.Module):
     def __init__(self, reward_model):
         super().__init__()
         self.reward_model = reward_model

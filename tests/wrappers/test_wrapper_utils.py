@@ -3,7 +3,7 @@ import numpy as np
 import pytest
 from stable_baselines3.common.atari_wrappers import AtariWrapper
 
-from reward_modeling.models.reward import Reward
+from reward_modeling.models.reward import RewardModel
 from wrappers.external.indirect_feedback_remover import IndirectFeedbackRemover
 from wrappers.internal.reward_predictor import RewardPredictor
 from wrappers.internal.reward_standardizer import RewardStandardizer
@@ -54,7 +54,7 @@ def test_wrap_external_environment(envs):
 
 
 def test_wrap_internal_environment(cartpole_env, ):
-    reward_model = Reward(cartpole_env)
+    reward_model = RewardModel(cartpole_env)
 
     wrapped_env = add_internal_env_wrappers(cartpole_env, reward_model=reward_model)
 

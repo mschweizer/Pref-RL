@@ -4,7 +4,7 @@ from torch.nn import functional as F
 from reward_modeling.utils import get_flattened_input_length
 
 
-class Reward(nn.Module):
+class RewardModel(nn.Module):
     def __init__(self, env):
         super().__init__()
 
