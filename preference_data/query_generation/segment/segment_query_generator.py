@@ -57,7 +57,7 @@ class AbstractSegmentQueryGenerator(AbstractQueryGenerator, AbstractSegmentSampl
 
 class RandomSegmentQueryGenerator(AbstractSegmentQueryGenerator, RandomSegmentSampler, RandomSegmentSelector):
     def __init__(self, policy_model):
-        super(AbstractSegmentQueryGenerator, self).__init__(policy_model)
+        AbstractSegmentQueryGenerator.__init__(self, policy_model)
 
     def calculate_num_segment_samples(self, num_queries):
         return num_queries * self.segments_per_query

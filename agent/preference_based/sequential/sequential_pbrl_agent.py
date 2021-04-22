@@ -8,21 +8,20 @@ from reward_modeling.reward_trainer import RewardTrainer
 
 
 class AbstractSequentialPbRLAgent(AbstractPbRLAgent, ABC):
-    def __int__(self, env, num_pretraining_epochs=10, num_training_epochs_per_iteration=10,
-                num_pretraining_preferences=500, preferences_per_iteration=500):
-        super().__init__(env=env)
+    def __init__(self, env, num_pretraining_epochs=10, num_training_epochs_per_iteration=10,
+                 preferences_per_iteration=500):
+        AbstractPbRLAgent.__init__(self, env=env)
 
         self.num_pretraining_epochs = num_pretraining_epochs
         self.num_training_epochs_per_iteration = num_training_epochs_per_iteration
-        self.num_pretraining_preferences = num_pretraining_preferences
         self.preferences_per_iteration = preferences_per_iteration
 
-    def learn_reward_model(self, num_training_timesteps):
-        self._pretrain()
+    def learn_reward_model(self, num_training_timesteps, num_pretraining_preferences=500):
+        self._pretrain(num_pretraining_preferences)
         self._train(num_training_timesteps)
 
-    def _pretrain(self):
-        self.collect_preferences(self.num_pretraining_preferences, with_policy_training=False)
+    def _pretrain(self, num_pretraining_preferences):
+        self.collect_preferences(num_pretraining_preferences, with_policy_training=False)
         self.train_reward_model(self.preferences, self.num_pretraining_epochs)
 
     def _train(self, total_timesteps):
@@ -48,6 +47,11 @@ class AbstractSequentialPbRLAgent(AbstractPbRLAgent, ABC):
 
 class SequentialPbRLAgent(AbstractSequentialPbRLAgent, RandomSegmentQueryGenerator, RandomQuerySelector,
                           RewardMaximizingOracle, RewardTrainer):
-    def __init__(self, env):
-        super(AbstractSequentialPbRLAgent, self).__init__(env)
-        super(RandomSegmentQueryGenerator, self).__init__(self.policy_model)
+    def __init__(self, env, num_pretraining_epochs=10, num_training_epochs_per_iteration=10,
+                 preferences_per_iteration=500):
+        AbstractSequentialPbRLAgent.__init__(self, env,
+                                             num_pretraining_epochs=num_pretraining_epochs,
+                                             num_training_epochs_per_iteration=num_training_epochs_per_iteration,
+                                             preferences_per_iteration=preferences_per_iteration)
+        RandomSegmentQueryGenerator.__init__(self, self.policy_model)
+        RewardTrainer.__init__(self, self.reward_model)

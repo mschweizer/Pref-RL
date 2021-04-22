@@ -19,10 +19,6 @@ class AbstractPbRLAgent(RLAgent, AbstractQueryGenerator, AbstractQuerySelector, 
         self.preferences = PreferenceDataset(capacity=dataset_capacity)
 
         RLAgent.__init__(self, env=add_internal_env_wrappers(env=env, reward_model=self.reward_model))
-        AbstractQueryGenerator.__init__(self)
-        AbstractQuerySelector.__init__(self)
-        AbstractPreferenceQuerent.__init__(self)
-        AbstractRewardTrainer.__init__(self)
 
     @abstractmethod
     def learn_reward_model(self, *args, **kwargs):
