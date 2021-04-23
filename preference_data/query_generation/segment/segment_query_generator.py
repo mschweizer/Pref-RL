@@ -1,6 +1,8 @@
 import sys
 from abc import ABC, abstractmethod
 
+from scipy import special, optimize
+
 from preference_data.query_generation.query_generator import AbstractQueryGenerator
 from preference_data.query_generation.segment.segment_sampler import AbstractSegmentSampler, RandomSegmentSampler
 from preference_data.query_generation.segment.segment_sampling_callback import SegmentSamplingCallback
@@ -60,4 +62,25 @@ class RandomSegmentQueryGenerator(AbstractSegmentQueryGenerator, RandomSegmentSa
         AbstractSegmentQueryGenerator.__init__(self, policy_model)
 
     def calculate_num_segment_samples(self, num_queries):
-        return num_queries * self.segments_per_query
+        """
+        Calculate required number of segment samples so that the expected number of duplicate (random) queries
+        is below 2%, see https://en.wikipedia.org/wiki/Birthday_problem#Collision_counting
+        """
+        max_duplicates = 0.02 * num_queries
+        initial_guess = 0.1 * num_queries
+
+        num_trajectories = optimize.fsolve(lambda x: self._diff_max_expected_duplicates(x, num_queries=num_queries,
+                                                                                        max_duplicates=max_duplicates),
+                                           initial_guess)
+
+        return max(self.segments_per_query, int(num_trajectories[0]))
+
+    def _diff_max_expected_duplicates(self, num_trajectories, num_queries, max_duplicates):
+        return max_duplicates - self._expected_duplicates(num_trajectories, num_queries)
+
+    def _expected_duplicates(self, num_trajectories, num_queries):
+        possible_queries = special.binom(num_trajectories, self.segments_per_query)
+        expected_duplicates = \
+            num_queries - possible_queries + \
+            possible_queries * pow((possible_queries - 1) / possible_queries, num_queries)
+        return expected_duplicates
