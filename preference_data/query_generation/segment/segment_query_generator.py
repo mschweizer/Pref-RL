@@ -37,7 +37,7 @@ class AbstractSegmentQueryGenerator(AbstractQueryGenerator, AbstractSegmentSampl
 
     def _generate_samples_with_training(self, num_samples):
         sampling_callback = SegmentSamplingCallback(self, self.segment_sampling_interval, num_samples)
-        self.policy_model.learn(total_timesteps=sys.maxsize, callback=sampling_callback)
+        self.policy_model.learn(total_timesteps=sys.maxsize, callback=sampling_callback, reset_num_timesteps=False)
 
     def _generate_samples_without_training(self, num_samples):
         num_timesteps = 0
@@ -58,8 +58,8 @@ class AbstractSegmentQueryGenerator(AbstractQueryGenerator, AbstractSegmentSampl
 
 
 class RandomSegmentQueryGenerator(AbstractSegmentQueryGenerator, RandomSegmentSampler, RandomSegmentSelector):
-    def __init__(self, policy_model):
-        AbstractSegmentQueryGenerator.__init__(self, policy_model)
+    def __init__(self, policy_model, segment_sampling_interval=30):
+        AbstractSegmentQueryGenerator.__init__(self, policy_model, segment_sampling_interval=segment_sampling_interval)
 
     def calculate_num_segment_samples(self, num_queries):
         """
