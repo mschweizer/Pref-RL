@@ -54,7 +54,7 @@ class AbstractSequentialPbRLAgent(AbstractPbRLAgent, ABC):
         self.queries.extend(generated_queries)
 
 
-class SequentialPbRLAgent(AbstractSequentialPbRLAgent, RandomSegmentQueryGenerator, RandomQuerySelector,
+class SequentialPbRLAgent(AbstractSequentialPbRLAgent, RandomSegmentQueryGenerator, IndexQuerySelector,
                           RewardMaximizingOracle, RewardTrainer):
     def __init__(self, env, num_pretraining_epochs=10, num_training_epochs_per_iteration=10,
                  preferences_per_iteration=500):
