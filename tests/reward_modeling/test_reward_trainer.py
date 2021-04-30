@@ -9,15 +9,14 @@ from reward_modeling.reward_trainer import RewardTrainer
 
 def test_writes_summary(cartpole_env):
     running_loss = 100
-    iteration = 1500
 
     with patch('reward_modeling.reward_trainer.SummaryWriter'):
         reward_trainer = RewardTrainer(RewardModel(cartpole_env))
-        reward_trainer._write_summary(running_loss, iteration, pretraining=False)
+        reward_trainer._write_summary(running_loss, pretraining=False)
 
         reward_trainer.writer.add_scalar.assert_called_with('training loss',
                                                             running_loss / reward_trainer.writing_interval,
-                                                            iteration)
+                                                            reward_trainer.global_training_step)
 
 
 def test_is_writing_iteration(cartpole_env):
