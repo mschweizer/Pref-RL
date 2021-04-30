@@ -1,3 +1,4 @@
+import itertools
 import random
 from abc import ABC, abstractmethod
 
@@ -22,4 +23,4 @@ class RandomQuerySelector(AbstractQuerySelector):
 class IndexQuerySelector(AbstractQuerySelector):
 
     def select_queries(self, queries, num_queries=1):
-        return queries[:num_queries]
+        return list(itertools.islice(queries, len(queries) - num_queries, len(queries)))

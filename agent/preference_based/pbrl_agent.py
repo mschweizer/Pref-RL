@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from collections import deque
 
 from agent.rl_agent import RLAgent
 from preference_data.dataset import PreferenceDataset
@@ -15,7 +16,8 @@ class AbstractPbRLAgent(RLAgent, AbstractQueryGenerator, AbstractQuerySelector, 
     def __init__(self, env, dataset_capacity=3000):
         self.reward_model = RewardModel(env)
 
-        self.queries = []
+        # TODO: make deque len either a function of preferences per iteration or a param
+        self.queries = deque(maxlen=700)
         self.preferences = PreferenceDataset(capacity=dataset_capacity)
 
         RLAgent.__init__(self, env=add_internal_env_wrappers(env=env, reward_model=self.reward_model))

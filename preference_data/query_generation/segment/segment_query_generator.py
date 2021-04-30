@@ -1,5 +1,6 @@
 import sys
 from abc import ABC, abstractmethod
+from collections import deque
 
 from scipy import special, optimize
 
@@ -20,7 +21,8 @@ class AbstractSegmentQueryGenerator(AbstractQueryGenerator, AbstractSegmentSampl
         self.segment_sampling_interval = segment_sampling_interval
         self.policy_model = policy_model
 
-        self.segment_samples = []
+        # TODO: make deque len either a function of preferences per iteration or a param
+        self.segment_samples = deque(maxlen=250)
 
     def generate_queries(self, num_queries=1, with_training=True):
         num_samples = self.calculate_num_segment_samples(num_queries)
