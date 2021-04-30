@@ -17,7 +17,7 @@ class AbstractRewardTrainer(ABC):
 
 
 class RewardTrainer(AbstractRewardTrainer):
-    def __init__(self, reward_model, batch_size=64, learning_rate=1e-3, summary_writing_interval=64):
+    def __init__(self, reward_model, batch_size=64, learning_rate=1e-3, summary_writing_interval=8):
         AbstractRewardTrainer.__init__(self)
         self.choice_model = ChoiceModel(reward_model)
         self.optimizer = optim.Adam(self.choice_model.parameters(), lr=learning_rate)
@@ -25,6 +25,7 @@ class RewardTrainer(AbstractRewardTrainer):
         self.batch_size = batch_size
         self.writer = SummaryWriter()
         self.writing_interval = summary_writing_interval
+        self.global_training_step = 0
 
     def train_reward_model(self, preferences, epochs, pretraining=False, *args, **kwargs):
         train_loader = torch.utils.data.DataLoader(dataset=preferences, batch_size=self.batch_size)
@@ -45,21 +46,23 @@ class RewardTrainer(AbstractRewardTrainer):
 
                 running_loss += loss.item()
 
-                if self._is_writing_iteration(i):
-                    iteration = self._calculate_iteration(epoch, i, train_loader)
-                    self._write_summary(running_loss, iteration, pretraining)
+                if self._is_writing_iteration(self.global_training_step):
+                    self._write_summary(running_loss, pretraining)
                     running_loss = 0.0
+
+                self.global_training_step += 1
+
+        if pretraining:
+            # reset global step after every round of pretraining
+            self.global_training_step = 0
 
     def _is_writing_iteration(self, i):
         return i % self.writing_interval == self.writing_interval - 1
 
-    @staticmethod
-    def _calculate_iteration(epoch, i, train_loader):
-        return epoch * len(train_loader) + i
-
-    def _write_summary(self, running_loss, iteration, pretraining):
+    def _write_summary(self, running_loss, pretraining):
         tag = "training loss"
         tag += " (pretraining)" if pretraining else ""
+        average_loss = running_loss / self.writing_interval
         self.writer.add_scalar(tag,
-                               running_loss / self.writing_interval,
-                               iteration)
+                               average_loss,
+                               self.global_training_step)
