@@ -8,17 +8,28 @@ from reward_modeling.reward_trainer import RewardTrainer
 
 
 def test_writes_summary(cartpole_env):
-    batch_loss = 100
-    i = 14
-    epoch = 3
-    batch_size = 64
+    running_loss = 100
+    iteration = 1500
 
     with patch('reward_modeling.reward_trainer.SummaryWriter'):
-        reward_trainer = RewardTrainer(RewardModel(cartpole_env), batch_size=batch_size)
-        reward_trainer._write_summary(epoch=epoch, batch_loss=batch_loss, pretraining=False, i=i)
+        reward_trainer = RewardTrainer(RewardModel(cartpole_env))
+        reward_trainer._write_summary(running_loss, iteration, pretraining=False)
+
         reward_trainer.writer.add_scalar.assert_called_with('training loss',
-                                                            batch_loss / reward_trainer.batch_size,
-                                                            reward_trainer._calculate_iteration(epoch=epoch, i=i))
+                                                            running_loss / reward_trainer.writing_interval,
+                                                            iteration)
+
+
+def test_is_writing_iteration(cartpole_env):
+    reward_model_trainer = RewardTrainer(RewardModel(cartpole_env))
+    reward_model_trainer.writing_interval = 10
+
+    # Note: we start counting at 0
+    no_writing_iteration = 7
+    writing_iteration = 19
+
+    assert reward_model_trainer._is_writing_iteration(writing_iteration)
+    assert not reward_model_trainer._is_writing_iteration(no_writing_iteration)
 
 
 def test_training_has_effect_on_any_model_parameters(env, preference):
