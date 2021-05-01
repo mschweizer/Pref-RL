@@ -20,9 +20,11 @@ def main():
 
     env = create_env(args.env_id, termination_penalty=10.)
 
-    agent = SequentialPbRLAgent(env=env)
+    agent = SequentialPbRLAgent(env=env, num_pretraining_epochs=10,
+                                num_training_epochs_per_iteration=20,
+                                preferences_per_iteration=30)
 
-    agent.learn_reward_model(num_training_timesteps=100000, num_pretraining_preferences=500)
+    agent.learn_reward_model(num_training_timesteps=200000, num_pretraining_preferences=500)
 
     env.close()
 
