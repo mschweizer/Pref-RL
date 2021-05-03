@@ -5,7 +5,7 @@ from agent.rl_agent import RLAgent
 from preference_data.preference.experience import Experience
 from preference_data.preference.label import Label
 from reward_modeling.models.choice import ChoiceModel
-from reward_modeling.models.reward import RewardModel
+from reward_modeling.models.reward.mlp import MlpRewardModel
 from wrappers.internal.reward_predictor import RewardPredictor
 from wrappers.utils import create_env, add_internal_env_wrappers
 
@@ -20,9 +20,10 @@ def env(request):
     return create_env(env_id=request.param, termination_penalty=0)
 
 
-@pytest.fixture()
-def reward_wrapper(cartpole_env):
-    return RewardPredictor(env=cartpole_env, reward_model=RewardModel(cartpole_env), trajectory_buffer_size=100)
+@pytest.fixture(params=[MlpRewardModel])
+def reward_wrapper(cartpole_env, request):
+    reward_model_class = request.param
+    return RewardPredictor(env=cartpole_env, reward_model=reward_model_class(cartpole_env), trajectory_buffer_size=100)
 
 
 @pytest.fixture()
@@ -40,9 +41,10 @@ def segment_samples():
     return [segment_1, segment_2]
 
 
-@pytest.fixture()
-def policy_model(cartpole_env):
-    return A2C('MlpPolicy', env=add_internal_env_wrappers(cartpole_env, RewardModel(cartpole_env)), n_steps=10)
+@pytest.fixture(params=[MlpRewardModel])
+def policy_model(cartpole_env, request):
+    reward_model_class = request.param
+    return A2C('MlpPolicy', env=add_internal_env_wrappers(cartpole_env, reward_model_class(cartpole_env)), n_steps=10)
 
 
 @pytest.fixture()

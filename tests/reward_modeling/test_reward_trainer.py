@@ -3,7 +3,7 @@ from unittest.mock import patch
 import torch
 
 from preference_data.dataset import PreferenceDataset
-from reward_modeling.models.reward import RewardModel
+from reward_modeling.models.reward.mlp import MlpRewardModel
 from reward_modeling.reward_trainer import RewardTrainer
 
 
@@ -11,7 +11,7 @@ def test_writes_summary(cartpole_env):
     running_loss = 100
 
     with patch('reward_modeling.reward_trainer.SummaryWriter'):
-        reward_trainer = RewardTrainer(RewardModel(cartpole_env))
+        reward_trainer = RewardTrainer(MlpRewardModel(cartpole_env))
         reward_trainer._write_summary(running_loss, pretraining=False)
 
         reward_trainer.writer.add_scalar.assert_called_with('training loss',
@@ -20,7 +20,7 @@ def test_writes_summary(cartpole_env):
 
 
 def test_is_writing_iteration(cartpole_env):
-    reward_model_trainer = RewardTrainer(RewardModel(cartpole_env))
+    reward_model_trainer = RewardTrainer(MlpRewardModel(cartpole_env))
     reward_model_trainer.writing_interval = 10
 
     # Note: we start counting at 0
@@ -37,7 +37,7 @@ def test_training_has_effect_on_any_model_parameters(env, preference):
     https://github.com/suriyadeepan/torchtest/blob/66a2c8b669aa23601f64e208463e9449ffc135da/torchtest/torchtest.py#L106
     """
 
-    reward_trainer = RewardTrainer(reward_model=RewardModel(env), batch_size=4)
+    reward_trainer = RewardTrainer(reward_model=MlpRewardModel(env), batch_size=4)
     preferences = PreferenceDataset(preferences=[preference, preference, preference, preference])
 
     # TODO: Clarify if the following modifications to torch have an effect on other tests
