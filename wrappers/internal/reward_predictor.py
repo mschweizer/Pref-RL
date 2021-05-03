@@ -29,7 +29,6 @@ class RewardPredictor(Wrapper):
         # support the deepcopy protocol at the moment'
         info['original_reward'] = torch.tensor(reward)
 
-        # TODO: should this really be the last observation / done? see implementation of stable baselines
         transformed_reward = self.reward(self._last_observation)
         experience = Experience(self._last_observation, action, transformed_reward, self._last_done, info)
 

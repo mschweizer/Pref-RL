@@ -29,7 +29,7 @@ def is_atari_env(env):
 
 # TODO: Make this function a static method of the pbrl agent ("_wrap_env", see stable baselines base class)
 def add_internal_env_wrappers(env, reward_model):
-    env = RewardPredictor(env, reward_model)
+    env = RewardPredictor(env, reward_model)  # TODO: choose the reward prediction wrapper suitable for the reward model
     env = RewardStandardizer(env)
     return env
 
