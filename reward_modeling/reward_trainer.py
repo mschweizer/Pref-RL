@@ -17,7 +17,7 @@ class AbstractRewardTrainer(ABC):
 
 
 class RewardTrainer(AbstractRewardTrainer):
-    def __init__(self, reward_model, batch_size=64, learning_rate=1e-3, summary_writing_interval=8):
+    def __init__(self, reward_model, batch_size=64, learning_rate=1e-3, summary_writing_interval=16):
         AbstractRewardTrainer.__init__(self)
         self.choice_model = ChoiceModel(reward_model)
         self.optimizer = optim.Adam(self.choice_model.parameters(), lr=learning_rate)
