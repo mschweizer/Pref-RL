@@ -3,3 +3,4 @@ pytest~=6.1.2
 torch~=1.7.0
 numpy~=1.19.4
 scipy~=1.5.4
+stable-baselines3[extra]~=1.0
