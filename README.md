@@ -1,9 +1,13 @@
 # Preference-based RL Framework
 
 ## Installation
+These instructions presume a *nix or OS X OS. 
 
 ### Prerequisites
-This framework requires python 3.6+.
+This framework requires python 3.6+ and `pip`.
+
+Install [`pip`](http://www.pip-installer.org/en/latest/) with these
+[installation instructions](http://www.pip-installer.org/en/latest/installing.html).
 
 ### Install using pip
 <a id="install-with-pip"></a>
@@ -11,6 +15,11 @@ Install the requirements using pip:
 ```
 pip install -r requirements.txt
 ```
+### Windows
+On Windows, you may encounter issues running OpenAI Gym Atari environments.
+[This stack overflow answer](https://stackoverflow.com/a/46739299/3902240)
+could help. 
+
 ## Example
 Here is an example of how to build a sequential PbRL agent and train it in 
 the mountaincar environment:
@@ -51,7 +60,7 @@ tensorboard --logdir=runs
 ```
 View the output by navigating to https://localhost:6006.
 
-## Testing the installation
+## Testing the implementation
 All unit tests in the framework can be run using `pytest`. 
 It is part of the project's requirements and has therefore already been installed. 
 Run the tests with:
