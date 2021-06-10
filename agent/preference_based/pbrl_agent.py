@@ -13,7 +13,7 @@ from wrappers.utils import add_internal_env_wrappers
 
 class AbstractPbRLAgent(RLAgent, AbstractQueryGenerator, AbstractQuerySelector, AbstractPreferenceQuerent,
                         AbstractRewardTrainer, ABC):
-    def __init__(self, env, reward_model_name="Mlp", dataset_capacity=4096):
+    def __init__(self, env, reward_model_name="Cnn", dataset_capacity=4096):
         reward_model_class = get_model_by_name(reward_model_name)
         self.reward_model = reward_model_class(env)
 
