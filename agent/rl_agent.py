@@ -8,5 +8,5 @@ class RLAgent:
     def choose_action(self, state):
         return self.policy_model.predict(state)
 
-    def learn_policy(self, total_timesteps):
+    def learn(self, total_timesteps):
         self.policy_model.learn(total_timesteps)

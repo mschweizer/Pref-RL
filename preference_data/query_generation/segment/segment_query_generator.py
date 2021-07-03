@@ -26,8 +26,8 @@ class AbstractSegmentQueryGenerator(AbstractQueryGenerator, AbstractSegmentSampl
 
     def generate_queries(self, num_queries=1, with_training=True):
         num_samples = self.calculate_num_segment_samples(num_queries)
-        self._generate_samples_with_training(num_samples) if with_training \
-            else self._generate_samples_without_training(num_samples)
+        self._generate_segment_samples_with_training(num_samples) if with_training \
+            else self._generate_segment_samples_without_training(num_samples)
         return [self.generate_query() for _ in range(num_queries)]
 
     def generate_query(self):
@@ -37,13 +37,12 @@ class AbstractSegmentQueryGenerator(AbstractQueryGenerator, AbstractSegmentSampl
     def calculate_num_segment_samples(self, num_queries):
         pass
 
-    def _generate_samples_with_training(self, num_samples):
+    def _generate_segment_samples_with_training(self, num_samples):
         sampling_callback = SegmentSamplingCallback(self, self.segment_sampling_interval, num_samples)
         self.policy_model.learn(total_timesteps=sys.maxsize, callback=sampling_callback, reset_num_timesteps=False)
 
-    def _generate_samples_without_training(self, num_samples):
-        num_timesteps = 0
-
+    def _generate_segment_samples_without_training(self, num_samples):
+        current_timestep = 0
         obs = self.policy_model.env.reset()
         while True:
             action, _states = self.policy_model.predict(obs)

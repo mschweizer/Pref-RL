@@ -1,14 +1,14 @@
 from unittest.mock import patch
 
-from preference_data.querent.synchronous.synchronous_querent import AbstractSynchronousPreferenceQuerent
+from preference_data.querent.oracle import AbstractOracle
 
 
-@patch.multiple(AbstractSynchronousPreferenceQuerent, __abstractmethods__=set())
+@patch.multiple(AbstractOracle, __abstractmethods__=set())
 def test_query_returns_preferences(segment_samples):
     queries = [segment_samples]
 
-    with patch.object(AbstractSynchronousPreferenceQuerent, "answer"):
-        preference_querent = AbstractSynchronousPreferenceQuerent()
+    with patch.object(AbstractOracle, "answer"):
+        preference_querent = AbstractOracle()
 
         preferences = preference_querent.query_preferences(queries)
 

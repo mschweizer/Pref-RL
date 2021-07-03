@@ -24,7 +24,7 @@ class AbstractPbRLAgent(RLAgent, AbstractQueryGenerator, AbstractQuerySelector, 
         RLAgent.__init__(self, env=add_internal_env_wrappers(env=env, reward_model=self.reward_model))
 
     @abstractmethod
-    def learn_reward_model(self, *args, **kwargs):
+    def pb_learn(self, *args, **kwargs):
         pass
 
     def predict_reward(self, observation):

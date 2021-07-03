@@ -10,7 +10,7 @@ def test_collect_preferences(cartpole_env, training):
     num_preferences = 3
     num_existing_preferences = len(agent.preferences)
 
-    agent.collect_preferences(num_preferences=num_preferences, with_policy_training=training)
+    agent._collect_preferences(num_preferences=num_preferences, with_policy_training=training)
 
     assert len(agent.preferences) == num_existing_preferences + num_preferences
 
@@ -21,4 +21,4 @@ def test_learn_reward_model(cartpole_env):
                                 num_training_epochs_per_iteration=1,
                                 preferences_per_iteration=1)
 
-    agent.learn_reward_model(num_training_timesteps=1, num_pretraining_preferences=1)
+    agent.pb_learn(num_training_timesteps=1, num_pretraining_preferences=1)
