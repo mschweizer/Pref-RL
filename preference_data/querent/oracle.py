@@ -1,8 +1,19 @@
+from abc import ABC, abstractmethod
+
 from preference_data.preference.label import Label
-from preference_data.querent.synchronous.synchronous_querent import AbstractSynchronousPreferenceQuerent
+from preference_data.querent.preference_querent import AbstractPreferenceQuerent
 
 
-class RewardMaximizingOracle(AbstractSynchronousPreferenceQuerent):
+class AbstractOracle(AbstractPreferenceQuerent, ABC):
+    def query_preferences(self, queries):
+        return [(query, self.answer(query)) for query in queries]
+
+    @abstractmethod
+    def answer(self, query):
+        pass
+
+
+class OriginalRewardMaximizingOracle(AbstractOracle):
     def answer(self, query):
         reward_1, reward_2 = self.compute_total_rewards(query)
         return self.compute_preference(reward_1, reward_2)
@@ -21,6 +32,6 @@ class RewardMaximizingOracle(AbstractSynchronousPreferenceQuerent):
             return Label.INDIFFERENT
 
 
-class RandomOracle(AbstractSynchronousPreferenceQuerent):
+class RandomOracle(AbstractOracle):
     def answer(self, query):
         return Label.random()
