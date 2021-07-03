@@ -8,7 +8,7 @@ from preference_data.query_generation.query_generator import AbstractQueryGenera
 from preference_data.query_generation.segment.segment_sampler import AbstractSegmentSampler, RandomSegmentSampler
 from preference_data.query_generation.segment.segment_sampling_callback import SegmentSamplingCallback
 from preference_data.query_generation.segment.segment_selector import AbstractSegmentSelector, RandomSegmentSelector
-from preference_data.query_generation.segment.utils import is_sampling_step, generation_volume_is_reached
+from preference_data.query_generation.segment.utils import is_sampling_step
 
 
 class AbstractSegmentQueryGenerator(AbstractQueryGenerator, AbstractSegmentSampler, AbstractSegmentSelector, ABC):
@@ -44,18 +44,26 @@ class AbstractSegmentQueryGenerator(AbstractQueryGenerator, AbstractSegmentSampl
     def _generate_segment_samples_without_training(self, num_samples):
         current_timestep = 0
         obs = self.policy_model.env.reset()
-        while True:
-            action, _states = self.policy_model.predict(obs)
-            _, _, done, _ = self.policy_model.env.step(action)
-            if done:
-                assert False, "Env should never return Done=True because of the wrapper that should prevent this."
-            if is_sampling_step(num_timesteps, self.segment_sampling_interval):
-                sample = self.try_to_sample()
-                if sample:
-                    self.segment_samples.append(sample)
-            if generation_volume_is_reached(num_samples, self.segment_samples):
-                break
-            num_timesteps += 1
+
+        while not self._generation_volume_is_reached(num_samples):
+            obs = self._make_step(obs)
+            if is_sampling_step(current_timestep, self.segment_sampling_interval):
+                self._generate_segment_sample()
+            current_timestep += 1
+
+    def _generation_volume_is_reached(self, generation_volume):
+        return generation_volume and len(self.segment_samples) >= generation_volume
+
+    def _generate_segment_sample(self):
+        sample = self.try_to_sample()
+        if sample:
+            self.segment_samples.append(sample)
+
+    def _make_step(self, obs):
+        action, _states = self.policy_model.predict(obs)
+        obs, _, done, _ = self.policy_model.env.step(action)
+        assert not done, "Env should never return Done=True because of the wrapper that should prevent this."
+        return obs
 
 
 class RandomSegmentQueryGenerator(AbstractSegmentQueryGenerator, RandomSegmentSampler, RandomSegmentSelector):
