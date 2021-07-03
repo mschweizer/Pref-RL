@@ -1,25 +1,22 @@
 from abc import ABC, abstractmethod
 
 from preference_data.preference.label import Label
-from preference_data.querent.preference_querent import AbstractPreferenceQuerent
 
 
-class AbstractOracle(AbstractPreferenceQuerent, ABC):
-    def query_preferences(self, queries):
-        return [(query, self.answer(query)) for query in queries]
+class AbstractOracle(ABC):
 
     @abstractmethod
     def answer(self, query):
         pass
 
 
-class OriginalRewardMaximizingOracle(AbstractOracle):
+class RewardMaximizingOracle(AbstractOracle):
     def answer(self, query):
-        reward_1, reward_2 = self.compute_total_rewards(query)
+        reward_1, reward_2 = self.compute_total_original_rewards(query)
         return self.compute_preference(reward_1, reward_2)
 
     @staticmethod
-    def compute_total_rewards(query):
+    def compute_total_original_rewards(query):
         return (sum(experience.info["original_reward"] for experience in segment) for segment in query)
 
     @staticmethod

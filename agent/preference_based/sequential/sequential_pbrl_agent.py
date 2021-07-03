@@ -1,9 +1,8 @@
 from abc import ABC
 
 from agent.preference_based.pbrl_agent import AbstractPbRLAgent
-from preference_data.querent.oracle import OriginalRewardMaximizingOracle
+from preference_data.querent.preference_querent import SyntheticPreferenceQuerent
 from preference_data.query_generation.segment.segment_query_generator import RandomSegmentQueryGenerator
-from preference_data.query_selection.query_selector import MostRecentlyGeneratedQuerySelector
 from reward_modeling.reward_trainer import RewardTrainer
 
 
@@ -43,19 +42,14 @@ class AbstractSequentialPbRLAgent(AbstractPbRLAgent, ABC):
         I.e. process waits until preference queries are answered."""
         generated_queries = self.generate_queries(num_preferences, with_policy_training)
         self.save_queries(generated_queries)
-        selected_queries = self.select_queries(queries=self.queries, num_queries=num_preferences)
-        collected_preferences = self.query_preferences(selected_queries)
-        self.save_preferences(collected_preferences)
-
-    def save_preferences(self, collected_preferences):
-        self.preferences.extend(collected_preferences)
+        self.query_preferences(num_preferences)
 
     def save_queries(self, generated_queries):
-        self.queries.extend(generated_queries)
+        self.query_candidates.extend(generated_queries)
 
 
-class SequentialPbRLAgent(AbstractSequentialPbRLAgent, RandomSegmentQueryGenerator, MostRecentlyGeneratedQuerySelector,
-                          OriginalRewardMaximizingOracle, RewardTrainer):
+class SequentialPbRLAgent(AbstractSequentialPbRLAgent,
+                          RandomSegmentQueryGenerator, SyntheticPreferenceQuerent, RewardTrainer):
     def __init__(self, env, num_pretraining_epochs=10, num_training_epochs_per_iteration=10,
                  preferences_per_iteration=500):
         AbstractSequentialPbRLAgent.__init__(self, env,

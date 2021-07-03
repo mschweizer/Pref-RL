@@ -1,13 +1,6 @@
-import pytest
-
 from preference_data.preference.experience import Experience
 from preference_data.preference.label import Label
-from preference_data.querent.oracle import OriginalRewardMaximizingOracle
-
-
-@pytest.fixture()
-def preference_oracle():
-    return OriginalRewardMaximizingOracle()
+from preference_data.querent.oracle import RewardMaximizingOracle
 
 
 def test_reward_maximizing_oracle_prefers_higher_reward():
@@ -15,10 +8,5 @@ def test_reward_maximizing_oracle_prefers_higher_reward():
                  Experience(observation=1, action=1, reward=1, done=1, info={"original_reward": 0})]
     segment_2 = [Experience(observation=1, action=1, reward=1, done=1, info={"original_reward": 25}),
                  Experience(observation=1, action=1, reward=1, done=1, info={"original_reward": 25})]
-    queries = [[segment_1, segment_2]]
 
-    preference_collector = OriginalRewardMaximizingOracle()
-
-    preferences = preference_collector.query_preferences(queries)
-
-    assert preferences[0][1] == Label.RIGHT
+    assert RewardMaximizingOracle().answer(query=[segment_1, segment_2]) == Label.RIGHT
