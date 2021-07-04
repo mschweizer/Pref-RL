@@ -23,9 +23,8 @@ class AbstractSequentialPbRLAgent(AbstractPbRLAgent, ABC):
         print("Finished reward model training")
 
     def _pretrain(self, num_pretraining_preferences):
-        print("Pretraining: Start data collection")
-        self._collect_preferences(num_pretraining_preferences, with_policy_training=False)
-        print("Pretraining: Start reward model training")
+        self.generate_queries(num_pretraining_preferences, with_policy_training=False)
+        self.query_preferences(num_pretraining_preferences)
         self.train_reward_model(self.preferences, self.num_pretraining_epochs, pretraining=True)
 
     def _train(self, total_timesteps):
@@ -34,18 +33,9 @@ class AbstractSequentialPbRLAgent(AbstractPbRLAgent, ABC):
             print("Training: Start new training iteration. {}/{} ({}%) RL training steps completed."
                   .format(self.policy_model.num_timesteps, total_timesteps, percent_completed))
 
-            self._collect_preferences(self.preferences_per_iteration, with_policy_training=True)
+            self.generate_queries(self.preferences_per_iteration, with_policy_training=True)
+            self.query_preferences(self.preferences_per_iteration)
             self.train_reward_model(self.preferences, self.num_training_epochs_per_iteration)
-
-    def _collect_preferences(self, num_preferences, with_policy_training=True):
-        """Collects preferences in a synchronous fashion.
-        I.e. process waits until preference queries are answered."""
-        generated_queries = self.generate_queries(num_preferences, with_policy_training)
-        self.save_queries(generated_queries)
-        self.query_preferences(num_preferences)
-
-    def save_queries(self, generated_queries):
-        self.query_candidates.extend(generated_queries)
 
 
 class SequentialPbRLAgent(AbstractSequentialPbRLAgent,
@@ -56,5 +46,6 @@ class SequentialPbRLAgent(AbstractSequentialPbRLAgent,
                                              num_pretraining_epochs=num_pretraining_epochs,
                                              num_training_epochs_per_iteration=num_training_epochs_per_iteration,
                                              preferences_per_iteration=preferences_per_iteration)
-        RandomSegmentQueryGenerator.__init__(self, self.policy_model, segment_sampling_interval=50)
+        RandomSegmentQueryGenerator.__init__(self, query_candidates=self.query_candidates,
+                                             policy_model=self.policy_model, segment_sampling_interval=50)
         RewardTrainer.__init__(self, self.reward_model)

@@ -7,7 +7,8 @@ from preference_data.query_generation.segment.segment_sampler import RandomSegme
 
 @pytest.fixture()
 def random_segment_sampler():
-    return RandomSegmentSampler(deque(maxlen=10), segment_length=5)
+    return RandomSegmentSampler(segment_samples=deque(maxlen=10),
+                                trajectory_buffer=deque(maxlen=10), segment_length=5)
 
 
 def test_samples_subsegment(random_segment_sampler):

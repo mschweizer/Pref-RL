@@ -20,6 +20,7 @@ class AbstractPbRLAgent(RLAgent, AbstractQueryGenerator, AbstractPreferenceQuere
         self.preferences = PreferenceDataset(capacity=dataset_capacity)
 
         RLAgent.__init__(self, env=add_internal_env_wrappers(env=env, reward_model=self.reward_model))
+        AbstractQueryGenerator.__init__(self, query_candidates=self.query_candidates)
         AbstractPreferenceQuerent.__init__(self, query_candidates=self.query_candidates, preferences=self.preferences)
 
     @abstractmethod

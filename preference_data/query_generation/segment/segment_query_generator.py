@@ -12,23 +12,24 @@ from preference_data.query_generation.segment.utils import is_sampling_step
 
 
 class AbstractSegmentQueryGenerator(AbstractQueryGenerator, AbstractSegmentSampler, AbstractSegmentSelector, ABC):
-    def __init__(self, policy_model, segments_per_query=2, segment_sampling_interval=30):
-        AbstractQueryGenerator.__init__(self)
+    def __init__(self, query_candidates, policy_model, segments_per_query=2, segment_sampling_interval=30):
+        # TODO: make deque len either a function of preferences per iteration or a param
+        self.segment_samples = deque(maxlen=250)
+
+        AbstractQueryGenerator.__init__(self, query_candidates)
         # TODO: Wrap policy model in a wrapper and make trajectory buffer a property of the wrapper class
-        AbstractSegmentSampler.__init__(self, trajectory_buffer=policy_model.env.envs[0].trajectory_buffer)
+        AbstractSegmentSampler.__init__(self, segment_samples=self.segment_samples,
+                                        trajectory_buffer=policy_model.env.envs[0].trajectory_buffer)
 
         self.segments_per_query = segments_per_query
         self.segment_sampling_interval = segment_sampling_interval
         self.policy_model = policy_model
 
-        # TODO: make deque len either a function of preferences per iteration or a param
-        self.segment_samples = deque(maxlen=250)
-
-    def generate_queries(self, num_queries=1, with_training=True):
+    def generate_queries(self, num_queries=1, with_policy_training=True):
         num_samples = self.calculate_num_segment_samples(num_queries)
-        self._generate_segment_samples_with_training(num_samples) if with_training \
+        self._generate_segment_samples_with_training(num_samples) if with_policy_training \
             else self._generate_segment_samples_without_training(num_samples)
-        return [self.generate_query() for _ in range(num_queries)]
+        self.query_candidates.extend([self.generate_query() for _ in range(num_queries)])
 
     def generate_query(self):
         return self.select_segments(self.segment_samples, self.segments_per_query)
@@ -67,8 +68,11 @@ class AbstractSegmentQueryGenerator(AbstractQueryGenerator, AbstractSegmentSampl
 
 
 class RandomSegmentQueryGenerator(AbstractSegmentQueryGenerator, RandomSegmentSampler, RandomSegmentSelector):
-    def __init__(self, policy_model, segment_sampling_interval=30):
-        AbstractSegmentQueryGenerator.__init__(self, policy_model, segment_sampling_interval=segment_sampling_interval)
+    def __init__(self, query_candidates, policy_model, segment_sampling_interval=30):
+        AbstractSegmentQueryGenerator.__init__(self,
+                                               query_candidates=query_candidates,
+                                               policy_model=policy_model,
+                                               segment_sampling_interval=segment_sampling_interval)
 
     def calculate_num_segment_samples(self, num_queries):
         """

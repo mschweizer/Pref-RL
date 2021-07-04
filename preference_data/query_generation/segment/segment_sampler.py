@@ -5,7 +5,8 @@ import numpy as np
 
 
 class AbstractSegmentSampler(ABC):
-    def __init__(self, trajectory_buffer, segment_length=25):
+    def __init__(self, segment_samples, trajectory_buffer, segment_length=25):
+        self.segment_samples = segment_samples
         self.trajectory_buffer = trajectory_buffer
         self.segment_length = segment_length
 

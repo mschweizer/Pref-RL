@@ -2,13 +2,21 @@ from unittest.mock import patch, Mock
 
 import pytest
 
-from preference_data.query_generation.segment.segment_query_generator import AbstractSegmentQueryGenerator
+from preference_data.query_generation.segment.segment_query_generator import AbstractSegmentQueryGenerator, \
+    RandomSegmentQueryGenerator
 
 
 @pytest.fixture()
 @patch.multiple(AbstractSegmentQueryGenerator, __abstractmethods__=set())
 def segment_query_generator(policy_model):
-    return AbstractSegmentQueryGenerator(policy_model)
+    return AbstractSegmentQueryGenerator(query_candidates=[], policy_model=policy_model)
+
+
+def test_generate_queries(policy_model):
+    random_segment_query_generator = RandomSegmentQueryGenerator(query_candidates=[], policy_model=policy_model)
+    num_queries = 2
+    random_segment_query_generator.generate_queries(num_queries=num_queries)
+    assert len(random_segment_query_generator.query_candidates) == num_queries
 
 
 def test_generation_volume_reached(segment_query_generator):
