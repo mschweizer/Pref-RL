@@ -26,7 +26,7 @@ class AbstractSegmentQueryGenerator(AbstractQueryGenerator, AbstractSegmentSampl
         self.segment_sampling_interval = segment_sampling_interval
         self.policy_model = policy_model
 
-        self.timestamp = strftime("_%a-%d%b%Y_%H-%M-%S", )
+        self.timestamp = strftime("%a-%d%b%Y_%H-%M-%S", )
 
     def generate_queries(self, num_queries=1, with_policy_training=True):
         num_samples = self.calculate_num_segment_samples(num_queries)
