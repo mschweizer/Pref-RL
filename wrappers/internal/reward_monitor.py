@@ -22,15 +22,6 @@ class RewardMonitor(Monitor):
             ep_len = len(self.original_rewards)
             ep_info = {"r": round(ep_rew, 6), "l": ep_len, "t": round(time.time() - self.t_start, 6)}
             self.original_rewards = []
-            for key in self.info_keywords:
-                ep_info[key] = info[key]
-            self.episode_rewards.append(ep_rew)
-            self.episode_lengths.append(ep_len)
-            self.episode_times.append(time.time() - self.t_start)
-            ep_info.update(self.current_reset_info)
-            if self.logger:
-                self.logger.writerow(ep_info)
-                self.file_handler.flush()
             info["episode"] = ep_info
 
         return observation, reward, done, info

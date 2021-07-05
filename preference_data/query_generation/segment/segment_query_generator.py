@@ -1,6 +1,7 @@
 import sys
 from abc import ABC, abstractmethod
 from collections import deque
+from time import strftime
 
 from scipy import special, optimize
 
@@ -25,6 +26,8 @@ class AbstractSegmentQueryGenerator(AbstractQueryGenerator, AbstractSegmentSampl
         self.segment_sampling_interval = segment_sampling_interval
         self.policy_model = policy_model
 
+        self.timestamp = strftime("_%a-%d%b%Y_%H-%M-%S", )
+
     def generate_queries(self, num_queries=1, with_policy_training=True):
         num_samples = self.calculate_num_segment_samples(num_queries)
         self._generate_segment_samples_with_training(num_samples) if with_policy_training \
@@ -40,7 +43,8 @@ class AbstractSegmentQueryGenerator(AbstractQueryGenerator, AbstractSegmentSampl
 
     def _generate_segment_samples_with_training(self, num_samples):
         sampling_callback = SegmentSamplingCallback(self, self.segment_sampling_interval, num_samples)
-        self.policy_model.learn(total_timesteps=sys.maxsize, callback=sampling_callback, reset_num_timesteps=False)
+        self.policy_model.learn(total_timesteps=sys.maxsize, callback=sampling_callback, reset_num_timesteps=False,
+                                log_interval=10, tb_log_name=f"A2C_{self.timestamp}")
 
     def _generate_segment_samples_without_training(self, num_samples):
         current_timestep = 0
