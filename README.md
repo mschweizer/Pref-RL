@@ -1,5 +1,5 @@
-# PrefRL
-`PrefRL` provides ready-to-use PbRL agents that are easily extensible.
+# Pref-RL
+`Pref-RL` provides ready-to-use PbRL agents that are easily extensible.
 
 We strive for:
 - Training of state-of-the-art PbRL agents on arbitrary environments in a few lines of code.
