@@ -1,15 +1,16 @@
 from unittest.mock import Mock, patch
 
-from preference_data.query_generation.segment.segment_query_generator import AbstractSegmentQueryGenerator
+from preference_data.query_generation.segment.segment_sampler import AbstractSegmentSampler
 from preference_data.query_generation.segment.segment_sampling_callback import SegmentSamplingCallback
 
 
-@patch.multiple(AbstractSegmentQueryGenerator, __abstractmethods__=set())
+@patch.multiple(AbstractSegmentSampler, __abstractmethods__=set())
 def test_samples_trajectory_segment_every_sampling_interval(policy_model):
     sample_mock = Mock()
     interval = 10
 
-    segment_sampler = AbstractSegmentQueryGenerator(policy_model=policy_model)
+    segment_sampler = AbstractSegmentSampler(segment_samples=[],
+                                             trajectory_buffer=policy_model.env.envs[0].trajectory_buffer)
     segment_sampler.try_to_sample = sample_mock
 
     callback = SegmentSamplingCallback(segment_sampler=segment_sampler, sampling_interval=interval,

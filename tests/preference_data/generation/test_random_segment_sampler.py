@@ -7,7 +7,8 @@ from preference_data.query_generation.segment.segment_sampler import RandomSegme
 
 @pytest.fixture()
 def random_segment_sampler():
-    return RandomSegmentSampler(deque(maxlen=10), segment_length=5)
+    return RandomSegmentSampler(segment_samples=deque(maxlen=10),
+                                trajectory_buffer=deque(maxlen=10), segment_length=5)
 
 
 def test_samples_subsegment(random_segment_sampler):
@@ -18,7 +19,7 @@ def test_samples_subsegment(random_segment_sampler):
     buffer.append(2)
     buffer.append(3)
 
-    segment = random_segment_sampler.generate_sample()
+    segment = random_segment_sampler.draw_segment_sample()
 
     def segment_is_subsegment_of_buffered_experiences(sample_segment):
         first_experience = sample_segment[0]
@@ -41,13 +42,13 @@ def test_sampled_segment_has_correct_length(random_segment_sampler):
     random_segment_sampler.trajectory_buffer = buffer
     random_segment_sampler.segment_length = 1
 
-    segment_len_1 = random_segment_sampler.generate_sample()
+    segment_len_1 = random_segment_sampler.draw_segment_sample()
 
     random_segment_sampler.segment_length = 2
-    segment_len_2 = random_segment_sampler.generate_sample()
+    segment_len_2 = random_segment_sampler.draw_segment_sample()
 
     random_segment_sampler.segment_length = 0
-    segment_len_0 = random_segment_sampler.generate_sample()
+    segment_len_0 = random_segment_sampler.draw_segment_sample()
 
     assert len(segment_len_0) == 0
     assert len(segment_len_1) == 1

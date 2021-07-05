@@ -24,7 +24,7 @@ def main():
                                 num_training_epochs_per_iteration=16,
                                 preferences_per_iteration=32)
 
-    agent.learn_reward_model(num_training_timesteps=200000, num_pretraining_preferences=512)
+    agent.pb_learn(num_training_timesteps=200000, num_pretraining_preferences=512)
 
     env.close()
 

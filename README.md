@@ -4,7 +4,7 @@
 These instructions presume a *nix or OS X OS. 
 
 ### Prerequisites
-This framework requires python 3.6+ and `pip`.
+This framework requires Python 3.6+ and `pip`.
 
 Install [`pip`](http://www.pip-installer.org/en/latest/) with these
 [installation instructions](http://www.pip-installer.org/en/latest/installing.html).
@@ -27,13 +27,12 @@ the mountaincar environment:
 from agent.preference_based.sequential.sequential_pbrl_agent import AbstractSequentialPbRLAgent
 
 from preference_data.query_generation.segment.segment_query_generator import RandomSegmentQueryGenerator
-from preference_data.query_selection.query_selector import IndexQuerySelector
-from preference_data.querent.synchronous.oracle.oracle import RewardMaximizingOracle
+from preference_data.querent.preference_querent import SyntheticPreferenceQuerent
 from reward_modeling.reward_trainer import RewardTrainer
 from wrappers.utils import create_env
 
-class SequentialPbRLAgent(AbstractSequentialPbRLAgent, RandomSegmentQueryGenerator, IndexQuerySelector,
-                          RewardMaximizingOracle, RewardTrainer):
+class SequentialPbRLAgent(AbstractSequentialPbRLAgent,
+                          RandomSegmentQueryGenerator, SyntheticPreferenceQuerent, RewardTrainer):
     def __init__(self, env, num_pretraining_epochs=10, num_training_epochs_per_iteration=10,
                  preferences_per_iteration=500):
         AbstractSequentialPbRLAgent.__init__(self, env,
@@ -49,7 +48,7 @@ agent = SequentialPbRLAgent(env=env, num_pretraining_epochs=8,
                                 num_training_epochs_per_iteration=16,
                                 preferences_per_iteration=32)
 
-agent.learn_reward_model(num_training_timesteps=200000, num_pretraining_preferences=512)
+agent.pb_learn(num_training_timesteps=200000, num_pretraining_preferences=512)
 
 env.close()
 ```
