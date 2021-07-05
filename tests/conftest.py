@@ -20,6 +20,12 @@ def env(request):
     return create_env(env_id=request.param, termination_penalty=0)
 
 
+@pytest.fixture()
+def pong_env():
+    return create_env('Pong-v0', termination_penalty=0)
+
+
+# TODO: extend to AtariCnnRewardModel
 @pytest.fixture(params=[MlpRewardModel])
 def reward_wrapper(cartpole_env, request):
     reward_model_class = request.param
