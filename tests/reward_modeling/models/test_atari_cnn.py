@@ -1,6 +1,7 @@
 import random
 
 import numpy as np
+import pytest as pytest
 import torch
 
 from reward_modeling.models.reward.atari_cnn import AtariCnnRewardModel
@@ -23,3 +24,12 @@ def test_forward_pass(pong_env):
     prediction = reward_model(observation)
 
     assert prediction is not None
+
+
+def test_throws_error_for_wrong_input_dims(cartpole_env):
+    with pytest.raises(AssertionError) as exception_info:
+        AtariCnnRewardModel(cartpole_env)
+    assert isinstance(exception_info.value, AssertionError)
+    assert exception_info.value.args[0] == "Invalid input shape: you\'re using input shape (4, 4), (4, 84, 84, 1) " \
+                                           "expected, note to use this CNN for Atari environment wrapped with " \
+                                           "AtariWrapper (stable_baselines3)"
