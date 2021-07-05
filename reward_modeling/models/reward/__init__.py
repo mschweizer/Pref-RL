@@ -1,4 +1,4 @@
-from . import utils, mlp
+from . import utils, mlp, cnn
 
 utils.register_model("Mlp", mlp.MlpRewardModel)
-utils.register_model("Cnn", mlp.CnnRewardModel)
+utils.register_model("Cnn", cnn.CnnRewardModel)

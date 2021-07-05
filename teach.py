@@ -6,7 +6,7 @@ from wrappers.utils import create_env
 
 def create_cli():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--env_id', default="Breakout-v0")
+    parser.add_argument('--env_id', default="Breakout-v0", required=True)
     parser.add_argument('--num_training_data', default=0, type=int)
     parser.add_argument('--num_pretrain_data', default=0, type=int)
     parser.add_argument('--pretrain_epochs', default=5, type=int)
