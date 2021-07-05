@@ -1,7 +1,7 @@
 import random
 
 import numpy as np
-import pytest as pytest
+import pytest
 import torch
 
 from reward_modeling.models.reward.atari_cnn import AtariCnnRewardModel
@@ -30,6 +30,7 @@ def test_throws_error_for_wrong_input_dims(cartpole_env):
     with pytest.raises(AssertionError) as exception_info:
         AtariCnnRewardModel(cartpole_env)
     assert isinstance(exception_info.value, AssertionError)
-    assert exception_info.value.args[0] == "Invalid input shape: you\'re using input shape (4, 4), (4, 84, 84, 1) " \
-                                           "expected, note to use this CNN for Atari environment wrapped with " \
-                                           "AtariWrapper (stable_baselines3)"
+    assert exception_info.value.args[0] == "Invalid input shape for reward model: " \
+                                           "Input shape (4, 4) but expected (4, 84, 84, 1). " \
+                                           "Use this reward model only for Atari environments with screen size 84x84 " \
+                                           "(or compatible environments)."

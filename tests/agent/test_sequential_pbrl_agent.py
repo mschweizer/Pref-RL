@@ -29,9 +29,7 @@ def test_query_preferences(sequential_agent):
 
 
 def test_pb_learn(cartpole_env):
-    agent = SequentialPbRLAgent(cartpole_env,
-                                num_pretraining_epochs=1,
-                                num_training_epochs_per_iteration=1,
+    agent = SequentialPbRLAgent(cartpole_env, num_pretraining_epochs=1, num_training_epochs_per_iteration=1,
                                 preferences_per_iteration=1)
 
     agent.pb_learn(num_training_timesteps=1, num_pretraining_preferences=1)

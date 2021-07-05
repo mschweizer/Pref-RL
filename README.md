@@ -33,13 +33,15 @@ from wrappers.utils import create_env
 
 class SequentialPbRLAgent(AbstractSequentialPbRLAgent,
                           RandomSegmentQueryGenerator, SyntheticPreferenceQuerent, RewardTrainer):
-    def __init__(self, env, num_pretraining_epochs=10, num_training_epochs_per_iteration=10,
+    def __init__(self, env, reward_model_name="Mlp", num_pretraining_epochs=10, num_training_epochs_per_iteration=10,
                  preferences_per_iteration=500):
         AbstractSequentialPbRLAgent.__init__(self, env,
+                                             reward_model_name=reward_model_name,
                                              num_pretraining_epochs=num_pretraining_epochs,
                                              num_training_epochs_per_iteration=num_training_epochs_per_iteration,
                                              preferences_per_iteration=preferences_per_iteration)
-        RandomSegmentQueryGenerator.__init__(self, self.policy_model, segment_sampling_interval=50)
+        RandomSegmentQueryGenerator.__init__(self, query_candidates=self.query_candidates,
+                                             policy_model=self.policy_model, segment_sampling_interval=50)
         RewardTrainer.__init__(self, self.reward_model)
 
 env = create_env("MountainCar-v0", termination_penalty=10.)
