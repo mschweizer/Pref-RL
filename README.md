@@ -1,7 +1,42 @@
-# Preference-based RL Framework
+# PrefRL
+`PrefRL` provides ready-to-use PbRL agents that are easily extensible.
+
+We strive for:
+- Training of state-of-the-art PbRL agents on arbitrary environments in a few lines of code.
+- An easily extensible agent framework to quickly build your own custom agents on top.
+- A clean and well-maintained implementation (in Python).
+
+## Main features (planned)
+**Note:** The project is still in an experimental development phase. 
+The initial feature set is not yet completed and no performance tests have been conducted.
+
+#### General
+- [x] Simple training of deep PbRL agents on arbitrary Gym environments 
+- [x] FNN and CNN reward models (implemented in [PyTorch](https://pytorch.org/))
+- [x] Synthetic preference data generation
+- [ ] Human preference data generation / collection (under development)
+- [x] State-of-the-art RL algorithms (via [Stable Baselines3](https://github.com/DLR-RM/stable-baselines3))
+- [x] TensorBoard support 
+
+#### Bould your own agents
+- [x] Custom environments ([Open AI Gym](https://gym.openai.com/) compatible) 
+- [x] Custom reward models 
+- [x] Custom PbRL agents with almost no code
+- [x] Easy integration of custom components via MixIn architecture
+
+#### Code quality
+- [x] High code coverage (> 90%)
+- [ ] PEP8 code style
+- [ ] Type hints 
+- [ ] Learning performance benchmarked against state-of-the-art
+
+#### Other features
+- [ ] Active, ensemble-based query selection
+- [ ] Advanced reward model pretraining with IRL, intrinsic motivation, ...
+- [ ] [PEBBLE](https://github.com/pokaxpoka/B_Pref) PbRL algorithm  
 
 ## Installation
-These instructions presume a *nix or OS X OS. 
+These instructions presume a *nix or OS X operating system. 
 
 ### Prerequisites
 This framework requires Python 3.6+ and `pip`.
@@ -21,7 +56,7 @@ On Windows, you may encounter issues running OpenAI Gym Atari environments.
 could help. 
 
 ## Example
-Here is an example of how to build a sequential PbRL agent and train it in 
+Here is an example of how to build a sequential PbRL agent with almost no code and train it in 
 the mountaincar environment:
 ```python
 from agent.preference_based.sequential.sequential_pbrl_agent import AbstractSequentialPbRLAgent
