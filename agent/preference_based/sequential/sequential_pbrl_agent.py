@@ -23,19 +23,19 @@ class AbstractSequentialPbRLAgent(AbstractPbRLAgent, ABC):
         print("Finished reward model training")
 
     def _pretrain(self, num_pretraining_preferences):
-        self._pbrl_iteration(num_pretraining_preferences, pretraining=True)
+        self.generate_queries(num_pretraining_preferences, with_policy_training=False)
+        self.query_preferences(num_pretraining_preferences)
+        self.train_reward_model(self.preferences, self.num_pretraining_epochs, pretraining=True)
 
     def _train(self, total_timesteps):
         while self.policy_model.num_timesteps < total_timesteps:
             percent_completed = "%.2f" % ((self.policy_model.num_timesteps / total_timesteps) * 100)
             print("Training: Start new training iteration. {}/{} ({}%) RL training steps completed."
                   .format(self.policy_model.num_timesteps, total_timesteps, percent_completed))
-            self._pbrl_iteration(self.preferences_per_iteration, pretraining=False)
 
-    def _pbrl_iteration(self, num_preferences, pretraining):
-        self.generate_queries(num_preferences, with_policy_training=False if pretraining else True)
-        self.query_preferences(num_preferences)
-        self.train_reward_model(self.preferences, self.num_pretraining_epochs, pretraining=pretraining)
+            self.generate_queries(self.preferences_per_iteration, with_policy_training=True)
+            self.query_preferences(self.preferences_per_iteration)
+            self.train_reward_model(self.preferences, self.num_training_epochs_per_iteration)
 
 
 class SequentialPbRLAgent(AbstractSequentialPbRLAgent,

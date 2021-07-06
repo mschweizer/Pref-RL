@@ -9,7 +9,7 @@ def create_cli():
     parser.add_argument('--env_id', default="CartPole-v1", required=True)
     parser.add_argument('--reward_model', default="Mlp")
     parser.add_argument('--num_training_data', default=0, type=int)
-    parser.add_argument('--num_pretrain_data', default=0, type=int)
+    parser.add_argument('--num_pretrain_data', default=500, type=int)
     parser.add_argument('--pretrain_epochs', default=5, type=int)
     parser.add_argument('--num_rl_timesteps', default=5e6, type=int)
     return parser

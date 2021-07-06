@@ -17,7 +17,7 @@ class RewardMaximizingOracle(AbstractOracle):
 
     @staticmethod
     def compute_total_original_rewards(query):
-        return (sum(experience.info["original_reward"] for experience in segment) for segment in query)
+        return (sum(experience.info["external_reward"] for experience in segment) for segment in query)
 
     @staticmethod
     def compute_preference(reward_1, reward_2):
