@@ -27,7 +27,7 @@ class RewardPredictor(Wrapper):
         # A reward_modeling tensor is explicitly created because stable baselines performs a deep copy on 'info'
         # Torch otherwise throws a 'RuntimeError: Only Tensors created explicitly by the user (graph leaves)
         # support the deepcopy protocol at the moment'
-        info['original_reward'] = torch.tensor(reward)
+        info['external_reward'] = torch.tensor(reward)
 
         transformed_reward = self.reward(self._last_observation)
         experience = Experience(self._last_observation, action, transformed_reward, self._last_done, info)
