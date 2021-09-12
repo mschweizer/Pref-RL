@@ -2,8 +2,8 @@ import numpy as np
 import pytest
 import torch.utils.data
 
-from preference_data.dataset import PreferenceDataset, make_discard_warning
-from preference_data.preference.label import Label
+from agents.preference_based.dataset import PreferenceDataset, make_discard_warning
+from preference_collection.label import Label
 
 
 @pytest.fixture

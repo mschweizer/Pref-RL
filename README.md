@@ -59,15 +59,15 @@ could help.
 Here is an example of how to build a sequential PbRL agent with almost no code and train it in 
 the mountaincar environment:
 ```python
-from agent.preference_based.sequential.sequential_pbrl_agent import AbstractSequentialPbRLAgent
+from agents.preference_based.sequential.sequential_pbrl_agent import AbstractSequentialPbRLAgent
 
-from preference_data.query_generation.segment.segment_query_generator import RandomSegmentQueryGenerator
-from preference_data.querent.preference_querent import SyntheticPreferenceQuerent
-from reward_modeling.reward_trainer import RewardTrainer
+from query_generation.segment_queries import RandomSegmentQueryGenerator
+from preference_collection.preference_collector import SyntheticPreferenceCollectorMixin
+from reward_model_training.reward_trainer import RewardTrainer
 from wrappers.utils import create_env
 
 class SequentialPbRLAgent(AbstractSequentialPbRLAgent,
-                          RandomSegmentQueryGenerator, SyntheticPreferenceQuerent, RewardTrainer):
+                          RandomSegmentQueryGenerator, SyntheticPreferenceCollectorMixin, RewardTrainer):
     def __init__(self, env, reward_model_name="Mlp", num_pretraining_epochs=10, num_training_epochs_per_iteration=10,
                  preferences_per_iteration=500):
         AbstractSequentialPbRLAgent.__init__(self, env,

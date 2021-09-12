@@ -1,11 +1,11 @@
 import pytest
 from stable_baselines3 import A2C
 
-from agent.rl_agent import RLAgent
-from preference_data.preference.experience import Experience
-from preference_data.preference.label import Label
-from reward_modeling.models.choice import ChoiceModel
-from reward_modeling.models.reward.mlp import MlpRewardModel
+from agents.rl_agent import RLAgent
+from models.choice import ChoiceModel
+from models.reward.mlp import MlpRewardModel
+from preference_collection.label import Label
+from wrappers.internal.experience import Experience
 from wrappers.internal.reward_predictor import RewardPredictor
 from wrappers.utils import create_env, add_internal_env_wrappers
 
@@ -55,7 +55,7 @@ def policy_model(cartpole_env, request):
 
 @pytest.fixture()
 def preference(env):
-    # TODO: Return a fixed segment (without running the env!) to make it faster and deterministic
+    # TODO: Return a fixed segment_queries (without running the env!) to make it faster and deterministic
     segment_length = 6
     experiences = []
     env.reset()

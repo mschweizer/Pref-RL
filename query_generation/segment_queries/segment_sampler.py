@@ -14,7 +14,7 @@ class AbstractSegmentSampler(ABC):
         try:
             return self.draw_segment_sample()
         except AssertionError as e:
-            logging.warning("Trajectory segment sampling failed. " + str(e))
+            logging.warning("Trajectory segment_queries sampling failed. " + str(e))
 
     @abstractmethod
     def draw_segment_sample(self):

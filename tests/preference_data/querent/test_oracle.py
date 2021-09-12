@@ -1,6 +1,6 @@
-from preference_data.preference.experience import Experience
-from preference_data.preference.label import Label
-from preference_data.querent.oracle import RewardMaximizingOracle
+from preference_collection.label import Label
+from preference_collection.preference_oracle import RewardMaximizingOracle
+from wrappers.internal.experience import Experience
 
 
 def test_reward_maximizing_oracle_prefers_higher_reward():

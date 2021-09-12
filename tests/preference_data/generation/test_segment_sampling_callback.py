@@ -1,7 +1,7 @@
 from unittest.mock import Mock, patch
 
-from preference_data.query_generation.segment.segment_sampler import AbstractSegmentSampler
-from preference_data.query_generation.segment.segment_sampling_callback import SegmentSamplingCallback
+from query_generation.segment_queries.segment_sampler import AbstractSegmentSampler
+from query_generation.segment_queries.segment_sampling_callback import SegmentSamplingCallback
 
 
 @patch.multiple(AbstractSegmentSampler, __abstractmethods__=set())

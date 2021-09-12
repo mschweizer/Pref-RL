@@ -6,7 +6,7 @@ import torch.optim as optim
 import torch.utils.data
 from torch.utils.tensorboard import SummaryWriter
 
-from reward_modeling.models.choice import ChoiceModel
+from models.choice import ChoiceModel
 
 
 class AbstractRewardTrainer(ABC):

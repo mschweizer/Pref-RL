@@ -2,7 +2,7 @@ from collections import deque
 
 import pytest
 
-from preference_data.query_generation.segment.segment_sampler import RandomSegmentSampler
+from query_generation.segment_queries.segment_sampler import RandomSegmentSampler
 
 
 @pytest.fixture()

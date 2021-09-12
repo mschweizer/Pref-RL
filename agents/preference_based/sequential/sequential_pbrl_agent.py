@@ -1,14 +1,9 @@
-from abc import ABC
-
-from agent.preference_based.pbrl_agent import AbstractPbRLAgent
-from preference_data.querent.preference_querent import SyntheticPreferenceQuerent
-from preference_data.query_generation.segment.segment_query_generator import RandomSegmentQueryGenerator
-from reward_modeling.reward_trainer import RewardTrainer
+from agents.preference_based.pbrl_agent import AbstractPbRLAgent
 
 
-class AbstractSequentialPbRLAgent(AbstractPbRLAgent, ABC):
+class SequentialPbRLAgent(AbstractPbRLAgent):
     def __init__(self, env, reward_model_name="Mlp", num_pretraining_epochs=10, num_training_epochs_per_iteration=10,
-                 preferences_per_iteration=500):
+                 preferences_per_iteration=32):
         AbstractPbRLAgent.__init__(self, env=env, reward_model_name=reward_model_name)
 
         self.num_pretraining_epochs = num_pretraining_epochs
@@ -36,17 +31,3 @@ class AbstractSequentialPbRLAgent(AbstractPbRLAgent, ABC):
             self.generate_queries(self.preferences_per_iteration, with_policy_training=True)
             self.query_preferences(self.preferences_per_iteration)
             self.train_reward_model(self.preferences, self.num_training_epochs_per_iteration)
-
-
-class SequentialPbRLAgent(AbstractSequentialPbRLAgent,
-                          RandomSegmentQueryGenerator, SyntheticPreferenceQuerent, RewardTrainer):
-    def __init__(self, env, reward_model_name="Mlp", num_pretraining_epochs=10, num_training_epochs_per_iteration=10,
-                 preferences_per_iteration=500):
-        AbstractSequentialPbRLAgent.__init__(self, env,
-                                             reward_model_name=reward_model_name,
-                                             num_pretraining_epochs=num_pretraining_epochs,
-                                             num_training_epochs_per_iteration=num_training_epochs_per_iteration,
-                                             preferences_per_iteration=preferences_per_iteration)
-        RandomSegmentQueryGenerator.__init__(self, query_candidates=self.query_candidates,
-                                             policy_model=self.policy_model, segment_sampling_interval=50)
-        RewardTrainer.__init__(self, self.reward_model)

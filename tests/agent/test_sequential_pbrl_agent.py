@@ -1,6 +1,6 @@
 import pytest
 
-from agent.preference_based.sequential.sequential_pbrl_agent import SequentialPbRLAgent
+from agents.preference_based.sequential.sequential_pbrl_agent import SequentialPbRLAgent
 
 
 @pytest.fixture()

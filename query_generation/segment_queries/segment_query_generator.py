@@ -5,19 +5,20 @@ from time import strftime
 
 from scipy import special, optimize
 
-from preference_data.query_generation.query_generator import AbstractQueryGenerator
-from preference_data.query_generation.segment.segment_sampler import AbstractSegmentSampler, RandomSegmentSampler
-from preference_data.query_generation.segment.segment_sampling_callback import SegmentSamplingCallback
-from preference_data.query_generation.segment.segment_selector import AbstractSegmentSelector, RandomSegmentSelector
-from preference_data.query_generation.segment.utils import is_sampling_step
+from query_generation.query_generator import AbstractQueryGeneratorMixin
+from query_generation.segment_queries.segment_sampler import AbstractSegmentSampler, RandomSegmentSampler
+from query_generation.segment_queries.segment_sampling_callback import SegmentSamplingCallback
+from query_generation.segment_queries.segment_selector import AbstractSegmentSelectorMixin, RandomSegmentSelectorMixin
+from query_generation.segment_queries.utils import is_sampling_step
 
 
-class AbstractSegmentQueryGenerator(AbstractQueryGenerator, AbstractSegmentSampler, AbstractSegmentSelector, ABC):
+class AbstractSegmentQueryGeneratorMixin(AbstractQueryGeneratorMixin, AbstractSegmentSampler,
+                                         AbstractSegmentSelectorMixin, ABC):
     def __init__(self, query_candidates, policy_model, segments_per_query=2, segment_sampling_interval=30):
         # TODO: make deque len either a function of preferences per iteration or a param
         self.segment_samples = deque(maxlen=250)
 
-        AbstractQueryGenerator.__init__(self, query_candidates)
+        AbstractQueryGeneratorMixin.__init__(self, query_candidates)
         # TODO: Wrap policy model in a wrapper and make trajectory buffer a property of the wrapper class
         AbstractSegmentSampler.__init__(self, segment_samples=self.segment_samples,
                                         trajectory_buffer=policy_model.env.envs[0].trajectory_buffer)
@@ -71,16 +72,17 @@ class AbstractSegmentQueryGenerator(AbstractQueryGenerator, AbstractSegmentSampl
         return obs
 
 
-class RandomSegmentQueryGenerator(AbstractSegmentQueryGenerator, RandomSegmentSampler, RandomSegmentSelector):
+class RandomSegmentQueryGeneratorMixin(AbstractSegmentQueryGeneratorMixin, RandomSegmentSampler,
+                                       RandomSegmentSelectorMixin):
     def __init__(self, query_candidates, policy_model, segment_sampling_interval=30):
-        AbstractSegmentQueryGenerator.__init__(self,
-                                               query_candidates=query_candidates,
-                                               policy_model=policy_model,
-                                               segment_sampling_interval=segment_sampling_interval)
+        AbstractSegmentQueryGeneratorMixin.__init__(self,
+                                                    query_candidates=query_candidates,
+                                                    policy_model=policy_model,
+                                                    segment_sampling_interval=segment_sampling_interval)
 
     def calculate_num_segment_samples(self, num_queries):
         """
-        Calculate required number of segment samples so that the expected number of duplicate (random) queries
+        Calculate required number of segment_queries samples so that the expected number of duplicate (random) queries
         is below 2%, see https://en.wikipedia.org/wiki/Birthday_problem#Collision_counting
         """
         max_duplicates = 0.02 * num_queries

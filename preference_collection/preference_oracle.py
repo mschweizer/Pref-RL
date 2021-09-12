@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from preference_data.preference.label import Label
+from preference_collection.label import Label
 
 
 class AbstractOracle(ABC):

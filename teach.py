@@ -1,12 +1,12 @@
 import argparse
 
-from agent.preference_based.sequential.sequential_pbrl_agent import SequentialPbRLAgent
+from agents.preference_based.sequential.sequential_pbrl_agent import SequentialPbRLAgent
 from wrappers.utils import create_env
 
 
 def create_cli():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--env_id', default="CartPole-v1", required=True)
+    parser.add_argument('--env_id', default="CartPole-v1")
     parser.add_argument('--reward_model', default="Mlp")
     parser.add_argument('--num_training_data', default=0, type=int)
     parser.add_argument('--num_pretrain_data', default=500, type=int)

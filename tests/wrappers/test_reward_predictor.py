@@ -1,4 +1,4 @@
-from preference_data.preference.experience import Experience
+from wrappers.internal.experience import Experience
 
 
 def test_wrapper_buffers_recent_behavior(reward_wrapper):

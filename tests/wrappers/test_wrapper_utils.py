@@ -3,7 +3,7 @@ import numpy as np
 import pytest
 from stable_baselines3.common.atari_wrappers import AtariWrapper
 
-from reward_modeling.models.reward.mlp import MlpRewardModel
+from models.reward.mlp import MlpRewardModel
 from wrappers.external.indirect_feedback_remover import IndirectFeedbackRemover
 from wrappers.internal.reward_predictor import RewardPredictor
 from wrappers.internal.reward_standardizer import RewardStandardizer

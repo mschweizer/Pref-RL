@@ -2,15 +2,15 @@ from unittest.mock import patch
 
 import torch
 
-from preference_data.dataset import PreferenceDataset
-from reward_modeling.models.reward.mlp import MlpRewardModel
-from reward_modeling.reward_trainer import RewardTrainer
+from agents.preference_based.dataset import PreferenceDataset
+from models.reward.mlp import MlpRewardModel
+from reward_model_training.reward_trainer import RewardTrainer
 
 
 def test_writes_summary(cartpole_env):
     running_loss = 100
 
-    with patch('reward_modeling.reward_trainer.SummaryWriter'):
+    with patch('reward_model_training.reward_trainer.SummaryWriter'):
         reward_trainer = RewardTrainer(MlpRewardModel(cartpole_env))
         reward_trainer._write_summary(running_loss, pretraining=False)
 
