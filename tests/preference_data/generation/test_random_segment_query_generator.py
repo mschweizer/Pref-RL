@@ -1,11 +1,11 @@
 import pytest
 
-from query_generation.segment_queries.segment_query_generator import RandomSegmentQueryGeneratorMixin
+from query_generation.segment_queries.segment_query_generator import BaseSegmentQueryGeneratorMixin
 
 
 @pytest.fixture()
 def segment_query_generator(policy_model):
-    return RandomSegmentQueryGeneratorMixin(policy_model=policy_model, query_candidates=[])
+    return BaseSegmentQueryGeneratorMixin(policy_model=policy_model, query_candidates=[])
 
 
 def test_calculate_num_segment_samples(segment_query_generator):

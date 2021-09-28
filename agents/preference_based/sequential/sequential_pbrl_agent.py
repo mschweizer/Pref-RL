@@ -1,7 +1,7 @@
 from agents.preference_based.pbrl_agent import AbstractPbRLAgent
 
 
-class SequentialPbRLAgent(AbstractPbRLAgent):
+class BaseSequentialPbRLAgent(AbstractPbRLAgent):
     def __init__(self, env, reward_model_name="Mlp", num_pretraining_epochs=10, num_training_epochs_per_iteration=10,
                  preferences_per_iteration=32):
         AbstractPbRLAgent.__init__(self, env=env, reward_model_name=reward_model_name)

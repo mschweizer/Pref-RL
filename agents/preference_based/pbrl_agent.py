@@ -4,13 +4,14 @@ from collections import deque
 from agents.preference_based.dataset import PreferenceDataset
 from agents.rl_agent import RLAgent
 from models.reward.utils import get_model_by_name
-from preference_collection.preference_collector import SyntheticPreferenceCollectorMixin
-from query_generation.segment_queries.segment_query_generator import RandomSegmentQueryGeneratorMixin
-from reward_model_training.reward_trainer import RewardTrainer
+from preference_collection.preference_collector import BaseSyntheticPreferenceCollectorMixin
+from query_generation.segment_queries.segment_query_generator import BaseSegmentQueryGeneratorMixin
+from reward_model_training.reward_trainer import RewardTrainerMixin
 from wrappers.utils import add_internal_env_wrappers
 
 
-class AbstractPbRLAgent(RLAgent, RandomSegmentQueryGeneratorMixin, SyntheticPreferenceCollectorMixin, RewardTrainer,
+class AbstractPbRLAgent(RLAgent, BaseSegmentQueryGeneratorMixin, BaseSyntheticPreferenceCollectorMixin,
+                        RewardTrainerMixin,
                         ABC):
     def __init__(self, env, reward_model_name="Mlp", dataset_capacity=4096):
         reward_model_class = get_model_by_name(reward_model_name)
@@ -22,11 +23,11 @@ class AbstractPbRLAgent(RLAgent, RandomSegmentQueryGeneratorMixin, SyntheticPref
 
         RLAgent.__init__(self, env=add_internal_env_wrappers(env=env, reward_model=self.reward_model))
 
-        RandomSegmentQueryGeneratorMixin.__init__(self, query_candidates=self.query_candidates,
-                                                  policy_model=self.policy_model, segment_sampling_interval=50)
-        SyntheticPreferenceCollectorMixin.__init__(self, query_candidates=self.query_candidates,
-                                                   preferences=self.preferences)
-        RewardTrainer.__init__(self, self.reward_model)
+        BaseSegmentQueryGeneratorMixin.__init__(self, query_candidates=self.query_candidates,
+                                                policy_model=self.policy_model, segment_sampling_interval=50)
+        BaseSyntheticPreferenceCollectorMixin.__init__(self, query_candidates=self.query_candidates,
+                                                       preferences=self.preferences)
+        RewardTrainerMixin.__init__(self, self.reward_model)
 
     @abstractmethod
     def pb_learn(self, *args, **kwargs):

@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 import numpy as np
 
 
-class AbstractSegmentSampler(ABC):
+class AbstractSegmentSamplerMixin(ABC):
     def __init__(self, segment_samples, trajectory_buffer, segment_length=25):
         self.segment_samples = segment_samples
         self.trajectory_buffer = trajectory_buffer
@@ -21,7 +21,7 @@ class AbstractSegmentSampler(ABC):
         pass
 
 
-class RandomSegmentSampler(AbstractSegmentSampler):
+class RandomSegmentSamplerMixin(AbstractSegmentSamplerMixin):
 
     def draw_segment_sample(self):
         start_idx = self._get_random_start_index()

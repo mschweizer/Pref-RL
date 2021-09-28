@@ -1,19 +1,17 @@
-from unittest.mock import patch, Mock
+from unittest.mock import Mock
 
 import pytest
 
-from query_generation.segment_queries.segment_query_generator import AbstractSegmentQueryGeneratorMixin, \
-    RandomSegmentQueryGeneratorMixin
+from query_generation.segment_queries.segment_query_generator import BaseSegmentQueryGeneratorMixin
 
 
 @pytest.fixture()
-@patch.multiple(AbstractSegmentQueryGeneratorMixin, __abstractmethods__=set())
 def segment_query_generator(policy_model):
-    return AbstractSegmentQueryGeneratorMixin(query_candidates=[], policy_model=policy_model)
+    return BaseSegmentQueryGeneratorMixin(query_candidates=[], policy_model=policy_model)
 
 
 def test_generate_queries(policy_model):
-    random_segment_query_generator = RandomSegmentQueryGeneratorMixin(query_candidates=[], policy_model=policy_model)
+    random_segment_query_generator = BaseSegmentQueryGeneratorMixin(query_candidates=[], policy_model=policy_model)
     num_queries = 2
     random_segment_query_generator.generate_queries(num_queries=num_queries)
     assert len(random_segment_query_generator.query_candidates) == num_queries

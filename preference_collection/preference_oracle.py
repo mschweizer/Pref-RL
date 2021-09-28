@@ -3,14 +3,14 @@ from abc import ABC, abstractmethod
 from preference_collection.label import Label
 
 
-class AbstractOracle(ABC):
+class AbstractOracleMixin(ABC):
 
     @abstractmethod
     def answer(self, query):
         pass
 
 
-class RewardMaximizingOracle(AbstractOracle):
+class RewardMaximizingOracleMixin(AbstractOracleMixin):
     def answer(self, query):
         reward_1, reward_2 = self.compute_total_original_rewards(query)
         return self.compute_preference(reward_1, reward_2)
@@ -29,6 +29,6 @@ class RewardMaximizingOracle(AbstractOracle):
             return Label.INDIFFERENT
 
 
-class RandomOracle(AbstractOracle):
+class RandomOracleMixin(AbstractOracleMixin):
     def answer(self, query):
         return Label.random()
