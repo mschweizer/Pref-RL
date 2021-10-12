@@ -5,8 +5,8 @@ from stable_baselines3.common.atari_wrappers import AtariWrapper
 
 from models.reward.mlp import MlpRewardModel
 from wrappers.external.indirect_feedback_remover import IndirectFeedbackRemover
-from wrappers.internal.reward_predictor import RewardPredictor
 from wrappers.internal.reward_standardizer import RewardStandardizer
+from wrappers.internal.trajectory_buffer import TrajectoryBuffer
 from wrappers.utils import add_external_env_wrappers, create_env, is_atari_env, is_wrapped, add_internal_env_wrappers
 
 
@@ -58,4 +58,4 @@ def test_wrap_internal_environment(cartpole_env):
 
     wrapped_env = add_internal_env_wrappers(cartpole_env, reward_model=reward_model)
 
-    assert is_wrapped(wrapped_env, RewardPredictor) and is_wrapped(wrapped_env, RewardStandardizer)
+    assert is_wrapped(wrapped_env, TrajectoryBuffer) and is_wrapped(wrapped_env, RewardStandardizer)

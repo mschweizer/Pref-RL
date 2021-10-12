@@ -29,7 +29,7 @@ def pong_env():
 @pytest.fixture(params=[MlpRewardModel])
 def reward_wrapper(cartpole_env, request):
     reward_model_class = request.param
-    return RewardPredictor(env=cartpole_env, reward_model=reward_model_class(cartpole_env), trajectory_buffer_size=100)
+    return RewardPredictor(env=cartpole_env, reward_model=reward_model_class(cartpole_env))
 
 
 @pytest.fixture()

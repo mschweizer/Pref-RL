@@ -8,6 +8,7 @@ from wrappers.external.visual_feedback_remover import VisualFeedbackRemover
 from wrappers.internal.reward_monitor import RewardMonitor
 from wrappers.internal.reward_predictor import RewardPredictor
 from wrappers.internal.reward_standardizer import RewardStandardizer
+from wrappers.internal.trajectory_buffer import TrajectoryBuffer
 
 
 def create_env(env_id, termination_penalty=0., frame_stack_depth=4):
@@ -32,6 +33,7 @@ def is_atari_env(env):
 
 # TODO: Make this function a static method of the pbrl agents ("_wrap_env", see stable baselines base class)
 def add_internal_env_wrappers(env, reward_model):
+    env = TrajectoryBuffer(env)
     env = RewardPredictor(env, reward_model)  # TODO: choose the reward prediction wrapper suitable for the reward model
     env = RewardStandardizer(env)
     env = RewardMonitor(env)
