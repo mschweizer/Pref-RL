@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 
 from preference_collection.preference_oracle import RewardMaximizingOracleMixin
 from query_selection.query_selector import AbstractQuerySelectorMixin, MostRecentlyGeneratedQuerySelectorMixin
+from video.segment_renderer import SegmentRenderer
 
 
 class AbstractPreferenceCollectorMixin(AbstractQuerySelectorMixin, ABC):
@@ -19,5 +20,21 @@ class BaseSyntheticPreferenceCollectorMixin(AbstractPreferenceCollectorMixin,
                                             MostRecentlyGeneratedQuerySelectorMixin, RewardMaximizingOracleMixin):
 
     def query_preferences(self, num_preferences):
+        queries = self.select_queries(
+            self.query_candidates, num_queries=num_preferences)
+        self.preferences.extend([(query, self.answer(query))
+                                for query in queries])
+
+
+class BaseHumanPreferenceCollectorMixin(AbstractPreferenceCollectorMixin, MostRecentlyGeneratedQuerySelectorMixin):
+
+    def __init__(self, preferences, query_candidates, output):
+        super().__init__(preferences, query_candidates)
+        self.renderer = SegmentRenderer(out=output)
+
+    def query_preferences(self, num_preferences):
         queries = self.select_queries(self.query_candidates, num_queries=num_preferences)
-        self.preferences.extend([(query, self.answer(query)) for query in queries])
+        for query in queries:
+            self.renderer.render_segment(query[0])
+            self.renderer.render_segment(query[1])
+        
