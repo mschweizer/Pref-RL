@@ -57,8 +57,4 @@ class PreferenceDataset(torch.utils.data.Dataset):
 
     def prepare_query(self, preference):
         query = preference[0]
-        return np.array([self.prepare_segment(query[0]), self.prepare_segment(query[1])])
-
-    @staticmethod
-    def prepare_segment(segment):
-        return [experience.observation for experience in segment]
+        return np.array([query[0].observations, query[1].observations])

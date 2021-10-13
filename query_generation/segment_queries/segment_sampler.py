@@ -27,7 +27,7 @@ class RandomSegmentSamplerMixin(AbstractSegmentSamplerMixin):
         start_idx = self._get_random_start_index()
         assert len(self.trajectory_buffer) >= self.segment_length, \
             "Fewer elements in buffer than sample size."
-        return list(self.trajectory_buffer)[start_idx: start_idx + self.segment_length]
+        return self.trajectory_buffer.get_segment(start=start_idx, stop=start_idx + self.segment_length)
 
     def _get_random_start_index(self):
         low = 0

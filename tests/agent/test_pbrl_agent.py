@@ -10,4 +10,5 @@ def test_agent_sets_sufficient_trajectory_buffer_length(cartpole_env):
 
     learning_agent = AbstractPbRLAgent(cartpole_env)
 
-    assert learning_agent.policy_model.env.envs[0].trajectory_buffer.maxlen >= min(segment_length, num_stacked_frames)
+    assert learning_agent.policy_model.get_env().get_attr("trajectory_buffer")[0].size \
+           >= min(segment_length, num_stacked_frames)

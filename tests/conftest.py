@@ -7,6 +7,7 @@ from models.reward.mlp import MlpRewardModel
 from preference_collection.label import Label
 from wrappers.internal.experience import Experience
 from wrappers.internal.reward_predictor import RewardPredictor
+from wrappers.internal.trajectory_buffer import Buffer
 from wrappers.utils import create_env, add_internal_env_wrappers
 
 
@@ -57,13 +58,13 @@ def policy_model(cartpole_env, request):
 def preference(env):
     # TODO: Return a fixed segment_queries (without running the env!) to make it faster and deterministic
     segment_length = 6
-    experiences = []
+    buffer = Buffer(buffer_size=50)
     env.reset()
     for i in range(segment_length * 2):
         action = env.action_space.sample()
         observation, reward, done, info = env.step(action)
-        experiences.append(Experience(observation, action, reward, done, info))
-    query = [experiences[:segment_length], experiences[segment_length:]]
+        buffer.append_step(observation, action, reward, done, info)
+    query = [buffer.get_segment(0, segment_length), buffer.get_segment(segment_length, 2 * segment_length)]
     return query, Label.LEFT
 
 
