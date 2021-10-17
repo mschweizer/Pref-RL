@@ -3,3 +3,5 @@
 /runs/
 /tests/.coveragerc
 /tests/htmlcov/
+.vscode/
+/__pycache__/

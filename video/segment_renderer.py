@@ -13,12 +13,12 @@ class SegmentRenderer:
 
     def render_segment(self, query):
         outfile = self.out + str(random.randint(0, 100000000)) + '.avi'
-        fps = 8
+        fps = 12
         fourcc = VideoWriter_fourcc(*'DIVX')
         singleframe = np.array(query.frames[0])
-        fshape = singleframe.shape
-        vid_writer = VideoWriter(outfile, fourcc, fps, fshape, False)
-
+        fshape = (singleframe.shape[1], singleframe.shape[0])
+        vid_writer = VideoWriter(outfile, fourcc, fps, fshape)
+        #TODO: reverse rgb values in frames
         for frame in query.frames:
             vid_writer.write(frame)
 
