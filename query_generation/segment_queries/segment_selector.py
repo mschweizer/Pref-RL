@@ -2,12 +2,12 @@ import random
 from abc import ABC, abstractmethod
 
 
-class AbstractSegmentSelectorMixin(ABC):
+class AbstractSegmentSelector(ABC):
     @abstractmethod
-    def select_segments(self, segment_samples, num_segments=2):
+    def select_segments(self, segment_samples, num_segments):
         pass
 
 
-class RandomSegmentSelectorMixin(AbstractSegmentSelectorMixin):
-    def select_segments(self, segment_samples, num_segments=2):
+class RandomSegmentSelector(AbstractSegmentSelector):
+    def select_segments(self, segment_samples, num_segments):
         return random.sample(segment_samples, num_segments)
