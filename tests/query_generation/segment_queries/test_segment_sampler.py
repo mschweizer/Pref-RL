@@ -1,12 +1,12 @@
 import pytest
 
 from query_generation.segment_queries.segment_sampler import AbstractSegmentSampler
-from wrappers.internal.trajectory_buffer import Segment, Buffer
+from wrappers.internal.trajectory_buffer import Buffer
 
 
 class ConcreteSegmentSampler(AbstractSegmentSampler):
     def _draw_segment_sample(self, trajectory_buffer):
-        return Segment(observations=[], actions=[], rewards=[], dones=[], infos=[])
+        return "sample"
 
 
 def test_sampler_samples_correct_number_of_samples():
