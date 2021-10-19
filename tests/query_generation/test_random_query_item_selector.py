@@ -1,6 +1,6 @@
 import pytest
 
-from query_generation.segment_queries.segment_selector import RandomSegmentSelector
+from query_generation.query_item_selector import RandomQueryItemSelector
 from wrappers.internal.trajectory_buffer import Segment
 
 
@@ -12,18 +12,18 @@ def segment_samples():
 
 
 def test_selected_segments_are_from_segment_samples(segment_samples):
-    segment_selector = RandomSegmentSelector()
+    segment_selector = RandomQueryItemSelector()
 
-    selected_segments = segment_selector.select_segments(segment_samples, num_segments=2)
+    selected_segments = segment_selector.select_items(segment_samples, num_items=2)
 
     for segment in selected_segments:
         assert segment in segment_samples
 
 
 def test_selects_right_number_of_segments(segment_samples):
-    segment_selector = RandomSegmentSelector()
+    segment_selector = RandomQueryItemSelector()
     num_segments = 2
 
-    selected_segments = segment_selector.select_segments(segment_samples, num_segments)
+    selected_segments = segment_selector.select_items(segment_samples, num_segments)
 
     assert len(selected_segments) == num_segments

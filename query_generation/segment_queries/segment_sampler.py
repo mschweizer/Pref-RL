@@ -3,6 +3,8 @@ from abc import ABC, abstractmethod
 
 import numpy as np
 
+from query_generation.query_item_generator import AbstractQueryItemGenerator
+
 
 class AbstractSegmentSamplerMixin(ABC):
     def __init__(self, segment_samples, trajectory_buffer, segment_length=25):
@@ -35,27 +37,28 @@ class RandomSegmentSamplerMixin(AbstractSegmentSamplerMixin):
         return np.random.randint(low=low, high=high)
 
 
-class AbstractSegmentSampler(ABC):
+class AbstractSegmentSampler(AbstractQueryItemGenerator, ABC):
     def __init__(self, segment_length):
         self.segment_length = segment_length
 
-    def sample_segments(self, num_segment_samples, trajectory_buffer):
-        assert len(trajectory_buffer) >= self.segment_length, \
+    def generate(self, policy_model, num_items):
+        assert len(policy_model.trajectory_buffer) >= self.segment_length, \
             "Cannot draw a segment sample of length {len} " \
-            "from a buffer with {num_elems} elements.".format(len=self.segment_length, num_elems=len(trajectory_buffer))
+            "from a buffer with {num_elems} elements.".format(len=self.segment_length,
+                                                              num_elems=len(policy_model.trajectory_buffer))
         samples = []
-        while len(samples) < num_segment_samples:
-            samples.append(self._draw_segment_sample(trajectory_buffer))
+        while len(samples) < num_items:
+            samples.append(self._sample_segment(policy_model.trajectory_buffer))
         return samples
 
     @abstractmethod
-    def _draw_segment_sample(self, trajectory_buffer):
+    def _sample_segment(self, trajectory_buffer):
         pass
 
 
 class RandomSegmentSampler(AbstractSegmentSampler):
 
-    def _draw_segment_sample(self, trajectory_buffer):
+    def _sample_segment(self, trajectory_buffer):
         start_idx = self._get_random_start_index(len(trajectory_buffer))
         return trajectory_buffer.get_segment(start=start_idx, stop=start_idx + self.segment_length)
 
