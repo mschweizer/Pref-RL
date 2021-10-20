@@ -4,4 +4,4 @@
 /tests/.coveragerc
 /tests/htmlcov/
 .vscode/
-/__pycache__/
+**/__pycache__/
