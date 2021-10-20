@@ -3,14 +3,14 @@ import random
 from abc import ABC, abstractmethod
 
 
-class AbstractQuerySelectorMixin(ABC):
+class AbstractQuerySelector(ABC):
 
     @abstractmethod
     def select_queries(self, query_candidates, num_queries=1):
         pass
 
 
-class RandomQuerySelectorMixin(AbstractQuerySelectorMixin):
+class RandomQuerySelector(AbstractQuerySelector):
 
     def select_queries(self, query_candidates, num_queries=1):
         return [self.select_query(query_candidates) for _ in range(num_queries)]
@@ -20,7 +20,7 @@ class RandomQuerySelectorMixin(AbstractQuerySelectorMixin):
         return random.choice(queries)
 
 
-class MostRecentlyGeneratedQuerySelectorMixin(AbstractQuerySelectorMixin):
+class MostRecentlyGeneratedQuerySelector(AbstractQuerySelector):
 
     def select_queries(self, query_candidates, num_queries=1):
         return list(itertools.islice(query_candidates, len(query_candidates) - num_queries, len(query_candidates)))

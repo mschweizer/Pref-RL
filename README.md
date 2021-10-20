@@ -63,12 +63,12 @@ how to train it in the mountaincar environment:
 from agents.preference_based.sequential.sequential_pbrl_agent import BaseSequentialPbRLAgent
 
 from preference_collection.preference_collector import BaseSyntheticPreferenceCollectorMixin
-from query_selection.query_selector import RandomQuerySelectorMixin
+from query_selection.query_selector import RandomQuerySelector
 
 from wrappers.utils import create_env
 
 
-class CustomPreferenceCollector(RandomQuerySelectorMixin, BaseSyntheticPreferenceCollectorMixin):
+class CustomPreferenceCollector(RandomQuerySelector, BaseSyntheticPreferenceCollectorMixin):
     pass
 
 class CustomPbRLAgent(CustomPreferenceCollector, BaseSequentialPbRLAgent):

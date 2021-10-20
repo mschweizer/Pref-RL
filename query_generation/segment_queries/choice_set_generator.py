@@ -5,13 +5,13 @@ from time import strftime
 from scipy import special, optimize
 
 from query_generation.query_generator import AbstractQueryGeneratorMixin
+from query_generation.query_item_selector import RandomItemSelector
 from query_generation.segment_queries.segment_sampler import AbstractSegmentSamplerMixin, RandomSegmentSamplerMixin
 from query_generation.segment_queries.segment_sampling_callback import SegmentSamplingCallback
-from query_generation.segment_queries.segment_selector import RandomSegmentSelectorMixin
 from query_generation.segment_queries.utils import is_sampling_step
 
 
-class BaseSegmentQueryGeneratorMixin(RandomSegmentSamplerMixin, RandomSegmentSelectorMixin,
+class BaseSegmentQueryGeneratorMixin(RandomSegmentSamplerMixin, RandomItemSelector,
                                      AbstractQueryGeneratorMixin):
     def __init__(self, query_candidates, policy_model, segments_per_query=2, segment_sampling_interval=30):
         # TODO: make deque len either a function of preferences per iteration or a param
@@ -35,7 +35,7 @@ class BaseSegmentQueryGeneratorMixin(RandomSegmentSamplerMixin, RandomSegmentSel
         self.query_candidates.extend([self.generate_query() for _ in range(num_queries)])
 
     def generate_query(self):
-        return self.select_segments(self.segment_samples, self.segments_per_query)
+        return self.select_items(self.segment_samples, self.segments_per_query)
 
     def calculate_num_segment_samples(self, num_queries):
         """
