@@ -21,12 +21,13 @@ class AbstractPbRLAgent(RLAgent, BaseSegmentQueryGeneratorMixin, BaseHumanPrefer
         self.query_candidates = deque(maxlen=1024)
         self.preferences = PreferenceDataset(capacity=dataset_capacity)
 
-        RLAgent.__init__(self, env=add_internal_env_wrappers(env=env, reward_model=self.reward_model))
+        RLAgent.__init__(self, env=add_internal_env_wrappers(
+            env=env, reward_model=self.reward_model))
 
         BaseSegmentQueryGeneratorMixin.__init__(self, query_candidates=self.query_candidates,
                                                 policy_model=self.policy_model, segment_sampling_interval=50)
         BaseHumanPreferenceCollectorMixin.__init__(self, query_candidates=self.query_candidates,
-                                                       preferences=self.preferences, output_path='../')
+                                                   preferences=self.preferences,)
         RewardTrainerMixin.__init__(self, self.reward_model)
 
     @abstractmethod

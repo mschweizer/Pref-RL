@@ -5,3 +5,4 @@
 /tests/htmlcov/
 .vscode/
 **/__pycache__/
+/videofiles

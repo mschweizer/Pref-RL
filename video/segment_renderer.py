@@ -9,8 +9,8 @@ class SegmentRenderer:
     def __init__(self, output_path):
         self.output_path = output_path
 
-    def render_segment(self, segment):
-        outfile = self.output_path + str(random.randint(0, 100000000)) + '.avi'
+    def render_segment(self, segment, name):
+        outfile = '{}{}.avi'.format(self.output_path, name)
         fps = 12
         fourcc = VideoWriter_fourcc(*'DIVX')
         singleframe = np.array(segment.frames[0])
