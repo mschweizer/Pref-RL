@@ -26,7 +26,7 @@ class AbstractPbRLAgent(RLAgent, BaseSegmentQueryGeneratorMixin, BaseHumanPrefer
         BaseSegmentQueryGeneratorMixin.__init__(self, query_candidates=self.query_candidates,
                                                 policy_model=self.policy_model, segment_sampling_interval=50)
         BaseHumanPreferenceCollectorMixin.__init__(self, query_candidates=self.query_candidates,
-                                                       preferences=self.preferences, output='../')
+                                                       preferences=self.preferences, output_path='../')
         RewardTrainerMixin.__init__(self, self.reward_model)
 
     @abstractmethod

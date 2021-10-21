@@ -28,13 +28,17 @@ class BaseSyntheticPreferenceCollectorMixin(AbstractPreferenceCollectorMixin,
 
 class BaseHumanPreferenceCollectorMixin(AbstractPreferenceCollectorMixin, MostRecentlyGeneratedQuerySelectorMixin):
 
-    def __init__(self, preferences, query_candidates, output):
+    def __init__(self, preferences, query_candidates, output_path):
         super().__init__(preferences, query_candidates)
-        self.renderer = SegmentRenderer(out=output)
+        self.renderer = SegmentRenderer(output_path=output_path)
 
     def query_preferences(self, num_preferences):
         queries = self.select_queries(self.query_candidates, num_queries=num_preferences)
         for query in queries:
-            self.renderer.render_segment(query[0])
-            self.renderer.render_segment(query[1])
-        
+            for segment in query:
+                self.renderer.render_segment(segment)
+        #add query to db, link to saved clips
+
+    def collect_preferences():
+        #TODO implement collection
+        pass
