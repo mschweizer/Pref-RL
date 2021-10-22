@@ -54,4 +54,5 @@ class SyntheticPreferenceCollector(AbstractPreferenceCollector):
     def collect_preferences(self) -> List:
         self.preferences.extend([Preference(query=query, choice=self.oracle.answer(query))
                                  for query in self.pending_queries])
+        self.pending_queries.clear()
         return self.preferences.copy()
