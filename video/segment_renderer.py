@@ -11,8 +11,8 @@ class SegmentRenderer:
         if not os.path.exists(output_path):
             os.makedirs(output_path)
 
-    def render_segment(self, segment, name, fps=12, fourcc=VideoWriter_fourcc(*'DIVX')):
-        outfile = '{}{}.avi'.format(self.output_path, name)
+    def render_segment(self, segment, name, fps=12, fourcc=VideoWriter_fourcc(*'DIVX'), file_extension='.avi'):
+        outfile = '{}{}{}'.format(self.output_path, name, file_extension)
         singleframe = np.array(segment.frames[0])
         fshape = (singleframe.shape[1], singleframe.shape[0])
 

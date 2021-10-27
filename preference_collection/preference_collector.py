@@ -3,6 +3,8 @@ from uuid import uuid4
 from sys import path
 import os
 import django
+from label import Label
+from math import trunc
 
 
 from preference_collection.preference_oracle import RewardMaximizingOracleMixin
@@ -39,7 +41,7 @@ class BaseHumanPreferenceCollectorMixin(AbstractPreferenceCollectorMixin, MostRe
         self._queried_prefs = []
 
         # preparations for django connection
-        path.append('D:/Sascha/BA/webapp/pbrlwebapp')
+        path.append('/home/sascha/BA/webapp/pref-rl-webapp')
         os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'pbrlwebapp.settings')
         django.setup()
 
@@ -65,9 +67,29 @@ class BaseHumanPreferenceCollectorMixin(AbstractPreferenceCollectorMixin, MostRe
     def collect_preferences(self):
         from preferences import models
         for pref in self._unlabeled_prefs():
-            db_pref = models.Preference.objects.get(pk=pref.id)
-            
+            db_pref = models.Preference.objects.get(pk=pref['id'])
+            retrieved_label = db_pref.label
+            if retrieved_label is not None:
+                pref['label'] = retrieved_label
+                self.preferences.extend(
+                    (pref['query'], self._convert_label(retrieved_label)))
+
+    @property
+    def label_quota(self):
+        return trunc((len(self._labeled_prefs)/len(self._unlabeled_prefs))*100)/100
 
     @property
     def _unlabeled_prefs(self):
+        return [pref for pref in self._queried_prefs if pref['label'] is None]
+
+    @property
+    def _labeled_prefs(self):
         return [pref for pref in self._queried_prefs if pref['label'] is not None]
+
+    def _convert_label(self, integer_label):
+        if integer_label < 0:
+            return Label.LEFT
+        elif integer_label > 0:
+            return Label.RIGHT
+        else:
+            return Label.INDIFFERENT
