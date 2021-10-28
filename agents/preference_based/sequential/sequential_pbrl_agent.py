@@ -24,9 +24,11 @@ class BaseSequentialPbRLAgent(AbstractPbRLAgent):
         self.generate_queries(num_pretraining_preferences,
                               with_policy_training=False)
         self.query_preferences(num_pretraining_preferences)
-        while (quota := self.label_quota < .75):
-            print('Label quota is {}'.format(quota))
+        while ((quota := self.label_quota) < .75):
+            self.collect_preferences()
+            print('Label quota is {}. Please add labels via the webapp.'.format(quota))
             sleep(30)
+        self.clear_queried_prefs()
         self.train_reward_model(
             self.preferences, self.num_pretraining_epochs, pretraining=True)
 
@@ -39,9 +41,11 @@ class BaseSequentialPbRLAgent(AbstractPbRLAgent):
 
             self.generate_queries(
                 self.preferences_per_iteration, with_policy_training=True)
-            while (quota := self.label_quota < .75):
-                print('Label quota is {}'.format(quota))
-                sleep(30)
             self.query_preferences(self.preferences_per_iteration)
+            while ((quota := self.label_quota) < .75):
+                self.collect_preferences()
+                print('Label quota is {}. Please add labels via the webapp.'.format(quota))
+                sleep(30)
+            self.clear_queried_prefs()
             self.train_reward_model(
                 self.preferences, self.num_training_epochs_per_iteration)

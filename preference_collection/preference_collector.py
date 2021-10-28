@@ -3,7 +3,7 @@ from uuid import uuid4
 from sys import path
 import os
 import django
-from label import Label
+from preference_collection.label import Label
 from math import trunc
 
 
@@ -51,9 +51,9 @@ class BaseHumanPreferenceCollectorMixin(AbstractPreferenceCollectorMixin, MostRe
         for query in queries:
             uuid = uuid4()
             str_id = str(uuid)
-            url_right = self.renderer.render_segment(
-                query[0], '{}-left'.format(str_id))
             url_left = self.renderer.render_segment(
+                query[0], '{}-left'.format(str_id))
+            url_right = self.renderer.render_segment(
                 query[1], '{}-right'.format(str_id))
 
             from preferences import models
@@ -62,21 +62,26 @@ class BaseHumanPreferenceCollectorMixin(AbstractPreferenceCollectorMixin, MostRe
             unlabeled_preference.save()
             self._queried_prefs.append(
                 {'id': unlabeled_preference.id, 'query': query, 'label': None})
-            debug = 1+1
+            pass
 
     def collect_preferences(self):
         from preferences import models
-        for pref in self._unlabeled_prefs():
+        for pref in self._unlabeled_prefs:
             db_pref = models.Preference.objects.get(pk=pref['id'])
             retrieved_label = db_pref.label
             if retrieved_label is not None:
                 pref['label'] = retrieved_label
-                self.preferences.extend(
+                self.preferences.append(
                     (pref['query'], self._convert_label(retrieved_label)))
+    
+    def clear_queried_prefs(self):
+        self._queried_prefs = []
 
     @property
     def label_quota(self):
-        return trunc((len(self._labeled_prefs)/len(self._unlabeled_prefs))*100)/100
+        if not len(self._queried_prefs)>0:
+            return 0.0
+        return trunc((len(self._labeled_prefs)/len(self._queried_prefs))*100)/100
 
     @property
     def _unlabeled_prefs(self):

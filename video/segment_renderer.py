@@ -22,4 +22,4 @@ class SegmentRenderer:
             vid_writer.write(cv2.cvtColor(frame, cv2.COLOR_RGB2BGR))
 
         vid_writer.release()
-        return outfile
+        return os.path.abspath(outfile)
