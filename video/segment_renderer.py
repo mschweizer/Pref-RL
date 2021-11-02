@@ -11,7 +11,7 @@ class SegmentRenderer:
         if not os.path.exists(output_path):
             os.makedirs(output_path)
 
-    def render_segment(self, segment, name, fps=12, fourcc=VideoWriter_fourcc(*'DIVX'), file_extension='.avi'):
+    def render_segment(self, segment, name, fps=12, fourcc=VideoWriter_fourcc(*'mp4v'), file_extension='.mp4'):
         outfile = '{}{}{}'.format(self.output_path, name, file_extension)
         singleframe = np.array(segment.frames[0])
         fshape = (singleframe.shape[1], singleframe.shape[0])
@@ -22,4 +22,4 @@ class SegmentRenderer:
             vid_writer.write(cv2.cvtColor(frame, cv2.COLOR_RGB2BGR))
 
         vid_writer.release()
-        return os.path.abspath(outfile)
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    return os.path.abspath(outfile)
