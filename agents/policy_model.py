@@ -2,20 +2,18 @@ from stable_baselines3 import A2C
 
 
 class PolicyModel:
-    def __init__(self, env):
-        self.rl_algo = A2C('MlpPolicy', env=env, tensorboard_log="runs")
+    def __init__(self, env, steps_per_model_update=1024):  # TODO: change steps per model update to recommended number
+        self.env = env
+        self.rl_algo = A2C('MlpPolicy', env=env, n_steps=steps_per_model_update, tensorboard_log="runs")
 
-    def learn(self, **kwargs):
-        return self.rl_algo.learn(**kwargs)
+    def learn(self, *args, **kwargs):
+        return self.rl_algo.learn(*args, **kwargs)
 
-    def choose_action(self, **kwargs):
-        return self.rl_algo.predict(**kwargs)
+    def run(self, steps):
+        obs = self.env.reset()
+        for _ in range(steps):
+            action, _states = self.choose_action(obs)
+            obs, _, _, _ = self.env.step(action)
 
-
-class BufferedPolicyModel(PolicyModel):
-    def __init__(self, env):
-        super().__init__(env)
-
-    @property
-    def trajectory_buffer(self):
-        return self.rl_algo.get_env().get_attr("trajectory_buffer")[0]  # TODO: How to properly handle DummyVecEnv?
+    def choose_action(self, *args, **kwargs):
+        return self.rl_algo.predict(*args, **kwargs)
