@@ -3,12 +3,12 @@ from gym import Wrapper
 from gym.envs.atari import AtariEnv
 from stable_baselines3.common.atari_wrappers import AtariWrapper
 
-from wrappers.external.indirect_feedback_remover import IndirectFeedbackRemover
-from wrappers.external.visual_feedback_remover import VisualFeedbackRemover
-from wrappers.internal.reward_monitor import RewardMonitor
-from wrappers.internal.reward_predictor import RewardPredictor
-from wrappers.internal.reward_standardizer import RewardStandardizer
-from wrappers.internal.trajectory_buffer import TrajectoryBuffer
+from environment_wrappers.external.indirect_feedback_remover import IndirectFeedbackRemover
+from environment_wrappers.external.visual_feedback_remover import VisualFeedbackRemover
+from environment_wrappers.internal.reward_monitor import RewardMonitor
+from environment_wrappers.internal.reward_predictor import RewardPredictor
+from environment_wrappers.internal.reward_standardizer import RewardStandardizer
+from environment_wrappers.internal.trajectory_buffer import TrajectoryBuffer
 
 
 def create_env(env_id, termination_penalty=0., frame_stack_depth=4):

@@ -1,11 +1,8 @@
-from unittest.mock import Mock
-
 import gym
-from gym import Env
 from stable_baselines3.common.atari_wrappers import AtariWrapper
 
-from wrappers.external.visual_feedback_remover import VisualFeedbackRemover
-from wrappers.utils import create_env
+from environment_wrappers.external.visual_feedback_remover import VisualFeedbackRemover
+from environment_wrappers.utils import create_env
 
 
 def test_wrapper_removes_visual_feedback():

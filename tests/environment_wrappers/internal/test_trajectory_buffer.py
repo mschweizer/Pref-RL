@@ -1,4 +1,4 @@
-from wrappers.internal.trajectory_buffer import TrajectoryBuffer
+from environment_wrappers.internal.trajectory_buffer import TrajectoryBuffer
 
 
 def test_wrapper_buffers_recent_behavior(cartpole_env):

@@ -11,7 +11,7 @@ class RewardPredictor(Wrapper):
     def step(self, action):
         observation, reward, done, info = self.env.step(action)
 
-        info['external_reward'] = reward
+        info['external_reward'] = reward  # not necessarily equal to 'original_reward' due to termination penalty
 
         return observation, self.reward(observation), done, info
 

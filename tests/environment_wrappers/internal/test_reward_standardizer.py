@@ -2,7 +2,7 @@ from unittest.mock import Mock
 
 import numpy as np
 
-from wrappers.internal.reward_standardizer import RewardStandardizer
+from environment_wrappers.internal.reward_standardizer import RewardStandardizer
 
 
 def test_buffers_rewards(cartpole_env):

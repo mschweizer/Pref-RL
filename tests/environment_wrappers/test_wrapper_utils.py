@@ -3,11 +3,12 @@ import numpy as np
 import pytest
 from stable_baselines3.common.atari_wrappers import AtariWrapper
 
-from models.reward.mlp import MlpRewardModel
-from wrappers.external.indirect_feedback_remover import IndirectFeedbackRemover
-from wrappers.internal.reward_standardizer import RewardStandardizer
-from wrappers.internal.trajectory_buffer import TrajectoryBuffer
-from wrappers.utils import add_external_env_wrappers, create_env, is_atari_env, is_wrapped, add_internal_env_wrappers
+from environment_wrappers.external.indirect_feedback_remover import IndirectFeedbackRemover
+from environment_wrappers.internal.reward_standardizer import RewardStandardizer
+from environment_wrappers.internal.trajectory_buffer import TrajectoryBuffer
+from environment_wrappers.utils import add_external_env_wrappers, create_env, is_atari_env, is_wrapped, \
+    add_internal_env_wrappers
+from reward_models.mlp import MlpRewardModel
 
 
 @pytest.fixture()

@@ -3,7 +3,7 @@ from unittest.mock import Mock
 import gym
 from gym import Env
 
-from wrappers.external.indirect_feedback_remover import IndirectFeedbackRemover
+from environment_wrappers.external.indirect_feedback_remover import IndirectFeedbackRemover
 
 
 def test_is_never_done():

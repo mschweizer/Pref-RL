@@ -2,7 +2,7 @@ from unittest.mock import Mock
 
 from gym import Env
 
-from wrappers.internal.reward_monitor import RewardMonitor
+from environment_wrappers.internal.reward_monitor import RewardMonitor
 
 
 def test_info_does_not_change_when_not_done():
