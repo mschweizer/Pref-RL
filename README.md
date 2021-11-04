@@ -60,18 +60,19 @@ Here is an example of how to customize the base PbRL agent with a new preference
 how to train it in the mountaincar environment:
 
 ```python
-from agents.preference_based.sequential.sequential_pbrl_agent import BaseSequentialPbRLAgent
+
+from agents.preference_based.pbrl_agent import PbRLAgent
 
 from preference_collection.preference_collector import BaseSyntheticPreferenceCollectorMixin
 from query_selection.query_selector import RandomQuerySelector
 
-from wrappers.utils import create_env
+from environment_wrappers.utils import create_env
 
 
 class CustomPreferenceCollector(RandomQuerySelector, BaseSyntheticPreferenceCollectorMixin):
     pass
 
-class CustomPbRLAgent(CustomPreferenceCollector, BaseSequentialPbRLAgent):
+class CustomPbRLAgent(CustomPreferenceCollector, PbRLAgent):
     pass
 
 env = create_env("MountainCar-v0", termination_penalty=10.)
