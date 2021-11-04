@@ -2,7 +2,7 @@ import numpy as np
 from torch import nn
 from torch.nn import functional as F
 
-from models.reward.base import BaseModel
+from reward_models.base import BaseModel
 
 
 class MlpRewardModel(BaseModel):

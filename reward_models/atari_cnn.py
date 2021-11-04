@@ -3,7 +3,7 @@ import torch
 from torch import nn
 from torch.nn import functional as F
 
-from models.reward.base import BaseModel
+from reward_models.base import BaseModel
 
 
 class AtariCnnRewardModel(BaseModel):

@@ -6,19 +6,21 @@ import torch.optim as optim
 import torch.utils.data
 from torch.utils.tensorboard import SummaryWriter
 
-from models.choice import ChoiceModel
+from reward_model_trainer.choice_model import ChoiceModel
+from reward_model_trainer.preference_dataset import PreferenceDataset
 
 
-class AbstractRewardTrainerMixin(ABC):
+class AbstractRewardModelTrainer(ABC):
 
     @abstractmethod
-    def train_reward_model(self, preferences, epochs, pretraining=False, *args, **kwargs):
+    def train(self, epochs, pretraining=False, *args, **kwargs):
         pass
 
 
-class RewardTrainerMixin(AbstractRewardTrainerMixin):
-    def __init__(self, reward_model, batch_size=64, learning_rate=1e-3, summary_writing_interval=16):
-        AbstractRewardTrainerMixin.__init__(self)
+class RewardModelTrainer(AbstractRewardModelTrainer):
+    def __init__(self, reward_model, batch_size=64, learning_rate=1e-3, summary_writing_interval=16,
+                 dataset_capacity=3000):
+        AbstractRewardModelTrainer.__init__(self)
         self.choice_model = ChoiceModel(reward_model)
         self.optimizer = optim.Adam(self.choice_model.parameters(), lr=learning_rate)
         self.criterion = F.binary_cross_entropy
@@ -26,9 +28,11 @@ class RewardTrainerMixin(AbstractRewardTrainerMixin):
         self.writer = SummaryWriter()
         self.writing_interval = summary_writing_interval
         self.global_training_step = 0
+        self.preferences = PreferenceDataset(capacity=dataset_capacity)
 
-    def train_reward_model(self, preferences, epochs, pretraining=False, *args, **kwargs):
-        train_loader = torch.utils.data.DataLoader(dataset=preferences, batch_size=self.batch_size)
+    def train(self, epochs, pretraining=False, *args, **kwargs):
+        # TODO: Remove preferences parameter and switch dataset=preferences to dataset=self.preferences
+        train_loader = torch.utils.data.DataLoader(dataset=self.preferences, batch_size=self.batch_size)
 
         running_loss = 0.
         for epoch in range(epochs):

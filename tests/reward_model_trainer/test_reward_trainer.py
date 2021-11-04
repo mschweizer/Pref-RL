@@ -2,16 +2,15 @@ from unittest.mock import patch
 
 import torch
 
-from agents.preference_based.dataset import PreferenceDataset
-from models.reward.mlp import MlpRewardModel
-from reward_model_training.reward_trainer import RewardTrainerMixin
+from reward_model_trainer.reward_model_trainer import RewardModelTrainer
+from reward_models.mlp import MlpRewardModel
 
 
 def test_writes_summary(cartpole_env):
     running_loss = 100
 
-    with patch('reward_model_training.reward_trainer.SummaryWriter'):
-        reward_trainer = RewardTrainerMixin(MlpRewardModel(cartpole_env))
+    with patch('reward_model_trainer.reward_model_trainer.SummaryWriter'):
+        reward_trainer = RewardModelTrainer(MlpRewardModel(cartpole_env))
         reward_trainer._write_summary(running_loss, pretraining=False)
 
         reward_trainer.writer.add_scalar.assert_called_with('training loss',
@@ -20,7 +19,7 @@ def test_writes_summary(cartpole_env):
 
 
 def test_is_writing_iteration(cartpole_env):
-    reward_model_trainer = RewardTrainerMixin(MlpRewardModel(cartpole_env))
+    reward_model_trainer = RewardModelTrainer(MlpRewardModel(cartpole_env))
     reward_model_trainer.writing_interval = 10
 
     # Note: we start counting at 0
@@ -37,8 +36,8 @@ def test_training_has_effect_on_any_model_parameters(env, preference):
     https://github.com/suriyadeepan/torchtest/blob/66a2c8b669aa23601f64e208463e9449ffc135da/torchtest/torchtest.py#L106
     """
 
-    reward_trainer = RewardTrainerMixin(reward_model=MlpRewardModel(env), batch_size=4)
-    preferences = PreferenceDataset(preferences=[preference, preference, preference, preference])
+    reward_trainer = RewardModelTrainer(reward_model=MlpRewardModel(env), batch_size=4)
+    reward_trainer.preferences.extend([preference, preference, preference, preference])
 
     # TODO: Clarify if the following modifications to torch have an effect on other tests
     torch.manual_seed(42)
@@ -47,7 +46,7 @@ def test_training_has_effect_on_any_model_parameters(env, preference):
     params = [param for param in reward_trainer.choice_model.named_parameters() if param[1].requires_grad]
     initial_params = [(name, param.clone()) for (name, param) in params]
 
-    reward_trainer.train_reward_model(preferences=preferences, epochs=1)
+    reward_trainer.train(epochs=1)
 
     param_change = [not torch.equal(p0, p1) for (_, p0), (name, p1) in zip(initial_params, params)]
     assert any(param_change)

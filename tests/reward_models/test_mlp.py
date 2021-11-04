@@ -1,6 +1,6 @@
 import numpy as np
 
-from models.reward.mlp import MlpRewardModel
+from reward_models.mlp import MlpRewardModel
 
 
 def test_has_correct_input_dimension(env):
