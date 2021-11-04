@@ -27,4 +27,7 @@ class ChoiceSetGenerator(AbstractQueryGenerator):
         return queries
 
     def _calculate_num_items(self, num_queries):
-        return int(num_queries / self.items_per_query)
+        if num_queries / self.items_per_query > 25:
+            return int(num_queries / self.items_per_query)
+        else:
+            return int(num_queries * self.items_per_query)
