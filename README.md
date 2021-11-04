@@ -22,7 +22,7 @@ The initial feature set is not yet completed and no performance tests have been 
 - [x] Custom environments ([Open AI Gym](https://gym.openai.com/) compatible) 
 - [x] Custom reward models 
 - [x] Custom PbRL agents with almost no code
-- [x] Easy integration of custom components via MixIn architecture
+- [x] Easy integration of custom components
 
 #### Code quality
 - [x] High code coverage (> 90%)
@@ -56,30 +56,18 @@ On Windows, you may encounter issues running OpenAI Gym Atari environments.
 could help. 
 
 ## Example
-Here is an example of how to customize the base PbRL agent with a new preference collector using almost no code and 
-how to train it in the mountaincar environment:
+Here is an example of how to run and train the base PbRL agent in the mountaincar environment:
 
 ```python
 
 from agents.preference_based.pbrl_agent import PbRLAgent
 
-from preference_collection.preference_collector import BaseSyntheticPreferenceCollectorMixin
-from query_selection.query_selector import RandomQuerySelector
-
 from environment_wrappers.utils import create_env
-
-
-class CustomPreferenceCollector(RandomQuerySelector, BaseSyntheticPreferenceCollectorMixin):
-    pass
-
-class CustomPbRLAgent(CustomPreferenceCollector, PbRLAgent):
-    pass
 
 env = create_env("MountainCar-v0", termination_penalty=10.)
 
-agent = CustomPbRLAgent(env=env, num_pretraining_epochs=8,
-                                num_training_epochs_per_iteration=16,
-                                preferences_per_iteration=32)
+agent = PbRLAgent(env=env, reward_model_name="Mlp", num_pretraining_epochs=8, 
+                  num_training_epochs_per_iteration=16)
 
 agent.pb_learn(num_training_timesteps=200000, num_pretraining_preferences=512)
 
