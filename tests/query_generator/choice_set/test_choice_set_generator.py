@@ -30,9 +30,11 @@ def test_choice_sets_have_correct_size():
 
 
 def test_calculate_num_items():
-    query_generator = ChoiceSetGenerator(item_selector=Mock(), item_generator=Mock())
-    num_samples = query_generator._calculate_num_items(num_queries=500)
-    assert num_samples == 157
+    items_per_query = 2
+    num_queries = 500
+    query_generator = ChoiceSetGenerator(item_selector=Mock(), item_generator=Mock(), items_per_query=items_per_query)
+    num_samples = query_generator._calculate_num_items(num_queries=num_queries)
+    assert num_samples == num_queries / items_per_query
 
 
 def test_calculate_num_items_for_one_query():

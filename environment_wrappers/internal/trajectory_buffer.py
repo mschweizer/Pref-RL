@@ -5,7 +5,7 @@ from gym import Wrapper
 
 
 class TrajectoryBuffer(Wrapper):
-    def __init__(self, env, trajectory_buffer_size=512):
+    def __init__(self, env, trajectory_buffer_size=1024):  # TODO: couple buffer size with steps per RL model update
         super().__init__(env)
         self.trajectory_buffer = Buffer(buffer_size=trajectory_buffer_size)
         self._last_observation = None

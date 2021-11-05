@@ -28,7 +28,7 @@ class AbstractSegmentSampler(AbstractQueryItemGenerator, ABC):
 
     def _log_duplicate_warning(self, num_items, policy_model):
         trajectory_buffer_length = policy_model.trajectory_buffer.size
-        if num_items > max(1, int(0.25 * trajectory_buffer_length / self.segment_length)):
+        if num_items > int(0.3 * trajectory_buffer_length / self.segment_length):
             msg = "About to sample {num_items} segments of length {seg_len} " \
                   "from a trajectory of length {traj_len}. " \
                   "Be aware of potential (near) duplicate segment samples.".format(num_items=num_items,

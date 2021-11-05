@@ -1,4 +1,5 @@
 import argparse
+import logging
 
 from agents.preference_based.pbrl_agent import PbRLAgent
 from environment_wrappers.utils import create_env
@@ -18,6 +19,8 @@ def create_cli():
 def main():
     parser = create_cli()
     args = parser.parse_args()
+
+    logging.basicConfig(level=logging.INFO)
 
     env = create_env(args.env_id, termination_penalty=10.)
 

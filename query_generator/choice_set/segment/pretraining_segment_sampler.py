@@ -16,7 +16,7 @@ class AbstractPretrainingSegmentSampler(AbstractQueryItemGenerator, ABC):
         # Source: https://github.com/nottombrown/rl-teacher/blob/b2c2201e9d2457b13185424a19da7209364f23df/rl_teacher/
         # segment_sampling.py#L76
         trajectory_buffer_length = policy_model.trajectory_buffer.size
-        samples_per_rollout = max(1, int(0.25 * trajectory_buffer_length / self.segment_length))
+        samples_per_rollout = max(1, int(0.3 * trajectory_buffer_length / self.segment_length))
 
         while len(samples) < num_items:
             policy_model.run(steps=policy_model.trajectory_buffer.size)
