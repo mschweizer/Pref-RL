@@ -11,8 +11,11 @@ class SegmentRenderer:
         if not os.path.exists(output_path):
             os.makedirs(output_path)
 
-    def render_segment(self, segment, name, fps=12, fourcc=VideoWriter_fourcc(*'vp80'), file_extension='.webm'):
-        outfile = '{}{}{}'.format(self.output_path, name, file_extension)
+    def render_segment(self, segment, subdir, name, fps=12, fourcc=VideoWriter_fourcc(*'vp80'), file_extension='.webm'):
+        outfile = '{}{}{}{}'.format(
+            self.output_path, subdir, name, file_extension)
+        if not os.path.exists(self.output_path+subdir):
+            os.makedirs(self.output_path+subdir)
         singleframe = np.array(segment.frames[0])
         fshape = (singleframe.shape[1], singleframe.shape[0])
 

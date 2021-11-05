@@ -49,16 +49,19 @@ class BaseHumanPreferenceCollectorMixin(AbstractPreferenceCollectorMixin, MostRe
         queries = self.select_queries(
             self.query_candidates, num_queries=num_preferences)
         for query in queries:
-            uuid = uuid4()
-            str_id = str(uuid)
-            url_left = self.renderer.render_segment(
-                query[0], '{}-left'.format(str_id))
-            url_right = self.renderer.render_segment(
-                query[1], '{}-right'.format(str_id))
-
             from preferences import models
-            unlabeled_preference = models.Preference.objects.create(
-                video_url_left=url_left, video_url_right=url_right)
+            unlabeled_preference = models.Preference.objects.create()
+            db_id = unlabeled_preference.id
+            uuid = uuid4()
+            str_uuid = str(uuid)
+            url_left = self.renderer.render_segment(
+                query[0], '{}/'.format(db_id), '{}-left'.format(str_uuid))
+            url_right = self.renderer.render_segment(
+                query[1], '{}/'.format(db_id), '{}-right'.format(str_uuid))
+
+            unlabeled_preference.url_left = url_left
+            unlabeled_preference.url_right = url_right
+
             unlabeled_preference.save()
             self._queried_prefs.append(
                 {'id': unlabeled_preference.id, 'query': query, 'label': None})
@@ -73,13 +76,13 @@ class BaseHumanPreferenceCollectorMixin(AbstractPreferenceCollectorMixin, MostRe
                 pref['label'] = retrieved_label
                 self.preferences.append(
                     (pref['query'], self._convert_label(retrieved_label)))
-    
+
     def clear_queried_prefs(self):
         self._queried_prefs = []
 
     @property
     def label_quota(self):
-        if not len(self._queried_prefs)>0:
+        if not len(self._queried_prefs) > 0:
             return 0.0
         return trunc((len(self._labeled_prefs)/len(self._queried_prefs))*100)/100
 
