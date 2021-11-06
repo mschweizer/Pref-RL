@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import List
 import os
-from os import path
+import sys
 import django
 import cv2
 import numpy as np
@@ -36,12 +36,11 @@ class DjangoPreferenceQuerent(AbstractPreferenceQuerent):
 
     def __init__(self, query_selector, output_path):
         super().__init__(query_selector)
-
         self.output_path = output_path
         if not os.path.exists(output_path):
             os.makedirs(output_path)
         # preparations for django connection
-        path.append('/home/sascha/BA/webapp/pref-rl-webapp')
+        sys.path.append('/home/sascha/BA/webapp/pref-rl-webapp')
         os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'pbrlwebapp.settings')
         django.setup()
 
@@ -53,10 +52,10 @@ class DjangoPreferenceQuerent(AbstractPreferenceQuerent):
 
             from preferences import models
 
-            video_url_left = self._render_segment(query[0], name=query.id)
-            video_url_right = self._render_segment(query[1], name=query.id)
+            self._render_segment(query[0], name=query.id)
+            self._render_segment(query[1], name=query.id)
 
-            models.Preference.objects.create(uuid=query.id, video_url_left=video_url_left, video_url_right=video_url_right)
+            models.Preference.objects.create(uuid=query.id)
 
         return selected_queries
 

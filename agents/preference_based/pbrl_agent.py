@@ -4,10 +4,9 @@ import time
 from agents.preference_based.buffered_policy_model import BufferedPolicyModel
 from agents.preference_based.pbrl_callback import PbRLCallback
 from agents.rl_agent import RLAgent
-from environment_wrappers.utils import add_internal_env_wrappers
-from preference_collector.synthetic_preference.preference_oracle import RewardMaximizingOracle
-from preference_collector.synthetic_preference.synthetic_preference_collector import SyntheticPreferenceCollector
-from preference_querent.preference_querent import SynchronousPreferenceQuerent
+from environment_wrappers.utils import add_django_and_internal_env_wrappers
+from preference_collector.django_preference.django_preference_collector import DjangoPreferenceCollector
+from preference_querent.preference_querent import DjangoPreferenceQuerent
 from preference_querent.query_selector.query_selector import RandomQuerySelector
 from query_generator.choice_set.choice_set_generator import ChoiceSetGenerator
 from query_generator.choice_set.segment.pretraining_segment_sampler import RandomPretrainingSegmentSampler
@@ -23,7 +22,7 @@ class PbRLAgent(RLAgent):
         self.reward_model = reward_model_class(env)
 
         super(PbRLAgent, self).__init__(
-            env=add_internal_env_wrappers(env=env, reward_model=self.reward_model))
+            env=add_django_and_internal_env_wrappers(env=env, reward_model=self.reward_model))
 
         self.policy_model = BufferedPolicyModel(self.env)
         self.reward_trainer = RewardModelTrainer(self.reward_model)
@@ -32,12 +31,11 @@ class PbRLAgent(RLAgent):
                                item_selector=RandomItemSelector())
         self.query_generator = ChoiceSetGenerator(item_generator=RandomSegmentSampler(segment_length=25),
                                                   item_selector=RandomItemSelector())
-        self.preference_collector = SyntheticPreferenceCollector(oracle=RewardMaximizingOracle())
+        self.preference_collector = DjangoPreferenceCollector()
         # TODO: Change RandomQuerySelector -> MostRecentlyGeneratedSelector (otherwise a lot of duplicates when we
         #  choose e.g. 500 out of 500 at random (with replacement!)
-        self.preference_querent = SynchronousPreferenceQuerent(query_selector=RandomQuerySelector(),
-                                                               preference_collector=self.preference_collector,
-                                                               preferences=self.reward_trainer.preferences)
+        self.preference_querent = DjangoPreferenceQuerent(query_selector=RandomQuerySelector(), 
+                                                               output_path='./videofiles/')
 
         self.num_pretraining_epochs = num_pretraining_epochs
         self.num_training_epochs_per_iteration = num_training_epochs_per_iteration

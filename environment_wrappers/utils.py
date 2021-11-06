@@ -8,7 +8,7 @@ from environment_wrappers.external.visual_feedback_remover import VisualFeedback
 from environment_wrappers.internal.reward_monitor import RewardMonitor
 from environment_wrappers.internal.reward_predictor import RewardPredictor
 from environment_wrappers.internal.reward_standardizer import RewardStandardizer
-from environment_wrappers.internal.trajectory_buffer import TrajectoryBuffer
+from environment_wrappers.internal.trajectory_buffer import FrameTrajectoryBuffer, TrajectoryBuffer
 
 
 def create_env(env_id, termination_penalty=0., frame_stack_depth=4):
@@ -39,6 +39,12 @@ def add_internal_env_wrappers(env, reward_model):
     env = RewardMonitor(env)
     return env
 
+def add_django_and_internal_env_wrappers(env, reward_model):
+    env = FrameTrajectoryBuffer(env)
+    env = RewardPredictor(env, reward_model)
+    env = RewardStandardizer(env)
+    env = RewardMonitor(env)
+    return env
 
 def is_wrapped(env, wrapper_class):
     # Credit: Based on https://github.com/DLR-RM/stable-baselines3/blob/

@@ -3,6 +3,7 @@ from preference_collector.preference import Preference
 
 from preference_collector.preference_collector import AbstractPreferenceCollector
 import os
+import sys
 import django
 
 
@@ -10,7 +11,7 @@ class DjangoPreferenceCollector(AbstractPreferenceCollector):
 
     def __init__(self):
         super().__init__()
-        os.path.append('/home/sascha/BA/webapp/pref-rl-webapp')
+        sys.path.append('/home/sascha/BA/webapp/pref-rl-webapp')
         os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'pbrlwebapp.settings')
         django.setup()
 
