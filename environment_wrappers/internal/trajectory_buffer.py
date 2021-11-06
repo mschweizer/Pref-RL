@@ -27,6 +27,27 @@ class TrajectoryBuffer(Wrapper):
         return new_observation, reward, new_done, info
 
 
+class FrameTrajectoryBuffer(Wrapper):
+    def __init__(self, env, trajectory_buffer_size=128):
+        super().__init__(env)
+        self.trajectory_buffer = FrameBuffer(buffer_size=trajectory_buffer_size)
+        self._last_observation = None
+        self._last_done = False
+
+    def step(self, action):
+        _last_image = self.env.render(mode='rgb_array')
+
+        new_observation, reward, new_done, info = super().step(action)
+
+        self.trajectory_buffer.append_step(
+            self._last_observation, action, reward, self._last_done, info, _last_image)
+
+        self._last_observation = new_observation
+        self._last_done = new_done
+
+        return new_observation, reward, new_done, info
+
+
 class Buffer:
     def __init__(self, buffer_size):
         self.observations = deque(maxlen=buffer_size)
@@ -57,6 +78,24 @@ class Buffer:
         return self.observations.maxlen
 
 
+class FrameBuffer(Buffer):
+    def __init__(self, buffer_size):
+        super().__init__(buffer_size)
+        self.frames = deque(maxlen=buffer_size)
+
+    def append_step(self, observation, action, reward, done, info, frame):
+        super().append_step(observation, action, reward, done, info)
+        self.frames.append(frame)
+
+    def get_segment(self, start, stop):
+        return FrameSegment(list(self.observations)[start: stop],
+                            list(self.actions)[start: stop],
+                            list(self.rewards)[start: stop],
+                            list(self.dones)[start: stop],
+                            list(self.infos)[start: stop],
+                            list(self.frames)[start: stop])
+
+
 class Segment:
     def __init__(self, observations, actions, rewards, dones, infos):
         self.observations = np.array(observations)
@@ -74,3 +113,15 @@ class Segment:
                 "reward": self.rewards[idx],
                 "done": self.dones[idx],
                 "info": self.infos[idx]}
+
+                
+class FrameSegment(Segment):
+    def __init__(self, observations, actions, rewards, dones, infos, frames):
+        super().__init__(observations, actions, rewards, dones, infos)
+        self.frames = np.array(frames)
+
+    def get_step(self, idx):
+        tmpdict = super().get_step(idx)
+        tmpdict['frame'] = self.frames[idx]
+        return tmpdict
+        
