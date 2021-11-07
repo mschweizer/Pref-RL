@@ -1,11 +1,11 @@
 import pytest
 
-from agent.preference_based.sequential.sequential_pbrl_agent import SequentialPbRLAgent
+from agents.preference_based.sequential.sequential_pbrl_agent import BaseSequentialPbRLAgent
 
 
 @pytest.fixture()
 def sequential_agent(cartpole_env):
-    return SequentialPbRLAgent(cartpole_env)
+    return BaseSequentialPbRLAgent(cartpole_env)
 
 
 @pytest.mark.parametrize('training', [True, False])
@@ -29,7 +29,7 @@ def test_query_preferences(sequential_agent):
 
 
 def test_pb_learn(cartpole_env):
-    agent = SequentialPbRLAgent(cartpole_env, num_pretraining_epochs=1, num_training_epochs_per_iteration=1,
-                                preferences_per_iteration=1)
+    agent = BaseSequentialPbRLAgent(cartpole_env, num_pretraining_epochs=1, num_training_epochs_per_iteration=1,
+                                    preferences_per_iteration=1)
 
     agent.pb_learn(num_training_timesteps=1, num_pretraining_preferences=1)

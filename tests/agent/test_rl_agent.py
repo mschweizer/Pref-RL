@@ -1,6 +1,6 @@
 import gym
 
-from agent.rl_agent import RLAgent
+from agents.rl_agent import RLAgent
 
 
 def test_agent_chooses_action(cartpole_env):

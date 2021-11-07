@@ -1,4 +1,4 @@
-from preference_data.query_generation.segment.utils import is_sampling_step
+from query_generation.segment_queries.utils import is_sampling_step
 
 
 def test_is_sampling_step():

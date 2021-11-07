@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 
-class AbstractQueryGenerator(ABC):
+class AbstractQueryGeneratorMixin(ABC):
 
     def __init__(self, query_candidates):
         self.query_candidates = query_candidates

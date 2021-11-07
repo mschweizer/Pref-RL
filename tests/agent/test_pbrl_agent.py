@@ -1,6 +1,6 @@
 from unittest.mock import patch
 
-from agent.preference_based.pbrl_agent import AbstractPbRLAgent
+from agents.preference_based.pbrl_agent import AbstractPbRLAgent
 
 
 @patch.multiple(AbstractPbRLAgent, __abstractmethods__=set())

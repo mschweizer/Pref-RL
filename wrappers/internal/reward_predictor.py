@@ -4,10 +4,10 @@ import numpy as np
 import torch
 from gym import Wrapper
 
-from preference_data.preference.experience import Experience
+from wrappers.internal.experience import Experience
 
 
-# TODO: Use gym.core.RewardWrapper instead of custom reward_modeling wrapper
+# TODO: Use gym.core.RewardWrapper instead of custom models wrapper
 class RewardPredictor(Wrapper):
     def __init__(self, env, reward_model, trajectory_buffer_size=128):
         super().__init__(env)
@@ -24,7 +24,7 @@ class RewardPredictor(Wrapper):
     def step(self, action):
         new_observation, reward, new_done, info = super().step(action)
 
-        # A reward_modeling tensor is explicitly created because stable baselines performs a deep copy on 'info'
+        # A models tensor is explicitly created because stable baselines performs a deep copy on 'info'
         # Torch otherwise throws a 'RuntimeError: Only Tensors created explicitly by the user (graph leaves)
         # support the deepcopy protocol at the moment'
         info['external_reward'] = torch.tensor(reward)

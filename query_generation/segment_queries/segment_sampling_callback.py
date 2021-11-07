@@ -1,6 +1,6 @@
 from stable_baselines3.common.callbacks import BaseCallback
 
-from preference_data.query_generation.segment.utils import is_sampling_step
+from query_generation.segment_queries.utils import is_sampling_step
 
 
 class SegmentSamplingCallback(BaseCallback):

@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 import torch
 
-from reward_modeling.models.reward.atari_cnn import AtariCnnRewardModel
+from models.reward.atari_cnn import AtariCnnRewardModel
 
 
 def test_has_correct_input_dimension(pong_env):
