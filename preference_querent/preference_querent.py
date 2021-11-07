@@ -34,11 +34,11 @@ class SynchronousPreferenceQuerent(AbstractPreferenceQuerent):
 
 class DjangoPreferenceQuerent(AbstractPreferenceQuerent):
 
-    def __init__(self, query_selector, output_path):
+    def __init__(self, query_selector, base_output_dir):
         super().__init__(query_selector)
-        self.output_path = output_path
-        if not os.path.exists(output_path):
-            os.makedirs(output_path)
+        self.base_output_dir = base_output_dir
+        if not os.path.exists(base_output_dir):
+            os.makedirs(base_output_dir)
         # preparations for django connection
         sys.path.append('/home/sascha/BA/webapp/pref-rl-webapp')
         os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'pbrlwebapp.settings')
@@ -52,16 +52,19 @@ class DjangoPreferenceQuerent(AbstractPreferenceQuerent):
 
             from preferences import models
 
-            self._render_segment(query[0], name=query.id)
-            self._render_segment(query[1], name=query.id)
+            self._render_segment(
+                query[0], subdir='{}/'.format(query.id), name='{}-left'.format(query.id))
+            self._render_segment(
+                query[1], subdir='{}/'.format(query.id), name='{}-right'.format(query.id))
 
             models.Preference.objects.create(uuid=query.id)
 
         return selected_queries
 
-    def _render_segment(self, segment, name, fps=12, fourcc=cv2.VideoWriter_fourcc(*'vp80'), file_extension='.webm'):
-        outfile = '{}{}{}'.format(
-            self.output_path, name, file_extension)
+    def _render_segment(self, segment, subdir, name, fps=12, fourcc=cv2.VideoWriter_fourcc(*'vp80'), file_extension='.webm'):
+        self._setup_subdir(self.base_output_dir, subdir)
+        outfile = '{}{}{}{}'.format(
+            self.base_output_dir, subdir, name, file_extension)
         singleframe = np.array(segment.frames[0])
         fshape = (singleframe.shape[1], singleframe.shape[0])
 
@@ -72,3 +75,8 @@ class DjangoPreferenceQuerent(AbstractPreferenceQuerent):
 
         vid_writer.release()
         return '{}{}'.format(name, file_extension)
+
+    def _setup_subdir(self, base_dir, subdir_name):
+        if not os.path.exists(base_dir+subdir_name):
+            os.mkdir(base_dir+subdir_name)
+        return subdir_name

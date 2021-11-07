@@ -35,7 +35,7 @@ class PbRLAgent(RLAgent):
         # TODO: Change RandomQuerySelector -> MostRecentlyGeneratedSelector (otherwise a lot of duplicates when we
         #  choose e.g. 500 out of 500 at random (with replacement!)
         self.preference_querent = DjangoPreferenceQuerent(query_selector=RandomQuerySelector(), 
-                                                               output_path='./videofiles/')
+                                                               base_output_dir='./videofiles/')
 
         self.num_pretraining_epochs = num_pretraining_epochs
         self.num_training_epochs_per_iteration = num_training_epochs_per_iteration
