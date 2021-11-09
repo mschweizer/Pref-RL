@@ -18,7 +18,7 @@ class IndirectFeedbackRemover(Wrapper):
             reward = self._apply_penalty(reward)
             observation = self.reset()
         if isinstance(self.unwrapped, AtariEnv) and info:
-            del info["lives"]
+            del info["ale.lives"]
         done = False
         return observation, reward, done, info
 

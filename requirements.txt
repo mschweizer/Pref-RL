@@ -1,4 +1,4 @@
-gym[atari, accept-rom-license]~=0.21.0
+gym~=0.17.3
 pytest~=6.1.2
 torch~=1.7.0
 numpy~=1.19.4
