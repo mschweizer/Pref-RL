@@ -1,12 +1,13 @@
-from stable_baselines3 import A2C
+from agents.policy_model import PolicyModel
 
 
 class RLAgent:
-    def __init__(self, env, env_steps_per_rl_update=100):
-        self.policy_model = A2C('MlpPolicy', env=env, n_steps=env_steps_per_rl_update, tensorboard_log="runs")
+    def __init__(self, env, steps_per_model_update=100):
+        self.env = env
+        self.policy_model = PolicyModel(env=env, steps_per_model_update=steps_per_model_update)
 
     def choose_action(self, state):
-        return self.policy_model.predict(state)
+        return self.policy_model.choose_action(state)
 
     def learn(self, total_timesteps):
         self.policy_model.learn(total_timesteps)
