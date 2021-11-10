@@ -63,6 +63,10 @@ class PbRLAgent(RLAgent):
     def _collect_pretraining_preferences(self, num_pretraining_preferences, wait_threshold=.8):
         while len(self.reward_trainer.preferences) < int(wait_threshold * num_pretraining_preferences):
             self._collect_preferences()
+            over = len(self.reward_trainer.preferences)
+            under = wait_threshold * num_pretraining_preferences
+            debug = over / under
+            print('Collecting pretraining data... %d%% done. Please add preferences via the web interface.' % debug)
             time.sleep(15)
 
     def _pretrain_and_collect(self):
