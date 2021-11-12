@@ -64,36 +64,32 @@ class PbRLAgent(RLAgent):
 
     def _collect_pretraining_preferences(self, num_pretraining_preferences, wait_threshold=.8):
         while len(self.reward_trainer.preferences) < int(wait_threshold * num_pretraining_preferences):
-            self._collect_preferences()
+            newly_collected_preferences = self.preference_collector.collect_preferences()
+            self.reward_trainer.preferences.extend(newly_collected_preferences)
             time.sleep(15)
 
     def _pretrain_and_collect(self):
         for _ in range(self.num_pretraining_epochs):
             self.reward_trainer.train(epochs=1, pretraining=True)
-            self._collect_preferences()
-
-    def _collect_preferences(self):
-        newly_collected_preferences = self.preference_collector.collect_preferences()
-        self.reward_trainer.preferences.extend(newly_collected_preferences)
+            newly_collected_preferences = self.preference_collector.collect_preferences()
+            self.reward_trainer.preferences.extend(newly_collected_preferences)
 
     def _train(self, total_timesteps):
         self.policy_model.learn(total_timesteps, callback=PbRLCallback(self._pbrl_iteration))
 
-    def _pbrl_iteration(self, episode_count):
-        self._collect_preferences()
-        self._query_preferences()
+    def _pbrl_iteration(self, episode_count, elapsed_timesteps):
+        newly_collected_preferences = self.preference_collector.collect_preferences()
+        self.reward_trainer.preferences.extend(newly_collected_preferences)
+        num_queries = self._calculate_num_queries_for_iteration()
+        # TODO: Generate more query candidates than num_queries (e.g. for active learning)
+        query_candidates = self.query_generator.generate_queries(self.policy_model, num_queries)
+        newly_pending_queries = self.preference_querent.query_preferences(query_candidates, num_queries)
+        self.preference_collector.pending_queries.extend(newly_pending_queries)
 
         if episode_count >= 100 and episode_count % 100 == 0:  # TODO: replace constant=100 by param
             self.reward_trainer.train(self.num_training_epochs_per_iteration)
 
-    def _query_preferences(self):
-        num_preferences = self._calculate_num_preferences_for_iteration()
-        # TODO: Generate more query candidates than num_queries (e.g. for active learning)
-        query_candidates = self.query_generator.generate_queries(self.policy_model, num_preferences)
-        newly_pending_queries = self.preference_querent.query_preferences(query_candidates, num_preferences)
-        self.preference_collector.pending_queries.extend(newly_pending_queries)
-
-    def _calculate_num_preferences_for_iteration(self):
+    def _calculate_num_queries_for_iteration(self):
         current_number_of_preferences = len(self.reward_trainer.preferences)
         desired_number_of_preferences = current_number_of_preferences + 10  # TODO: dummy; replace by schedule
         num_queries = desired_number_of_preferences - current_number_of_preferences

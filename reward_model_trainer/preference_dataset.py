@@ -35,27 +35,27 @@ class PreferenceDataset(torch.utils.data.Dataset):
             warning_msg = make_discard_warning(len(preferences), self.queries.maxlen)
             warnings.warn(warning_msg)
 
-        self.choices.extend(self.prepare_choices(preferences))
-        self.queries.extend(self.prepare_queries(preferences))
+        self.choices.extend(self._prepare_choices(preferences))
+        self.queries.extend(self._prepare_queries(preferences))
 
         assert len(self.queries) == len(self.choices), "Dataset is corrupt. Unequal number of data (queries) " \
                                                        "and labels (choices)."
 
     def append(self, preference):
-        self.choices.append(self.prepare_choice(preference))
-        self.queries.append(self.prepare_query(preference))
+        self.choices.append(self._prepare_choice(preference))
+        self.queries.append(self._prepare_query(preference))
 
-    def prepare_choices(self, preferences):
-        return [self.prepare_choice(preference) for preference in preferences]
+    def _prepare_choices(self, preferences):
+        return [self._prepare_choice(preference) for preference in preferences]
 
     @staticmethod
-    def prepare_choice(preference):
+    def _prepare_choice(preference):
         return float(preference.choice.value)
 
-    def prepare_queries(self, preferences):
-        return [self.prepare_query(preference) for preference in preferences]
+    def _prepare_queries(self, preferences):
+        return [self._prepare_query(preference) for preference in preferences]
 
     @staticmethod
-    def prepare_query(preference):
+    def _prepare_query(preference):
         choice_set = preference.query.choice_set
         return np.array([choice_set[0].observations, choice_set[1].observations])

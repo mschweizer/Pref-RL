@@ -36,8 +36,8 @@ def test_initializes_with_data(preference):
     dataset = PreferenceDataset(capacity=len(preferences), preferences=preferences)
 
     assert len(dataset) == len(preferences)
-    assert dataset.choices[0] == dataset.prepare_choices(preferences)[0]
-    assert np.all(dataset.queries[0] == dataset.prepare_query(preference))
+    assert dataset.choices[0] == dataset._prepare_choices(preferences)[0]
+    assert np.all(dataset.queries[0] == dataset._prepare_query(preference))
 
 
 def test_initializes_without_data():
@@ -72,3 +72,8 @@ def test_discards_oldest_records_when_capacity_is_reached(preference):
     dataset.extend([new_preference])
 
     assert dataset[0][1] == BinaryChoice.RIGHT.value
+
+
+def test_counts_number_of_preferences_over_lifetime(preferences):
+    dataset = PreferenceDataset(capacity=1, preferences=preferences)
+    assert dataset.lifetime_preference_count == len(preferences)
