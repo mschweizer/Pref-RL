@@ -6,9 +6,15 @@ from stable_baselines3.common.atari_wrappers import AtariWrapper
 from environment_wrappers.external.indirect_feedback_remover import IndirectFeedbackRemover
 from environment_wrappers.internal.reward_standardizer import RewardStandardizer
 from environment_wrappers.internal.trajectory_buffer import TrajectoryBuffer
-from environment_wrappers.utils import add_external_env_wrappers, create_env, is_atari_env, is_wrapped, \
-    add_internal_env_wrappers
+from environment_wrappers.utils import (
+    add_external_env_wrappers, create_env, is_atari_env, is_wrapped,
+    add_internal_env_wrappers, create_gridworld_env)
 from reward_models.mlp import MlpRewardModel
+from gym_gridworld import GridworldWrapper
+
+
+GRIDWORLD_LEVEL_DIRECTORY = \
+    '/home/cln/MA/repo/masterarbeit/Code/gym_gridworld/gym_gridworld/levels'
 
 
 @pytest.fixture()
@@ -60,3 +66,18 @@ def test_wrap_internal_environment(cartpole_env):
     wrapped_env = add_internal_env_wrappers(cartpole_env, reward_model=reward_model)
 
     assert is_wrapped(wrapped_env, TrajectoryBuffer) and is_wrapped(wrapped_env, RewardStandardizer)
+
+
+@pytest.fixture()
+def gridworld_envs():
+    risky_env = create_gridworld_env(
+        "Gridworld:Lab2D-risky-v0",
+        {'level_directory': GRIDWORLD_LEVEL_DIRECTORY})
+    return risky_env
+
+
+def test_gridworld_member_instances(gridworld_envs):
+    risky_env = gridworld_envs
+    assert isinstance(risky_env, GridworldWrapper)
+    assert isinstance(risky_env.gym_env, gym.Env)
+    assert risky_env.gym_env.gridworld_wrapper is risky_env
