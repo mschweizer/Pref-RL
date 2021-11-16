@@ -16,6 +16,8 @@ class PreferenceDataset(torch.utils.data.Dataset):
     def __init__(self, capacity=4096, preferences=None):
         self.queries = deque(maxlen=capacity)
         self.choices = deque(maxlen=capacity)
+        self.lifetime_preference_count = 0
+
         if preferences:
             self.extend(preferences)
 
@@ -41,9 +43,13 @@ class PreferenceDataset(torch.utils.data.Dataset):
         assert len(self.queries) == len(self.choices), "Dataset is corrupt. Unequal number of data (queries) " \
                                                        "and labels (choices)."
 
+        self.lifetime_preference_count += len(preferences)
+
     def append(self, preference):
         self.choices.append(self._prepare_choice(preference))
         self.queries.append(self._prepare_query(preference))
+
+        self.lifetime_preference_count += 1
 
     def _prepare_choices(self, preferences):
         return [self._prepare_choice(preference) for preference in preferences]
