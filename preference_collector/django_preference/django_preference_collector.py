@@ -1,22 +1,23 @@
 from typing import List
-from preference_collector.preference import Preference
-from preference_collector.preference_collector import AbstractPreferenceCollector
-from preference_collector.binary_choice import BinaryChoice
 import os
 import sys
 import django
+from preference_collector.preference import Preference
+from preference_collector.preference_collector import AbstractPreferenceCollector
+from preference_collector.binary_choice import BinaryChoice
 
 
 class DjangoPreferenceCollector(AbstractPreferenceCollector):
 
     def __init__(self):
         super().__init__()
-        sys.path.append('/home/sascha/BA/webapp/pref-rl-webapp')
-        os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'pbrlwebapp.settings')
+        sys.path.append(os.path.abspath('./django_webapp'))
+        os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'django_webapp.pbrlwebapp.settings')
         django.setup()
+        
 
     def collect_preferences(self) -> List:
-        from preferences import models
+        from preferences import models 
 
         just_collected_preferences = []
 
@@ -26,16 +27,16 @@ class DjangoPreferenceCollector(AbstractPreferenceCollector):
             if (retrieved_label := db_pref.label) is None:
                 continue
 
-            label = None
+            pref_rl_label = None
 
             if retrieved_label == 1:
-                label = BinaryChoice.LEFT
+                pref_rl_label = BinaryChoice.LEFT
             elif retrieved_label == .5:
-                label = BinaryChoice.INDIFFERENT
+                pref_rl_label = BinaryChoice.INDIFFERENT
             elif retrieved_label == 0:
-                label = BinaryChoice.RIGHT
+                pref_rl_label = BinaryChoice.RIGHT
             just_collected_preferences.append(
-                Preference(query=query, choice=label))
+                Preference(query=query, choice=pref_rl_label))
             self.pending_queries.remove(query)
 
         return just_collected_preferences

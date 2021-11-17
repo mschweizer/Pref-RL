@@ -1,17 +1,17 @@
 document.addEventListener('keydown', (e) => {
-    if (e.code == 'ArrowLeft'){
+    if (e.code == 'ArrowLeft') {
         document.getElementById('leftButton').click()
     }
-    else if (e.code=='ArrowUp'){
+    else if (e.code == 'ArrowUp') {
         document.getElementById('equalsButton').click()
     }
-    else if (e.code=='ArrowDown'){
+    else if (e.code == 'ArrowDown') {
         document.getElementById('skipButton').click()
     }
-    else if (e.code=='ArrowRight'){
+    else if (e.code == 'ArrowRight') {
         document.getElementById('rightButton').click()
     }
-    else{
+    else {
         //do nothing
     }
 })

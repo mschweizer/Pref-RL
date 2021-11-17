@@ -126,7 +126,7 @@ STATICFILES_FINDERS = [
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 ]
 
-MEDIA_ROOT = '/home/BA/Pref-RL/Pref-RL/videofiles/'
+MEDIA_ROOT = os.path.join(BASE_DIR.parents[2], '/videofiles/')
 
 MEDIA_URL = '/videofiles/'
 
