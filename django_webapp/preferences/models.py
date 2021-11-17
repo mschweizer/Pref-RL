@@ -7,13 +7,7 @@ class Preference(models.Model):
 
     created_timestamp = models.DateTimeField(
         'created at', auto_now_add=True, db_index=True)
-    updated_timestamp = models.DateTimeField(
-        'last updated at', auto_now=True, db_index=True)
-
-    shown_to_human_timestamp = models.DateTimeField(
-        'shown to human at', db_index=True, blank=True, null=True)
-    response_timestamp = models.DateTimeField(
-        'response given at', db_index=True, blank=True, null=True)
+    priority = models.IntegerField('priority', db_index=True, default=0)
 
     label = models.DecimalField('preference label', max_digits=2,
                                 decimal_places=1, db_index=True, blank=True, null=True)

@@ -13,7 +13,7 @@ def index(request):
 
 
 def next_query(request):
-    top_query = Preference.objects.filter(label__isnull=True).first()
+    top_query = Preference.objects.filter(label__isnull=True).order_by('priority').first()
     if top_query is not None:
         return redirect('query', query_id=top_query.uuid)
     else:
@@ -30,9 +30,8 @@ def query(request, query_id):
             query.label = 0
         elif label =='Indifferent':
             query.label = .5
-        else:
-            #TODO implement proper skip functionality
-            pass
+        elif label == 'Skip':
+            query.priority += 1
         query.full_clean()
         query.save()
         return redirect('next')

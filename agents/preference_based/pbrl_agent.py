@@ -34,8 +34,8 @@ class PbRLAgent(RLAgent):
         self.preference_collector = DjangoPreferenceCollector()
         # TODO: Change RandomQuerySelector -> MostRecentlyGeneratedSelector (otherwise a lot of duplicates when we
         #  choose e.g. 500 out of 500 at random (with replacement!)
-        self.preference_querent = DjangoPreferenceQuerent(query_selector=RandomQuerySelector(), 
-                                                               base_output_dir='./videofiles/')
+        self.preference_querent = DjangoPreferenceQuerent(query_selector=RandomQuerySelector(),
+                                                          base_output_dir='./videofiles/')
 
         self.num_pretraining_epochs = num_pretraining_epochs
         self.num_training_epochs_per_iteration = num_training_epochs_per_iteration
@@ -52,21 +52,23 @@ class PbRLAgent(RLAgent):
 
     def _pretrain(self, num_preferences):
         self._query_pretraining_preferences(num_preferences)
-        self._collect_pretraining_preferences(num_preferences, wait_threshold=.8)
+        self._collect_pretraining_preferences(
+            num_preferences, wait_threshold=.8)
         self._pretrain_and_collect()
 
     def _query_pretraining_preferences(self, num_preferences):
-        query_candidates = self.pretraining_query_generator.generate_queries(self.policy_model, num_preferences)
-        newly_pending_queries = self.preference_querent.query_preferences(query_candidates, num_preferences)
+        query_candidates = self.pretraining_query_generator.generate_queries(
+            self.policy_model, num_preferences)
+        newly_pending_queries = self.preference_querent.query_preferences(
+            query_candidates, num_preferences)
         self.preference_collector.pending_queries.extend(newly_pending_queries)
 
     def _collect_pretraining_preferences(self, num_pretraining_preferences, wait_threshold=.8):
         while len(self.reward_trainer.preferences) < int(wait_threshold * num_pretraining_preferences):
             self._collect_preferences()
-            over = len(self.reward_trainer.preferences)
-            under = wait_threshold * num_pretraining_preferences
-            debug = over / under
-            print('Collecting pretraining data... %d%% done. Please add preferences via the web interface.' % debug)
+            percent_done = (len(self.reward_trainer.preferences) /
+                            (wait_threshold * num_pretraining_preferences))*100
+            print('Collecting pretraining data... %d%% done. Please add preferences via the web interface.' % percent_done)
             time.sleep(15)
 
     def _pretrain_and_collect(self):
@@ -79,7 +81,8 @@ class PbRLAgent(RLAgent):
         self.reward_trainer.preferences.extend(newly_collected_preferences)
 
     def _train(self, total_timesteps):
-        self.policy_model.learn(total_timesteps, callback=PbRLCallback(self._pbrl_iteration))
+        self.policy_model.learn(
+            total_timesteps, callback=PbRLCallback(self._pbrl_iteration))
 
     def _pbrl_iteration(self, episode_count):
         self._collect_preferences()
@@ -91,12 +94,15 @@ class PbRLAgent(RLAgent):
     def _query_preferences(self):
         num_preferences = self._calculate_num_preferences_for_iteration()
         # TODO: Generate more query candidates than num_queries (e.g. for active learning)
-        query_candidates = self.query_generator.generate_queries(self.policy_model, num_preferences)
-        newly_pending_queries = self.preference_querent.query_preferences(query_candidates, num_preferences)
+        query_candidates = self.query_generator.generate_queries(
+            self.policy_model, num_preferences)
+        newly_pending_queries = self.preference_querent.query_preferences(
+            query_candidates, num_preferences)
         self.preference_collector.pending_queries.extend(newly_pending_queries)
 
     def _calculate_num_preferences_for_iteration(self):
         current_number_of_preferences = len(self.reward_trainer.preferences)
-        desired_number_of_preferences = current_number_of_preferences + 10  # TODO: dummy; replace by schedule
+        desired_number_of_preferences = current_number_of_preferences + \
+            10  # TODO: dummy; replace by schedule
         num_queries = desired_number_of_preferences - current_number_of_preferences
         return num_queries
