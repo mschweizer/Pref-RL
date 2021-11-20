@@ -1,3 +1,4 @@
+import os
 import gym
 import numpy as np
 import pytest
@@ -11,10 +12,6 @@ from environment_wrappers.utils import (
     add_internal_env_wrappers, create_gridworld_env)
 from reward_models.mlp import MlpRewardModel
 from gym_gridworld import GridworldWrapper
-
-
-GRIDWORLD_LEVEL_DIRECTORY = \
-    '/home/cln/MA/repo/masterarbeit/Code/gym_gridworld/gym_gridworld/levels'
 
 
 @pytest.fixture()
@@ -70,9 +67,7 @@ def test_wrap_internal_environment(cartpole_env):
 
 @pytest.fixture()
 def gridworld_envs():
-    risky_env = create_gridworld_env(
-        "Gridworld:Lab2D-risky-v0",
-        {'level_directory': GRIDWORLD_LEVEL_DIRECTORY})
+    risky_env = create_gridworld_env("Gridworld:Lab2D-risky-v0")
     return risky_env
 
 

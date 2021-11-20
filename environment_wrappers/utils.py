@@ -11,24 +11,23 @@ from environment_wrappers.internal.reward_predictor import RewardPredictor
 from environment_wrappers.internal.reward_standardizer import RewardStandardizer
 from environment_wrappers.internal.trajectory_buffer import TrajectoryBuffer
 
-from gym_gridworld import GridworldWrapper
-
-GRIDWORLD_PREFIX = 'Gridworld:'
-GRIDWORLD_SETTING_KEYS = (
-    'level_id', 'entry_point', 'level_directory', 'sprite_size', 'topology',
-    'reward_threshold', 'nondeterministic', 'max_episode_steps',
-    'observations', 'agent_observation', 'seed_input', 'window_scale',
-    'ext_settings'
+from gym_gridworld import (
+    CONFIG_KEYS as GRIDWORLD_CONFIG_KEYS,
+    GridworldWrapper
 )
+
+GRIDWORLD_LEVEL_PREFIX = 'Gridworld:'
 
 
 def create_env(env_id, termination_penalty=0., frame_stack_depth=4,
                gridworld_settings: dict = None):
-    if not env_id.startswith(GRIDWORLD_PREFIX):
+    if not env_id.startswith(GRIDWORLD_LEVEL_PREFIX):
         env = gym.make(env_id)
-        env = add_external_env_wrappers(env, termination_penalty, frame_stack_depth)
     else:
-        env = create_gridworld_env(env_id, gridworld_settings)
+        gridworld_env = create_gridworld_env(env_id, gridworld_settings)
+        env = gridworld_env.gym_env
+    env = add_external_env_wrappers(env, termination_penalty,
+                                    frame_stack_depth)
     return env
 
 
@@ -74,11 +73,12 @@ def unwrap_wrapper(env, wrapper_class):
     return None
 
 
-def create_gridworld_env(env_id: str, env_settings: Dict) -> GridworldWrapper:
+def create_gridworld_env(env_id: str, env_settings: Dict = None) \
+        -> GridworldWrapper:
     """Create a gridworld environment instance.
 
     Derives `level_id` for the level to load from the given `env_id`
-    using the pre-defined `GRIDWORLD_PREFIX`. Further gridworld
+    using the pre-defined `GRIDWORLD_LEVEL_PREFIX`. Further gridworld
     configuration is done in `env_settings`.
 
     Keys in `env_settings`:
@@ -107,10 +107,9 @@ def create_gridworld_env(env_id: str, env_settings: Dict) -> GridworldWrapper:
         `window_scale` (float, optional):
             Factor to scale the pixel resolution of the window that
             displays the game.
-        `ext_settings` (Dict, optional):
-            Arbitrary placeholder for additional kwargs.
+        `ext_settings` (Dict, optional): Additional kwargs.
 
-    Arguments provided to the constructor are composed explicitely to
+    Arguments provided to the constructor are reordered deliberately to
     comply with the expected argument order.
 
     Args:
@@ -121,22 +120,23 @@ def create_gridworld_env(env_id: str, env_settings: Dict) -> GridworldWrapper:
     Returns:
         GridworldWrapper
     """
-    required_fields = set(['level_directory'])
-    setting_key_level_id = 'level_id'
-    level_id = env_id[len(GRIDWORLD_PREFIX):]
+    key_level_id = 'level_id'
+    key_extended_settings = 'ext_settings'
+    level_id = env_id[len(GRIDWORLD_LEVEL_PREFIX):]
 
-    assert env_settings is not None, \
-        'No env_settings provided for the grid world.'
-    assert required_fields.issubset(set(env_settings)), \
-        'No level_directory provided for the grid world.'
-
-    # Prepare constructor arguments as a dict composed of level ID and
-    # any other given setting.
+    # Prepare constructor arguments as a dict composed of level ID,
+    # further optional settings with pre-defined keys, and additional
+    # kwargs.
     env_args = { 
-        setting_key_level_id: level_id,
-        **{ k: env_settings[k] for k in GRIDWORLD_SETTING_KEYS 
-            if k in env_settings }
+        key_level_id: level_id,
+        **{ k: env_settings[k] for k in GRIDWORLD_CONFIG_KEYS 
+            if env_settings is not None
+            and k in env_settings
+            and k is not key_extended_settings }
     }
+    if env_settings is not None \
+        and key_extended_settings in env_settings.keys():
+        env_args.update(env_settings[key_extended_settings])
     gridworld = GridworldWrapper(**env_args)
     gridworld.make_gym_environment(level_id)
     return gridworld
