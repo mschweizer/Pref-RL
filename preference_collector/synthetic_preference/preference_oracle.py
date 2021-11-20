@@ -3,37 +3,6 @@ from abc import ABC, abstractmethod
 from preference_collector.binary_choice import BinaryChoice
 
 
-class AbstractOracleMixin(ABC):
-
-    @abstractmethod
-    def answer(self, query):
-        pass
-
-
-class RewardMaximizingOracleMixin(AbstractOracleMixin):
-    def answer(self, query):
-        reward_1, reward_2 = self.compute_total_original_rewards(query)
-        return self.compute_preference(reward_1, reward_2)
-
-    @staticmethod
-    def compute_total_original_rewards(query):
-        return (sum(info["external_reward"] for info in segment.infos) for segment in query)
-
-    @staticmethod
-    def compute_preference(reward_1, reward_2):
-        if reward_1 > reward_2:
-            return BinaryChoice.LEFT
-        elif reward_1 < reward_2:
-            return BinaryChoice.RIGHT
-        else:
-            return BinaryChoice.INDIFFERENT
-
-
-class RandomOracleMixin(AbstractOracleMixin):
-    def answer(self, query):
-        return BinaryChoice.random()
-
-
 class AbstractOracle(ABC):
 
     @abstractmethod
