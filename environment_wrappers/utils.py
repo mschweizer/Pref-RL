@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Any, Dict
 import gym
 from gym import Wrapper
 from gym.envs.atari import AtariEnv
@@ -20,7 +20,7 @@ GRIDWORLD_LEVEL_PREFIX = 'Gridworld:'
 
 
 def create_env(env_id, termination_penalty=0., frame_stack_depth=4,
-               gridworld_settings: dict = None):
+               gridworld_settings: Dict[str, Any] = None):
     if not env_id.startswith(GRIDWORLD_LEVEL_PREFIX):
         env = gym.make(env_id)
     else:
