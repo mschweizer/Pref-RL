@@ -1,0 +1,46 @@
+body {
+    background-color: #2E2E2E;
+    align-content: center;
+}
+
+h2 {
+    text-align: center;
+    color: whitesmoke;
+}
+
+video {
+    width: 45vw;
+    border: 5px solid whitesmoke;
+    border-radius: 15px;
+    margin: 1vw;
+}
+
+#videoDiv {
+    width: 95vw;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+}
+
+#buttonDiv {
+    width: 24vw;
+    margin: auto;
+    display: grid;
+    grid-template-rows: repeat(2, 4vw [row-start]);
+    grid-template-columns: repeat(3, 8vw [col-start]);
+}
+
+button {
+    border-radius: 1vw;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+    font-size: 2vw;
+}
+
+#leftButton {
+    grid-row: 1 / span 2;
+}
+
+#rightButton {
+    grid-column: 3;
+    grid-row: 1 / span 2;
+}

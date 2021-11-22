@@ -5,11 +5,8 @@ from .models import Preference
 
 
 def index(request):
-    latest_queries = Preference.objects.order_by('created_timestamp')[:5]
-    context = {
-        'latest_queries': latest_queries,
-    }
-    return render(request, 'preferences/index.html', context)
+    
+    return render(request, 'preferences/index.html')
 
 
 def next_query(request):
