@@ -73,7 +73,7 @@ def unwrap_wrapper(env, wrapper_class):
     return None
 
 
-def create_gridworld_env(env_id: str, env_settings: Dict = None
+def create_gridworld_env(env_id: str, env_settings: Dict[str, Any] = None
 ) -> GridworldWrapper:
     """Create a gridworld environment instance.
 
