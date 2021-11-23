@@ -5,8 +5,8 @@ from agents.preference_based.buffered_policy_model import BufferedPolicyModel
 from agents.preference_based.pbrl_callback import PbRLCallback
 from agents.rl_agent import RLAgent
 from environment_wrappers.utils import add_django_and_internal_env_wrappers
-from preference_collector.django_preference.django_preference_collector import DjangoPreferenceCollector
-from preference_querent.preference_querent import DjangoPreferenceQuerent
+from preference_collector.human_preference.human_preference_collector import DjangoPreferenceCollector
+from preference_querent.preference_querent import HumanPreferenceQuerent
 from preference_querent.query_selector.query_selector import RandomQuerySelector
 from query_generator.choice_set.choice_set_generator import ChoiceSetGenerator
 from query_generator.choice_set.segment.pretraining_segment_sampler import RandomPretrainingSegmentSampler
@@ -34,8 +34,8 @@ class PbRLAgent(RLAgent):
         self.preference_collector = DjangoPreferenceCollector()
         # TODO: Change RandomQuerySelector -> MostRecentlyGeneratedSelector (otherwise a lot of duplicates when we
         #  choose e.g. 500 out of 500 at random (with replacement!)
-        self.preference_querent = DjangoPreferenceQuerent(query_selector=RandomQuerySelector(),
-                                                          base_output_dir='./videofiles/')
+        self.preference_querent = HumanPreferenceQuerent(query_selector=RandomQuerySelector(),
+                                                          video_root_output_dir='./videofiles/')
 
         self.num_pretraining_epochs = num_pretraining_epochs
         self.num_training_epochs_per_iteration = num_training_epochs_per_iteration
@@ -68,7 +68,7 @@ class PbRLAgent(RLAgent):
             self._collect_preferences()
             percent_done = (len(self.reward_trainer.preferences) /
                             (wait_threshold * num_pretraining_preferences))*100
-            print('Collecting pretraining data... %d%% done. Please add preferences via the web interface.' % percent_done)
+            logging.info(f'Collecting pretraining data... {percent_done}% done. Please add preferences via the web interface.')
             time.sleep(15)
 
     def _pretrain_and_collect(self):

@@ -32,15 +32,15 @@ class SynchronousPreferenceQuerent(AbstractPreferenceQuerent):
         return []
 
 
-class DjangoPreferenceQuerent(AbstractPreferenceQuerent):
+class HumanPreferenceQuerent(AbstractPreferenceQuerent):
 
-    def __init__(self, query_selector, base_output_dir):
+    def __init__(self, query_selector, video_root_output_dir):
         super().__init__(query_selector)
-        self.base_output_dir = base_output_dir
-        if not os.path.exists(base_output_dir):
-            os.makedirs(base_output_dir)
+        self.root_output_dir = video_root_output_dir
+        if not os.path.exists(video_root_output_dir):
+            os.makedirs(video_root_output_dir)
         # preparations for django connection
-        sys.path.append('/home/sascha/BA/webapp/pref-rl-webapp')
+        sys.path.append(os.path.abspath('./django_webapp'))
         os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'pbrlwebapp.settings')
         django.setup()
 
@@ -52,31 +52,29 @@ class DjangoPreferenceQuerent(AbstractPreferenceQuerent):
 
             from preferences import models
 
-            self._render_segment(
-                query[0], subdir='{}/'.format(query.id), name='{}-left'.format(query.id))
-            self._render_segment(
-                query[1], subdir='{}/'.format(query.id), name='{}-right'.format(query.id))
+            self._write_segment_video(
+                query[0], subdir=f'{query.id}/', name=f'{query.id}-left')
+            self._write_segment_video(
+                query[1], subdir=f'{query.id}/', name=f'{query.id}-right')
 
             models.Preference.objects.create(uuid=query.id)
 
         return selected_queries
 
-    def _render_segment(self, segment, subdir, name, fps=12, fourcc=cv2.VideoWriter_fourcc(*'vp80'), file_extension='.webm'):
-        self._setup_subdir(self.base_output_dir, subdir)
-        outfile = '{}{}{}{}'.format(
-            self.base_output_dir, subdir, name, file_extension)
-        singleframe = np.array(segment.frames[0])
-        fshape = (singleframe.shape[1], singleframe.shape[0])
+    def _write_segment_video(self, segment, subdir, name, fps=14, fourcc=cv2.VideoWriter_fourcc(*'VP80'), file_extension='.webm'):
 
-        vid_writer = cv2.VideoWriter(outfile, fourcc, fps, fshape)
+        self._ensure_subdir(self.root_output_dir, subdir)
+        output_file = f'{self.root_output_dir}{subdir}{name}{file_extension}'
+        single_frame = np.array(segment.frames[0])
+        frame_shape = (single_frame.shape[1], single_frame.shape[0])
+
+        video_writer = cv2.VideoWriter(output_file, fourcc, fps, frame_shape)
 
         for frame in segment.frames:
-            vid_writer.write(cv2.cvtColor(frame, cv2.COLOR_RGB2BGR))
+            video_writer.write(cv2.cvtColor(frame, cv2.COLOR_RGB2BGR))
 
-        vid_writer.release()
-        return '{}{}'.format(name, file_extension)
+        video_writer.release()
 
-    def _setup_subdir(self, base_dir, subdir_name):
-        if not os.path.exists(base_dir+subdir_name):
-            os.mkdir(base_dir+subdir_name)
-        return subdir_name
+    def _ensure_subdir(self, base_dir, subdir):
+        if not os.path.exists(f'{base_dir}{subdir}'):
+            os.mkdir(f'{base_dir}{subdir}')

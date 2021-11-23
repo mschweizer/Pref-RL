@@ -11,8 +11,8 @@ class DjangoPreferenceCollector(AbstractPreferenceCollector):
 
     def __init__(self):
         super().__init__()
-        sys.path.append(os.path.abspath('./django_webapp'))
-        os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'django_webapp.pbrlwebapp.settings')
+        sys.path.append(os.path.abspath('./preference_collection_webapp'))
+        os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'preference_collection_webapp.pbrlwebapp.settings')
         django.setup()
         
 
