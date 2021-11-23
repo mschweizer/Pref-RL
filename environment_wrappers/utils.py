@@ -24,8 +24,7 @@ def create_env(env_id, termination_penalty=0., frame_stack_depth=4,
     if not env_id.startswith(GRIDWORLD_LEVEL_PREFIX):
         env = gym.make(env_id)
     else:
-        gridworld_env = create_gridworld_env(env_id, gridworld_settings)
-        env = gridworld_env.gym_env
+        env = create_gridworld_env(env_id, gridworld_settings)
     env = add_external_env_wrappers(env, termination_penalty,
                                     frame_stack_depth)
     return env
