@@ -12,12 +12,12 @@ class DjangoPreferenceCollector(AbstractPreferenceCollector):
     def __init__(self):
         super().__init__()
         sys.path.append(os.path.abspath('./preference_collection_webapp'))
-        os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'preference_collection_webapp.pbrlwebapp.settings')
+        os.environ.setdefault('DJANGO_SETTINGS_MODULE',
+                              'preference_collection_webapp.pbrlwebapp.settings')
         django.setup()
-        
 
     def collect_preferences(self) -> List:
-        from preferences import models 
+        from preferences import models
 
         just_collected_preferences = []
 
@@ -35,6 +35,12 @@ class DjangoPreferenceCollector(AbstractPreferenceCollector):
                 pref_rl_label = BinaryChoice.INDIFFERENT
             elif retrieved_label == 0:
                 pref_rl_label = BinaryChoice.RIGHT
+            elif retrieved_label == -1:
+                self.pending_queries.remove(query)
+                continue
+            else:
+                raise ValueError('Unexpected label value retrieved from database.')
+
             just_collected_preferences.append(
                 Preference(query=query, choice=pref_rl_label))
             self.pending_queries.remove(query)

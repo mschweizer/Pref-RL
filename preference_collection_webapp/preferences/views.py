@@ -28,7 +28,7 @@ def query(request, query_id):
         elif label =='Indifferent':
             query.label = .5
         elif label == 'Skip':
-            query.priority += 1
+            query.label = -1
         query.full_clean()
         query.save()
         return redirect('next')
