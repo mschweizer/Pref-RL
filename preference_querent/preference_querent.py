@@ -40,7 +40,7 @@ class HumanPreferenceQuerent(AbstractPreferenceQuerent):
         if not os.path.exists(video_root_output_dir):
             os.makedirs(video_root_output_dir)
         # preparations for django connection
-        sys.path.append(os.path.abspath('./django_webapp'))
+        sys.path.append(os.path.abspath('./preference_collection_webapp'))
         os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'pbrlwebapp.settings')
         django.setup()
 
