@@ -5,7 +5,7 @@ from agents.preference_based.buffered_policy_model import BufferedPolicyModel
 from agents.preference_based.pbrl_callback import PbRLCallback
 from agents.rl_agent import RLAgent
 from environment_wrappers.utils import add_django_and_internal_env_wrappers
-from preference_collector.human_preference.human_preference_collector import DjangoPreferenceCollector
+from preference_collector.human_preference.human_preference_collector import HumanPreferenceCollector
 from preference_querent.preference_querent import HumanPreferenceQuerent
 from preference_querent.query_selector.query_selector import RandomQuerySelector
 from query_generator.choice_set.choice_set_generator import ChoiceSetGenerator
@@ -31,11 +31,11 @@ class PbRLAgent(RLAgent):
                                item_selector=RandomItemSelector())
         self.query_generator = ChoiceSetGenerator(item_generator=RandomSegmentSampler(segment_length=25),
                                                   item_selector=RandomItemSelector())
-        self.preference_collector = DjangoPreferenceCollector()
+        self.preference_collector = HumanPreferenceCollector()
         # TODO: Change RandomQuerySelector -> MostRecentlyGeneratedSelector (otherwise a lot of duplicates when we
         #  choose e.g. 500 out of 500 at random (with replacement!)
         self.preference_querent = HumanPreferenceQuerent(query_selector=RandomQuerySelector(),
-                                                          video_root_output_dir='./videofiles/')
+                                                         video_root_output_dir='./videofiles/')
 
         self.num_pretraining_epochs = num_pretraining_epochs
         self.num_training_epochs_per_iteration = num_training_epochs_per_iteration
@@ -64,11 +64,22 @@ class PbRLAgent(RLAgent):
         self.preference_collector.pending_queries.extend(newly_pending_queries)
 
     def _collect_pretraining_preferences(self, num_pretraining_preferences, wait_threshold=.8):
-        while len(self.reward_trainer.preferences) < int(wait_threshold * num_pretraining_preferences):
+        while len(self.reward_trainer.preferences) < int(wait_threshold * len(self.preference_collector.pending_queries)):
             self._collect_preferences()
-            percent_done = (len(self.reward_trainer.preferences) /
-                            (wait_threshold * num_pretraining_preferences))*100
-            logging.info(f'Collecting pretraining data... {percent_done}% done. Please add preferences via the web interface.')
+            debug1 = len(self.reward_trainer.preferences)
+            debug2 = wait_threshold * len(self.preference_collector.pending_queries)
+            debug3 = int(debug2)
+            debug4 = (debug1/debug3)*100
+            debug5 = round(debug4)
+            percent_done = round((len(self.reward_trainer.preferences) /
+                                  int(wait_threshold * len(self.preference_collector.pending_queries)))*100)
+            logging.info(
+                f'Collecting pretraining data... {percent_done}% done. Please add preferences via the web interface.')
+            incomparable_quota = round(
+                (1-(len(self.preference_collector.pending_queries) / num_pretraining_preferences)*100))
+            if len(self.preference_collector.pending_queries) < num_pretraining_preferences * .8:
+                logging.warn(
+                    f'{incomparable_quota}% of queries declared incomparable, training accuracy may be compromised.')
             time.sleep(15)
 
     def _pretrain_and_collect(self):

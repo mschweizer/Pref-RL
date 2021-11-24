@@ -61,7 +61,7 @@ class HumanPreferenceQuerent(AbstractPreferenceQuerent):
 
         return selected_queries
 
-    def _write_segment_video(self, segment, subdir, name, fps=14, fourcc=cv2.VideoWriter_fourcc(*'VP80'), file_extension='.webm'):
+    def _write_segment_video(self, segment, subdir, name, fps=8, fourcc=cv2.VideoWriter_fourcc(*'VP80'), file_extension='.webm'):
 
         self._ensure_subdir(self.root_output_dir, subdir)
         output_file = f'{self.root_output_dir}{subdir}{name}{file_extension}'

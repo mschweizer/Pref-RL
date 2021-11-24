@@ -7,7 +7,7 @@ from preference_collector.preference_collector import AbstractPreferenceCollecto
 from preference_collector.binary_choice import BinaryChoice
 
 
-class DjangoPreferenceCollector(AbstractPreferenceCollector):
+class HumanPreferenceCollector(AbstractPreferenceCollector):
 
     def __init__(self):
         super().__init__()
