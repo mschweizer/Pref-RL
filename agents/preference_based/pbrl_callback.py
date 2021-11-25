@@ -8,9 +8,11 @@ class PbRLCallback(BaseCallback):
         super().__init__(verbose)
         self.pbrl_iteration_method = pbrl_iteration_method
         self.episode_count = 0
+        self.num_timesteps_at_start_of_run = self.num_timesteps
 
     def _on_rollout_end(self) -> None:
-        self.pbrl_iteration_method(self.episode_count)
+        # `num_timesteps` attribute is not guaranteed to be reset before each run
+        self.pbrl_iteration_method(self.episode_count, self.num_timesteps - self.num_timesteps_at_start_of_run)
 
     def _on_step(self) -> bool:
         # TODO: Validate logic

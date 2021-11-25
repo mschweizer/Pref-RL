@@ -41,7 +41,7 @@ def test_training_has_effect_on_any_model_parameters(env, preference):
 
     # TODO: Clarify if the following modifications to torch have an effect on other tests
     torch.manual_seed(42)
-    torch.set_deterministic(d=True)
+    torch.use_deterministic_algorithms(True)
 
     params = [param for param in reward_trainer.choice_model.named_parameters() if param[1].requires_grad]
     initial_params = [(name, param.clone()) for (name, param) in params]
