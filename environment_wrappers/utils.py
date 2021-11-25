@@ -5,10 +5,6 @@ from stable_baselines3.common.atari_wrappers import AtariWrapper
 
 from environment_wrappers.external.indirect_feedback_remover import IndirectFeedbackRemover
 from environment_wrappers.external.visual_feedback_remover import VisualFeedbackRemover
-from environment_wrappers.internal.reward_monitor import RewardMonitor
-from environment_wrappers.internal.reward_predictor import RewardPredictor
-from environment_wrappers.internal.reward_standardizer import RewardStandardizer
-from environment_wrappers.internal.trajectory_buffer import TrajectoryBuffer
 
 
 def create_env(env_id, termination_penalty=0., frame_stack_depth=4):
@@ -29,15 +25,6 @@ def add_external_env_wrappers(env, termination_penalty, frame_stack_depth=4):
 
 def is_atari_env(env):
     return isinstance(env.unwrapped, AtariEnv)
-
-
-# TODO: Make this function a static method of the pbrl agents ("_wrap_env", see stable baselines base class)
-def add_internal_env_wrappers(env, reward_model):
-    env = TrajectoryBuffer(env)
-    env = RewardPredictor(env, reward_model)  # TODO: choose the reward prediction wrapper suitable for the reward model
-    env = RewardStandardizer(env)
-    env = RewardMonitor(env)
-    return env
 
 
 def is_wrapped(env, wrapper_class):

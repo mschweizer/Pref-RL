@@ -13,4 +13,4 @@ def test_queries_correct_number_of_queries():
 
     preference_querent.query_preferences(query_candidates, num_queries=num_preference_queries)
 
-    assert len(preference_collector.pending_queries.extend.call_args.args[0]) == num_preference_queries
+    assert len(preference_collector.pending_queries.extend.call_args[0]) == num_preference_queries
