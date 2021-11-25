@@ -27,7 +27,7 @@ class HumanPreferenceCollector(AbstractPreferenceCollector):
             if (retrieved_label := db_pref.label) is None:
                 continue
 
-            pref_rl_label = None
+            pref_rl_label: BinaryChoice
 
             if retrieved_label == 1:
                 pref_rl_label = BinaryChoice.LEFT

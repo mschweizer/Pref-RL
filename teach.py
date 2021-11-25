@@ -1,7 +1,7 @@
 import argparse
 import logging
 
-from agent_factory.rl_teacher_factory import SyntheticRLTeacherFactory
+from agent_factory.rl_teacher_factory import SyntheticRLTeacherFactory, RLTeacherFactory
 from agents.preference_based.pbrl_agent import PbRLAgent
 from environment_wrappers.utils import create_env
 
@@ -14,6 +14,7 @@ def create_cli():
     parser.add_argument('--num_pretraining_preferences', default=128, type=int)
     parser.add_argument('--pretrain_epochs', default=5, type=int)
     parser.add_argument('--num_rl_timesteps', default=5e6, type=int)
+    parser.add_argument('--preference_type', default="synthetic", type=str)
     return parser
 
 
@@ -25,8 +26,13 @@ def main():
 
     env = create_env(args.env_id, termination_penalty=10.)
 
+    if args.preference_type == "human":
+        agent_factory = RLTeacherFactory(segment_length=25)
+    else:
+        agent_factory = SyntheticRLTeacherFactory(segment_length=25)
+
     agent = PbRLAgent(env=env,
-                      agent_factory=SyntheticRLTeacherFactory(segment_length=25),
+                      agent_factory=agent_factory,
                       reward_model_name=args.reward_model,
                       num_pretraining_epochs=8,
                       num_training_iteration_epochs=16)
