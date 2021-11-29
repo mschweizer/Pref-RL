@@ -34,7 +34,7 @@ class SynchronousPreferenceQuerent(AbstractPreferenceQuerent):
 
 class HumanPreferenceQuerent(AbstractPreferenceQuerent):
 
-    def __init__(self, query_selector, video_root_output_dir):
+    def __init__(self, query_selector, video_root_output_dir='./videofiles/'):
         super().__init__(query_selector)
         self.root_output_dir = video_root_output_dir
         if not os.path.exists(video_root_output_dir):
@@ -50,13 +50,12 @@ class HumanPreferenceQuerent(AbstractPreferenceQuerent):
 
         for query in selected_queries:
 
-            from preferences import models
-
             self._write_segment_video(
                 query[0], subdir=f'{query.id}/', name=f'{query.id}-left')
             self._write_segment_video(
                 query[1], subdir=f'{query.id}/', name=f'{query.id}-right')
 
+            from preferences import models
             models.Preference.objects.create(uuid=query.id)
 
         return selected_queries
@@ -65,8 +64,7 @@ class HumanPreferenceQuerent(AbstractPreferenceQuerent):
 
         self._ensure_subdir(self.root_output_dir, subdir)
         output_file = f'{self.root_output_dir}{subdir}{name}{file_extension}'
-        single_frame = np.array(segment.frames[0])
-        frame_shape = (single_frame.shape[1], single_frame.shape[0])
+        frame_shape = self._get_frame_shape(segment)
 
         video_writer = cv2.VideoWriter(output_file, fourcc, fps, frame_shape)
 
@@ -78,3 +76,7 @@ class HumanPreferenceQuerent(AbstractPreferenceQuerent):
     def _ensure_subdir(self, base_dir, subdir):
         if not os.path.exists(f'{base_dir}{subdir}'):
             os.mkdir(f'{base_dir}{subdir}')
+
+    def _get_frame_shape(self, segment):
+        single_frame = np.array(segment.frames[0])
+        return (single_frame.shape[1], single_frame.shape[0])

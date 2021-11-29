@@ -54,7 +54,7 @@ class RLTeacherFactory(AbstractAgentFactory):
         return HumanPreferenceCollector()
 
     def create_preference_querent(self) -> AbstractPreferenceQuerent:
-        return HumanPreferenceQuerent(query_selector=RandomQuerySelector(), video_root_output_dir="./videofiles/")
+        return HumanPreferenceQuerent(query_selector=RandomQuerySelector())
 
     def create_query_schedule_cls(self) -> Type[AbstractQuerySchedule]:
         return ConstantQuerySchedule
