@@ -35,7 +35,7 @@ class HumanPreferenceCollector(AbstractPreferenceCollector):
                 pref_rl_label = BinaryChoice.INDIFFERENT
             elif retrieved_label == 0:
                 pref_rl_label = BinaryChoice.RIGHT
-            elif retrieved_label == -1:
+            elif retrieved_label < 0:
                 self.pending_queries.remove(query)
                 continue
             else:

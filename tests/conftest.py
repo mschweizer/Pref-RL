@@ -1,4 +1,5 @@
 import pytest
+import sys, os, django 
 
 from environment_wrappers.internal.trajectory_buffer import Buffer
 from environment_wrappers.utils import create_env
@@ -34,3 +35,10 @@ def preference(env):
     query = BinaryChoiceQuery(choice_set=[buffer.get_segment(0, segment_length),
                                           buffer.get_segment(segment_length, 2 * segment_length)])
     return BinaryChoiceSetPreference(query, BinaryChoice.LEFT)
+
+@pytest.fixture()
+def setup_django():
+    sys.path.append(os.path.abspath('../preference_collection_webapp'))
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE',
+                              'preference_collection_webapp.pbrlwebapp.settings')
+    django.setup()
