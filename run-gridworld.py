@@ -3,19 +3,14 @@ from environment_wrappers.utils import create_env
 import gym_gridworld as gridworld
 
 
-_DEBUG = gridworld.DEBUG
-_VERBOSE = gridworld.VERBOSE
-
 def main():
 
-    extended_settings = {
-        'verbose': _VERBOSE,
-    }
-    number_of_episodes = 50
-    steps_per_episode = 10
+    steps_per_episode = 100
 
     levelname = 'Gridworld:Lab2D-risky-v0'
-    gridworld_settings = {'ext_settings': extended_settings}
+    gridworld_settings = {
+        'max_episode_steps': steps_per_episode,
+    }
     # env = create_env("MountainCar-v0", termination_penalty=10.)
     env = create_env(levelname, frame_stack_depth=0,
                      gridworld_settings=gridworld_settings)
