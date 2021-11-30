@@ -41,7 +41,7 @@ class PbRLAgent(RLAgent):
 
     def _pretrain(self, num_preferences):
         self._query_pretraining_preferences(num_preferences)
-        self._collect_pretraining_preferences(num_preferences, wait_threshold=.8)
+        self._collect_until_threshold_is_reached(num_preferences, wait_threshold=.8)
 
         for _ in range(self.num_pretraining_epochs):
             self.reward_model_trainer.train(epochs=1, pretraining=True)
@@ -52,7 +52,7 @@ class PbRLAgent(RLAgent):
         newly_pending_queries = self.preference_querent.query_preferences(query_candidates, num_preferences)
         self.preference_collector.pending_queries.extend(newly_pending_queries)
 
-    def _collect_pretraining_preferences(self, num_pretraining_preferences, wait_threshold=.8):
+    def _collect_until_threshold_is_reached(self, num_pretraining_preferences, wait_threshold=.8):
         while len(self.reward_model_trainer.preferences) < int(wait_threshold * num_pretraining_preferences):
             self._collect_preferences()
             time.sleep(15)
@@ -66,9 +66,9 @@ class PbRLAgent(RLAgent):
         self.policy_model.learn(total_timesteps, callback=PbRLCallback(self._pbrl_iteration_fn))
 
     def _pbrl_iteration_fn(self, episode_count, current_timestep):
-        self._collect_preferences()
         num_queries = self._calculate_num_desired_queries(current_timestep)
         self._query_preferences(num_queries)
+        self._collect_preferences()
 
         if episode_count >= 100 and episode_count % 100 == 0:  # TODO: replace constant=100 by param
             self.reward_model_trainer.train(self.num_training_iteration_epochs)
@@ -85,7 +85,11 @@ class PbRLAgent(RLAgent):
 
     def _calculate_num_desired_queries(self, current_timestep):
         num_scheduled_prefs = self.query_schedule.retrieve_num_scheduled_preferences(current_timestep)
+
+        self._collect_preferences()
         num_actual_prefs = self.reward_model_trainer.preferences.lifetime_preference_count
+
         num_pending_queries = len(self.preference_collector.pending_queries)
         num_desired_queries = num_scheduled_prefs - (num_actual_prefs + num_pending_queries)
+
         return max(0, num_desired_queries)
