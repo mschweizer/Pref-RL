@@ -13,14 +13,15 @@ class PbRLAgent(RLAgent):
                  num_training_iteration_epochs=10):
         self.reward_model = agent_factory.create_reward_model(env, reward_model_name)
 
-        super(PbRLAgent, self).__init__(env=agent_factory.create_env(env))
+        wrapped_env = agent_factory.create_env(env, self.reward_model)
+        super(PbRLAgent, self).__init__(env=wrapped_env)
 
-        self.policy_model = agent_factory.create_policy_model()
-        self.reward_model_trainer = agent_factory.create_reward_model_trainer()
+        self.policy_model = agent_factory.create_policy_model(self.env)
         self.pretraining_query_generator = agent_factory.create_pretraining_query_generator()
         self.query_generator = agent_factory.create_query_generator()
         self.preference_collector = agent_factory.create_preference_collector()
         self.preference_querent = agent_factory.create_preference_querent()
+        self.reward_model_trainer = agent_factory.create_reward_model_trainer(self.reward_model)
 
         self.query_schedule_cls = agent_factory.create_query_schedule_cls()
         self.query_schedule: Union[AbstractQuerySchedule, None] = None
