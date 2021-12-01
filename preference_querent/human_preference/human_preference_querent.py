@@ -1,24 +1,18 @@
 from preference_querent.preference_querent import AbstractPreferenceQuerent
 from typing import List
 import os
-import sys
-import django
 import cv2
 import numpy as np
+from . import utils
 
 
 class HumanPreferenceQuerent(AbstractPreferenceQuerent):
 
     def __init__(self, query_selector, video_root_output_dir='./videofiles/'):
         super().__init__(query_selector)
-        self.root_output_dir = video_root_output_dir
-        if not os.path.exists(video_root_output_dir):
-            os.makedirs(video_root_output_dir)
-        # preparations for django connection
-        sys.path.append(os.path.abspath('./preference_collection_webapp'))
-        os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'pbrlwebapp.settings')
-        django.setup()
-
+        self.root_output_dir = utils.ensure_dir(video_root_output_dir)
+        utils.prepare_django_connection()
+        
     def query_preferences(self, query_candidates, num_queries) -> List:
         selected_queries = self.query_selector.select_queries(
             query_candidates, num_queries)
@@ -35,13 +29,13 @@ class HumanPreferenceQuerent(AbstractPreferenceQuerent):
 
         return selected_queries
 
-    def _write_segment_video(self, segment, subdir, name, fps=8, fourcc=cv2.VideoWriter_fourcc(*'VP80'), file_extension='.webm'):
+    def _write_segment_video(self, segment, subdir, name, fps=12, fourcc=cv2.VideoWriter_fourcc(*'VP80'), file_extension='.webm'):
 
         self._ensure_subdir(self.root_output_dir, subdir)
-        output_file = f'{self.root_output_dir}{subdir}{name}{file_extension}'
+        output_file_name = f'{self.root_output_dir}{subdir}{name}{file_extension}'
         frame_shape = self._get_frame_shape(segment)
 
-        video_writer = cv2.VideoWriter(output_file, fourcc, fps, frame_shape)
+        video_writer = cv2.VideoWriter(output_file_name, fourcc, fps, frame_shape)
 
         for frame in segment.frames:
             video_writer.write(cv2.cvtColor(frame, cv2.COLOR_RGB2BGR))

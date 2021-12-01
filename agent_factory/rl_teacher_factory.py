@@ -12,7 +12,7 @@ from preference_collector.human_preference.human_preference_collector import \
     HumanPreferenceCollector
 from preference_collector.preference_collector import \
     AbstractPreferenceCollector
-from preference_querent.human_preference_querent import HumanPreferenceQuerent
+from preference_querent.human_preference.human_preference_querent import HumanPreferenceQuerent
 from preference_querent.preference_querent import AbstractPreferenceQuerent
 from preference_querent.query_selector.query_selector import \
     RandomQuerySelector

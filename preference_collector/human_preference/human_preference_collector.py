@@ -1,8 +1,6 @@
 from typing import List
-import os
-import sys
-import django
-from preference_collector.preference import Preference
+from preference_querent.human_preference import utils
+from preference_collector.preference import BinaryChoiceSetPreference
 from preference_collector.preference_collector import AbstractPreferenceCollector
 from preference_collector.binary_choice import BinaryChoice
 
@@ -11,10 +9,7 @@ class HumanPreferenceCollector(AbstractPreferenceCollector):
 
     def __init__(self):
         super().__init__()
-        sys.path.append(os.path.abspath('./preference_collection_webapp'))
-        os.environ.setdefault('DJANGO_SETTINGS_MODULE',
-                              'preference_collection_webapp.pbrlwebapp.settings')
-        django.setup()
+
 
     def collect_preferences(self) -> List:
         from preferences import models
@@ -35,14 +30,15 @@ class HumanPreferenceCollector(AbstractPreferenceCollector):
                 pref_rl_label = BinaryChoice.INDIFFERENT
             elif retrieved_label == 0:
                 pref_rl_label = BinaryChoice.RIGHT
-            elif retrieved_label < 0:
+            elif retrieved_label < 0:  # query could not be answered
                 self.pending_queries.remove(query)
                 continue
             else:
-                raise ValueError('Unexpected label value retrieved from database.')
+                raise ValueError(
+                    'Unexpected value for label retrieved from database.')
 
             just_collected_preferences.append(
-                Preference(query=query, choice=pref_rl_label))
+                BinaryChoiceSetPreference(query=query, choice=pref_rl_label))
             self.pending_queries.remove(query)
 
         return just_collected_preferences

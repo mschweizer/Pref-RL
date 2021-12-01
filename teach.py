@@ -1,7 +1,8 @@
 import argparse
 import logging
 
-from agent_factory.rl_teacher_factory import SyntheticRLTeacherFactory, RLTeacherFactory
+from agent_factory.rl_teacher_factory import RLTeacherFactory
+from agent_factory.synthetic_rl_teacher_factory import SyntheticRLTeacherFactory
 from agents.preference_based.pbrl_agent import PbRLAgent
 from environment_wrappers.utils import create_env
 
