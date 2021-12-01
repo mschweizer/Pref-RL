@@ -64,7 +64,7 @@ class RewardModelTrainer(AbstractRewardModelTrainer):
         return i % self.writing_interval == self.writing_interval - 1
 
     def _write_summary(self, running_loss, pretraining):
-        tag = "training loss"
+        tag = "reward model loss"
         tag += " (pretraining)" if pretraining else ""
         average_loss = running_loss / self.writing_interval
         self.writer.add_scalar(tag,

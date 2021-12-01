@@ -13,7 +13,7 @@ def test_writes_summary(cartpole_env):
         reward_trainer = RewardModelTrainer(MlpRewardModel(cartpole_env))
         reward_trainer._write_summary(running_loss, pretraining=False)
 
-        reward_trainer.writer.add_scalar.assert_called_with('training loss',
+        reward_trainer.writer.add_scalar.assert_called_with('reward model loss',
                                                             running_loss / reward_trainer.writing_interval,
                                                             reward_trainer.global_training_step)
 

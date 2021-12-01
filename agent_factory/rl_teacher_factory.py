@@ -11,9 +11,9 @@ from preference_collector.human_preference.human_preference_collector import Hum
 from preference_collector.preference_collector import AbstractPreferenceCollector
 from preference_collector.synthetic_preference.preference_oracle import RewardMaximizingOracle
 from preference_collector.synthetic_preference.synthetic_preference_collector import SyntheticPreferenceCollector
-from preference_querent.preference_querent import AbstractPreferenceQuerent, SynchronousPreferenceQuerent, \
-    HumanPreferenceQuerent
+from preference_querent.preference_querent import AbstractPreferenceQuerent, HumanPreferenceQuerent
 from preference_querent.query_selector.query_selector import RandomQuerySelector
+from preference_querent.dummy_preference_querent import DummyPreferenceQuerent
 from query_generator.choice_set.choice_set_generator import ChoiceSetGenerator
 from query_generator.choice_set.segment.pretraining_segment_sampler import RandomPretrainingSegmentSampler
 from query_generator.choice_set.segment.segment_sampler import RandomSegmentSampler
@@ -26,21 +26,20 @@ from reward_model_trainer.reward_model_trainer import RewardModelTrainer
 class RLTeacherFactory(AbstractAgentFactory):
     def __init__(self, segment_length=25):
         super().__init__()
-        self.env = None
         self.segment_length = segment_length
 
-    def create_env(self, env):
+    def create_env(self, env, reward_model):
         env = FrameTrajectoryBuffer(env)
-        env = RewardPredictor(env, self.reward_model)
+        env = RewardPredictor(env, reward_model)
         env = RewardStandardizer(env)
-        self.env = RewardMonitor(env)
-        return self.env
+        env = RewardMonitor(env)
+        return env
 
-    def create_policy_model(self) -> PolicyModel:
-        return BufferedPolicyModel(self.env)
+    def create_policy_model(self, env) -> PolicyModel:
+        return BufferedPolicyModel(env)
 
-    def create_reward_model_trainer(self) -> RewardModelTrainer:
-        return RewardModelTrainer(self.reward_model)
+    def create_reward_model_trainer(self, reward_model) -> RewardModelTrainer:
+        return RewardModelTrainer(reward_model)
 
     def create_pretraining_query_generator(self) -> AbstractQueryGenerator:
         return ChoiceSetGenerator(item_generator=RandomPretrainingSegmentSampler(segment_length=self.segment_length),
@@ -64,27 +63,17 @@ class SyntheticRLTeacherFactory(RLTeacherFactory):
 
     def __init__(self, segment_length=25):
         super().__init__(segment_length=segment_length)
-        self.preference_collector = None
-        self.reward_model_trainer = None
 
-    def create_env(self, env):
+    def create_env(self, env, reward_model):
         env = TrajectoryBuffer(env)
-        env = RewardPredictor(env, self.reward_model)
+        env = RewardPredictor(env, reward_model)
         env = RewardStandardizer(env)
-        self.env = RewardMonitor(env)
-        return self.env
-
-    def create_reward_model_trainer(self) -> RewardModelTrainer:
-        self.reward_model_trainer = RewardModelTrainer(self.reward_model)
-        return self.reward_model_trainer
+        env = RewardMonitor(env)
+        return env
 
     def create_preference_collector(self) -> AbstractPreferenceCollector:
         self.preference_collector = SyntheticPreferenceCollector(oracle=RewardMaximizingOracle())
         return self.preference_collector
 
     def create_preference_querent(self) -> AbstractPreferenceQuerent:
-        # TODO: Change RandomQuerySelector -> MostRecentlyGeneratedSelector (otherwise a lot of duplicates when we
-        #  choose e.g. 500 out of 500 at random (with replacement!)
-        return SynchronousPreferenceQuerent(query_selector=RandomQuerySelector(),
-                                            preference_collector=self.preference_collector,
-                                            preferences=self.reward_model_trainer.preferences)
+        return DummyPreferenceQuerent(query_selector=RandomQuerySelector())

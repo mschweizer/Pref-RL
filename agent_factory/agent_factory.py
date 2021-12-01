@@ -12,25 +12,22 @@ from reward_models.utils import get_model_by_name
 
 class AbstractAgentFactory(ABC):
 
-    def __init__(self):
-        self.reward_model = None
-
-    def create_reward_model(self, env, reward_model_name):
+    @staticmethod
+    def create_reward_model(env, reward_model_name):
         """ Returns reward model. """
         reward_model_cls = get_model_by_name(reward_model_name)
-        self.reward_model = reward_model_cls(env)
-        return self.reward_model
+        return reward_model_cls(env)
 
     @abstractmethod
-    def create_env(self, env):
-        """ Returns (wrapped) environment. """
+    def create_env(self, env, reward_model):
+        """ Returns the prepared (= wrapped) environment. """
 
     @abstractmethod
-    def create_policy_model(self) -> PolicyModel:
+    def create_policy_model(self, env) -> PolicyModel:
         """ Returns policy model. """
 
     @abstractmethod
-    def create_reward_model_trainer(self) -> RewardModelTrainer:
+    def create_reward_model_trainer(self, reward_model) -> RewardModelTrainer:
         """ Returns reward model trainer. """
 
     @abstractmethod
