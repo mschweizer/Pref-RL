@@ -56,6 +56,7 @@ class PbRLAgent(RLAgent):
     def _collect_until_threshold_is_reached(self, num_pretraining_preferences, wait_threshold=.8):
         while len(self.reward_model_trainer.preferences) < int(wait_threshold * num_pretraining_preferences):
             self._collect_preferences()
+            logging.info(f"{len(self.reward_model_trainer.preferences)} of {int(wait_threshold * num_pretraining_preferences)} preferences collected. Please add preferences via the webapp.")
             time.sleep(15)
 
     def _setup_query_schedule(self, num_training_steps, num_training_preferences, num_pretraining_preferences):

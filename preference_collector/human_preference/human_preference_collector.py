@@ -1,6 +1,5 @@
 from typing import List
-from preference_querent.human_preference import utils
-from preference_collector.preference import BinaryChoiceSetPreference
+from preference_collector.preference import Preference
 from preference_collector.preference_collector import AbstractPreferenceCollector
 from preference_collector.binary_choice import BinaryChoice
 
@@ -9,7 +8,6 @@ class HumanPreferenceCollector(AbstractPreferenceCollector):
 
     def __init__(self):
         super().__init__()
-
 
     def collect_preferences(self) -> List:
         from preferences import models
@@ -38,7 +36,7 @@ class HumanPreferenceCollector(AbstractPreferenceCollector):
                     'Unexpected value for label retrieved from database.')
 
             just_collected_preferences.append(
-                BinaryChoiceSetPreference(query=query, choice=pref_rl_label))
+                Preference(query=query, choice=pref_rl_label))
             self.pending_queries.remove(query)
 
         return just_collected_preferences
