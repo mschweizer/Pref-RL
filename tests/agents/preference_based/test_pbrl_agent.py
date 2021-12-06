@@ -1,4 +1,4 @@
-from agent_factory.rl_teacher_factory import SyntheticRLTeacherFactory
+from agent_factory.synthetic_rl_teacher_factory import SyntheticRLTeacherFactory
 from agents.preference_based.pbrl_agent import PbRLAgent
 
 
