@@ -14,7 +14,7 @@ class HumanPreferenceCollector(AbstractPreferenceCollector):
 
         just_collected_preferences = []
 
-        for query in self.pending_queries:
+        for query in list(self.pending_queries):
             db_pref = models.Preference.objects.get(uuid=str(query.id))
 
             if (retrieved_label := db_pref.label) is None:
