@@ -10,6 +10,6 @@ def ensure_dir(dir):
 
 
 def prepare_django_connection():
-    sys.path.append(os.path.abspath('./preference_collection_webapp'))
+    sys.path.append('./preference_collection_webapp')
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'pbrlwebapp.settings')
     django.setup()
