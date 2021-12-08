@@ -48,4 +48,4 @@ class AbstractAgentFactory(ABC):
 
     @abstractmethod
     def create_query_schedule_cls(self) -> Type[AbstractQuerySchedule]:
-        """ Returns query schedule. """
+        """ Returns query schedule class. """
