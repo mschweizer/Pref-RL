@@ -1,5 +1,6 @@
-from _typeshed import FileDescriptor
 import os
+import numpy as np
+import gym
 import pytest
 from unittest.mock import Mock, MagicMock
 
@@ -7,15 +8,19 @@ from preference_querent.human_preference.human_preference_querent import HumanPr
 from preference_querent.query_selector.query_selector import RandomQuerySelector
 from query_generator.query import BinaryChoiceQuery
 
+
 def test_human_pref_querent(video_directory):
 
     human_preference_querent = HumanPreferenceQuerent(
         query_selector=RandomQuerySelector(), video_root_output_dir=video_directory)
 
+    dummy_frame = np.zeros((2,2,3))
+    dummy_segment = np.array([dummy_frame, dummy_frame, dummy_frame])
+
     segment1 = Mock()
-    segment1.frames = MagicMock(return_value=[[[[255, 255, 255]]]])
+    segment1.frames = MagicMock(return_value=dummy_segment)
     segment2 = Mock()
-    segment2.frames = MagicMock(return_value=[[[[255, 255, 255]]]])
+    segment2.frames = MagicMock(return_value=dummy_segment)
 
     test_query = BinaryChoiceQuery([segment1, segment2])
 
@@ -34,7 +39,7 @@ def test_human_pref_querent(video_directory):
 
 
 @pytest.fixture()
-def prepare_video_directory():
+def video_directory():
     video_directory = '/tmp/videofiles/'
     if not os.path.exists(video_directory):
         os.makedirs(video_directory)
