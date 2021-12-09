@@ -61,6 +61,8 @@ class PreferenceDataset(torch.utils.data.Dataset):
     def _prepare_queries(self, preferences):
         return [self._prepare_query(preference) for preference in preferences]
 
+    # TODO: Implement abstract classes Query and QueryItem with _prepare_for_model method that are called here
+    #  (same for Choice)
     @staticmethod
     def _prepare_query(preference):
         choice_set = preference.query.choice_set

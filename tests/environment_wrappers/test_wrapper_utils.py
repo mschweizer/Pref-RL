@@ -5,12 +5,11 @@ import pytest
 from stable_baselines3.common.atari_wrappers import AtariWrapper
 
 from environment_wrappers.external.indirect_feedback_remover import IndirectFeedbackRemover
-from environment_wrappers.internal.reward_standardizer import RewardStandardizer
-from environment_wrappers.internal.trajectory_buffer import TrajectoryBuffer
 from environment_wrappers.utils import (
     add_external_env_wrappers, create_env, is_atari_env, is_wrapped,
-    add_internal_env_wrappers, create_gridworld_env)
-from reward_models.mlp import MlpRewardModel
+    create_gridworld_env
+)
+
 from gym_gridworld import GridworldWrapper
 
 
@@ -55,14 +54,6 @@ def test_wrap_external_environment(envs):
     _, pong_env = envs
     assert is_wrapped(pong_env, AtariWrapper)
     assert is_wrapped(pong_env, IndirectFeedbackRemover)
-
-
-def test_wrap_internal_environment(cartpole_env):
-    reward_model = MlpRewardModel(cartpole_env)
-
-    wrapped_env = add_internal_env_wrappers(cartpole_env, reward_model=reward_model)
-
-    assert is_wrapped(wrapped_env, TrajectoryBuffer) and is_wrapped(wrapped_env, RewardStandardizer)
 
 
 @pytest.fixture()
