@@ -6,7 +6,7 @@ from unittest.mock import Mock, MagicMock
 
 from preference_querent.human_preference.human_preference_querent import HumanPreferenceQuerent
 from preference_querent.query_selector.query_selector import RandomQuerySelector
-from query_generator.query import BinaryChoiceQuery
+from query_generator.query import ChoiceQuery
 
 
 def test_human_pref_querent(video_directory):
@@ -14,7 +14,8 @@ def test_human_pref_querent(video_directory):
     human_preference_querent = HumanPreferenceQuerent(
         query_selector=RandomQuerySelector(), video_root_output_dir=video_directory)
 
-    dummy_frame = np.zeros((2,2,3))
+    dummy_frame = np.zeros((2, 2, 3), dtype=np.int8)
+    test=[[[[0, 0, 0], [0, 0, 0]]]]
     dummy_segment = np.array([dummy_frame, dummy_frame, dummy_frame])
 
     segment1 = Mock()
@@ -22,7 +23,7 @@ def test_human_pref_querent(video_directory):
     segment2 = Mock()
     segment2.frames = MagicMock(return_value=dummy_segment)
 
-    test_query = BinaryChoiceQuery([segment1, segment2])
+    test_query = ChoiceQuery(choice_set=np.array([segment1, segment2]))
 
     human_preference_querent.query_preferences(
         query_candidates=[test_query], num_queries=1)
