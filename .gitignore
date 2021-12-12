@@ -154,3 +154,4 @@ cython_debug/
 #------------------------------ 
 # gym_gridworld is only included in the dev process
 gym_gridworld
+.idea/
