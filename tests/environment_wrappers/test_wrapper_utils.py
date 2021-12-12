@@ -7,10 +7,7 @@ from stable_baselines3.common.atari_wrappers import AtariWrapper
 from environment_wrappers.external.indirect_feedback_remover import IndirectFeedbackRemover
 from environment_wrappers.utils import (
     add_external_env_wrappers, create_env, is_atari_env, is_wrapped,
-    create_gridworld_env
 )
-
-from gym_gridworld import GridworldWrapper
 
 
 @pytest.fixture()
@@ -54,16 +51,3 @@ def test_wrap_external_environment(envs):
     _, pong_env = envs
     assert is_wrapped(pong_env, AtariWrapper)
     assert is_wrapped(pong_env, IndirectFeedbackRemover)
-
-
-@pytest.fixture()
-def gridworld_envs():
-    risky_env = create_gridworld_env("Gridworld:Lab2D-risky-v0")
-    return risky_env
-
-
-def test_gridworld_member_instances(gridworld_envs):
-    risky_env = gridworld_envs
-    assert isinstance(risky_env, GridworldWrapper)
-    assert isinstance(risky_env.gym_env, gym.Env)
-    assert risky_env.gym_env.gridworld_wrapper is risky_env
