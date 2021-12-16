@@ -22,20 +22,22 @@ from query_schedule.query_schedule import AbstractQuerySchedule, ConstantQuerySc
 from reward_model_trainer.reward_model_trainer import RewardModelTrainer
 
 
+def _wrap_env(env, reward_model):
+    env = TrajectoryBuffer(env)
+    env = RewardPredictor(env, reward_model)
+    env = RewardStandardizer(env)
+    env = RewardMonitor(env)
+    return env
+
+
 class SyntheticRLTeacherFactory(AbstractAgentFactory):
 
     def __init__(self, segment_length=25):
         super().__init__()
         self.segment_length = segment_length
 
-    def create_env(self, env, reward_model):
-        env = TrajectoryBuffer(env)
-        env = RewardPredictor(env, reward_model)
-        env = RewardStandardizer(env)
-        env = RewardMonitor(env)
-        return env
-
-    def create_policy_model(self, env) -> PolicyModel:
+    def create_policy_model(self, env, reward_model) -> PolicyModel:
+        env = _wrap_env(env, reward_model)
         return BufferedPolicyModel(env)
 
     def create_reward_model_trainer(self, reward_model) -> RewardModelTrainer:

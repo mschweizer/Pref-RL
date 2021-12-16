@@ -13,8 +13,7 @@ class PbRLAgent(RLAgent):
                  num_training_iteration_epochs=10):
         self.reward_model = agent_factory.create_reward_model(env, reward_model_name)
 
-        wrapped_env = agent_factory.create_env(env, self.reward_model)
-        policy_model = agent_factory.create_policy_model(wrapped_env)
+        policy_model = agent_factory.create_policy_model(env, self.reward_model)
         super(PbRLAgent, self).__init__(policy_model)
 
         self.pretraining_query_generator = agent_factory.create_pretraining_query_generator()
