@@ -1,11 +1,12 @@
 import gym
 
+from agents.policy_model import PolicyModel
 from agents.rl_agent import RLAgent
 
 
 def test_agent_chooses_action(cartpole_env):
     obs = cartpole_env.reset()
-    agent = RLAgent(cartpole_env)
+    agent = RLAgent(PolicyModel(cartpole_env, steps_per_model_update=5))
     action = agent.choose_action(obs)
     assert action is not None
 
@@ -13,8 +14,8 @@ def test_agent_chooses_action(cartpole_env):
 def test_agent_chooses_valid_action(cartpole_env):
     mountaincar_env = gym.make('MountainCar-v0')
 
-    cartpole_agent = RLAgent(cartpole_env)
-    mountaincar_agent = RLAgent(mountaincar_env)
+    cartpole_agent = RLAgent(PolicyModel(cartpole_env, steps_per_model_update=5))
+    mountaincar_agent = RLAgent(PolicyModel(mountaincar_env, steps_per_model_update=5))
 
     cartpole_observation = cartpole_env.reset()
     mountaincar_observation = mountaincar_env.reset()
