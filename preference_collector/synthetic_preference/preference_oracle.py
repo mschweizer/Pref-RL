@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 
+from environment_wrappers.info_dict_keys import PENALIZED_TRUE_REW
 from preference_collector.binary_choice import BinaryChoice
 
 
@@ -19,7 +20,7 @@ class RewardMaximizingOracle(AbstractOracle):
 
     @staticmethod
     def compute_total_original_rewards(query):
-        return (sum(info["external_reward"] for info in segment.infos) for segment in query.choice_set)
+        return (sum(info[PENALIZED_TRUE_REW] for info in segment.infos) for segment in query.choice_set)
 
     @staticmethod
     def compute_preference(reward_1, reward_2):

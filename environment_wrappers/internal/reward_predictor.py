@@ -2,6 +2,8 @@ import numpy as np
 import torch
 from gym import Wrapper
 
+from environment_wrappers.info_dict_keys import PENALIZED_TRUE_REW
+
 
 class RewardPredictor(Wrapper):
     def __init__(self, env, reward_model):
@@ -11,7 +13,7 @@ class RewardPredictor(Wrapper):
     def step(self, action):
         observation, reward, done, info = self.env.step(action)
 
-        info['external_reward'] = reward  # not necessarily equal to 'original_reward' due to termination penalty
+        info[PENALIZED_TRUE_REW] = reward  # not necessarily equal to 'original_reward' due to termination penalty
 
         return observation, self.reward(observation), done, info
 
