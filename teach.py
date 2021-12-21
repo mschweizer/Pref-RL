@@ -1,8 +1,8 @@
 import argparse
 import logging
 
+from agent_factory.agent_assembler import PbRLAgentAssembler
 from agent_factory.rl_teacher_factory import SyntheticRLTeacherFactory
-from agents.preference_based.pbrl_agent import PbRLAgent
 from environment_wrappers.utils import create_env
 
 
@@ -25,11 +25,11 @@ def main():
 
     env = create_env(args.env_id, termination_penalty=10.)
 
-    agent = PbRLAgent(env=env,
-                      agent_factory=SyntheticRLTeacherFactory(segment_length=25),
-                      reward_model_name=args.reward_model,
-                      num_pretraining_epochs=8,
-                      num_training_iteration_epochs=16)
+    agent = PbRLAgentAssembler.assemble_agent(agent_factory=SyntheticRLTeacherFactory(),
+                                              env=env,
+                                              reward_model_name="Mlp",
+                                              num_pretraining_epochs=8,
+                                              num_training_iteration_epochs=16)
 
     agent.pb_learn(num_training_timesteps=args.num_rl_timesteps,
                    num_training_preferences=args.num_training_preferences,

@@ -10,7 +10,7 @@ from reward_model_trainer.reward_model_trainer import RewardModelTrainer
 from reward_models.utils import get_model_by_name
 
 
-class AbstractAgentFactory(ABC):
+class PbRLAgentFactory(ABC):
 
     @staticmethod
     def create_reward_model(env, reward_model_name):

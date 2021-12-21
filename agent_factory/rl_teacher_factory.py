@@ -1,6 +1,6 @@
 from typing import Type
 
-from agent_factory.agent_factory import AbstractAgentFactory
+from agent_factory.agent_factory import PbRLAgentFactory
 from agents.policy_model import PolicyModel
 from agents.preference_based.buffered_policy_model import BufferedPolicyModel
 from environment_wrappers.internal.reward_monitor import RewardMonitor
@@ -30,7 +30,7 @@ def _wrap_env(env, reward_model):
     return env
 
 
-class SyntheticRLTeacherFactory(AbstractAgentFactory):
+class SyntheticRLTeacherFactory(PbRLAgentFactory):
 
     def __init__(self, segment_length=25):
         super().__init__()

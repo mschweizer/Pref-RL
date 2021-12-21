@@ -2,28 +2,28 @@ import logging
 import time
 from typing import Union
 
-from agent_factory.agent_factory import AbstractAgentFactory
 from agents.preference_based.pbrl_callback import PbRLCallback
 from agents.rl_agent import RLAgent
 from query_schedule.query_schedule import AbstractQuerySchedule
 
 
 class PbRLAgent(RLAgent):
-    def __init__(self, env, agent_factory: AbstractAgentFactory, reward_model_name="Mlp", num_pretraining_epochs=10,
-                 num_training_iteration_epochs=10):
-        self.reward_model = agent_factory.create_reward_model(env, reward_model_name)
+    # TODO: add type hints to injected components
+    def __init__(self, policy_model, pretraining_query_generator, query_generator, preference_querent,
+                 preference_collector, reward_model_trainer, reward_model, query_schedule_cls,
+                 num_pretraining_epochs=10, num_training_iteration_epochs=10):
 
-        policy_model = agent_factory.create_policy_model(env, self.reward_model)
         super(PbRLAgent, self).__init__(policy_model)
 
-        self.pretraining_query_generator = agent_factory.create_pretraining_query_generator()
-        self.query_generator = agent_factory.create_query_generator()
-        self.preference_collector = agent_factory.create_preference_collector()
-        self.preference_querent = agent_factory.create_preference_querent()
-        self.reward_model_trainer = agent_factory.create_reward_model_trainer(self.reward_model)
-
-        self.query_schedule_cls = agent_factory.create_query_schedule_cls()
+        self.query_schedule_cls = query_schedule_cls
         self.query_schedule: Union[AbstractQuerySchedule, None] = None
+
+        self.pretraining_query_generator = pretraining_query_generator
+        self.query_generator = query_generator
+        self.preference_querent = preference_querent
+        self.preference_collector = preference_collector
+        self.reward_model = reward_model
+        self.reward_model_trainer = reward_model_trainer
 
         self.num_pretraining_epochs = num_pretraining_epochs
         self.num_training_iteration_epochs = num_training_iteration_epochs
