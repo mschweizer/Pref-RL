@@ -6,11 +6,10 @@ from agent_factory.rl_teacher_factory import SyntheticRLTeacherFactory
 
 @pytest.fixture()
 def agent(cartpole_env):
-    return PbRLAgentAssembler.assemble_agent(agent_factory=SyntheticRLTeacherFactory(policy_train_freq=5),
-                                             env=cartpole_env,
-                                             reward_model_name="Mlp",
-                                             num_pretraining_epochs=8,
-                                             num_training_iteration_epochs=16)
+    return PbRLAgentAssembler.assemble_agent(env=cartpole_env, reward_model_name="Mlp",
+                                             agent_factory=SyntheticRLTeacherFactory(policy_train_freq=5),
+                                             num_pretraining_epochs=8, num_training_iteration_epochs=16,
+                                             pb_step_freq=100)
 
 
 def test_agent_sets_sufficient_trajectory_buffer_length(agent):

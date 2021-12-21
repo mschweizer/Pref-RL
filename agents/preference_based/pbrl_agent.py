@@ -11,7 +11,7 @@ class PbRLAgent(RLAgent):
     # TODO: add type hints to injected components
     def __init__(self, policy_model, pretraining_query_generator, query_generator, preference_querent,
                  preference_collector, reward_model_trainer, reward_model, query_schedule_cls,
-                 num_pretraining_epochs=10, num_training_iteration_epochs=10):
+                 pb_step_freq, num_pretraining_epochs=10, num_training_iteration_epochs=10):
 
         super(PbRLAgent, self).__init__(policy_model)
 
@@ -25,6 +25,7 @@ class PbRLAgent(RLAgent):
         self.reward_model = reward_model
         self.reward_model_trainer = reward_model_trainer
 
+        self.pb_step_freq = pb_step_freq
         self.num_pretraining_epochs = num_pretraining_epochs
         self.num_training_iteration_epochs = num_training_iteration_epochs
 
@@ -63,7 +64,7 @@ class PbRLAgent(RLAgent):
                                                       num_training_steps=num_training_steps)
 
     def _train(self, total_timesteps):
-        self.policy_model.learn(total_timesteps, callback=PbRLCallback(self._pbrl_iteration_fn))
+        self.policy_model.learn(total_timesteps, callback=PbRLCallback(self._pbrl_iteration_fn, self.pb_step_freq))
 
     def _pbrl_iteration_fn(self, episode_count, current_timestep):
         num_queries = self._calculate_num_desired_queries(current_timestep)
