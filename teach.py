@@ -25,7 +25,8 @@ def main():
 
     env = create_env(args.env_id, termination_penalty=10.)
 
-    agent = PbRLAgentAssembler.assemble_agent(agent_factory=SyntheticRLTeacherFactory(),
+    agent = PbRLAgentAssembler.assemble_agent(agent_factory=SyntheticRLTeacherFactory(policy_train_freq=5,
+                                                                                      segment_length=25),
                                               env=env,
                                               reward_model_name="Mlp",
                                               num_pretraining_epochs=8,

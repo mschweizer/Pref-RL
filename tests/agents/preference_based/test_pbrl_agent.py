@@ -6,7 +6,7 @@ from agent_factory.rl_teacher_factory import SyntheticRLTeacherFactory
 
 @pytest.fixture()
 def agent(cartpole_env):
-    return PbRLAgentAssembler.assemble_agent(agent_factory=SyntheticRLTeacherFactory(),
+    return PbRLAgentAssembler.assemble_agent(agent_factory=SyntheticRLTeacherFactory(policy_train_freq=5),
                                              env=cartpole_env,
                                              reward_model_name="Mlp",
                                              num_pretraining_epochs=8,

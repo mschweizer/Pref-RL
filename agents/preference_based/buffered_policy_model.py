@@ -2,8 +2,8 @@ from agents.policy_model import PolicyModel
 
 
 class BufferedPolicyModel(PolicyModel):
-    def __init__(self, env):
-        super().__init__(env)
+    def __init__(self, env, train_freq):
+        super().__init__(env, train_freq)
 
     @property
     def trajectory_buffer(self):
