@@ -5,8 +5,8 @@ from agents.preference_based.pbrl_agent import PbRLAgent
 class PbRLAgentAssembler:
 
     @staticmethod
-    def assemble_agent(env, reward_model_name, agent_factory: PbRLAgentFactory, num_pretraining_epochs,
-                       num_training_iteration_epochs, pb_step_freq) -> PbRLAgent:
+    def assemble_agent(env, reward_model_name, agent_factory: PbRLAgentFactory, num_epochs_in_pretraining,
+                       num_epochs_in_training, pb_step_freq) -> PbRLAgent:
 
         reward_model = agent_factory.create_reward_model(env, reward_model_name)
         policy_model = agent_factory.create_policy_model(env, reward_model)
@@ -19,4 +19,4 @@ class PbRLAgentAssembler:
 
         return PbRLAgent(policy_model, pretraining_query_generator, query_generator, preference_querent,
                          preference_collector, reward_model_trainer, reward_model, query_schedule_cls,
-                         pb_step_freq, num_pretraining_epochs, num_training_iteration_epochs)
+                         pb_step_freq, num_epochs_in_pretraining, num_epochs_in_training)

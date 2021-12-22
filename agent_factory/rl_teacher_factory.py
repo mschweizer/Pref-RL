@@ -22,24 +22,16 @@ from query_schedule.query_schedule import AbstractQuerySchedule, ConstantQuerySc
 from reward_model_trainer.reward_model_trainer import RewardModelTrainer
 
 
-def _wrap_env(env, reward_model):
-    env = TrajectoryBuffer(env)
-    env = RewardPredictor(env, reward_model)
-    env = RewardStandardizer(env)
-    env = RewardMonitor(env)
-    return env
-
-
 class SyntheticRLTeacherFactory(PbRLAgentFactory):
 
-    def __init__(self, policy_train_freq, segment_length=25):
+    def __init__(self, policy_train_freq, pb_step_freq, segment_length=25):
         super().__init__()
         self.segment_length = segment_length
         self.policy_train_freq = policy_train_freq
+        self.pb_step_freq = pb_step_freq
 
     def create_policy_model(self, env, reward_model) -> PolicyModel:
-        env = _wrap_env(env, reward_model)
-        return BufferedPolicyModel(env, train_freq=self.policy_train_freq)
+        return BufferedPolicyModel(env=self._wrap_env(env, reward_model), train_freq=self.policy_train_freq)
 
     def create_reward_model_trainer(self, reward_model) -> RewardModelTrainer:
         return RewardModelTrainer(reward_model)
@@ -60,3 +52,10 @@ class SyntheticRLTeacherFactory(PbRLAgentFactory):
 
     def create_query_schedule_cls(self) -> Type[AbstractQuerySchedule]:
         return ConstantQuerySchedule
+
+    def _wrap_env(self, env, reward_model):
+        env = TrajectoryBuffer(env, trajectory_buffer_size=max(self.pb_step_freq, self.policy_train_freq))
+        env = RewardPredictor(env, reward_model)
+        env = RewardStandardizer(env)
+        env = RewardMonitor(env)
+        return env

@@ -27,8 +27,9 @@ def main():
 
     agent = PbRLAgentAssembler.assemble_agent(env=env, reward_model_name="Mlp",
                                               agent_factory=SyntheticRLTeacherFactory(policy_train_freq=5,
+                                                                                      pb_step_freq=1024,
                                                                                       segment_length=25),
-                                              num_pretraining_epochs=8, num_training_iteration_epochs=16,
+                                              num_epochs_in_pretraining=8, num_epochs_in_training=16,
                                               pb_step_freq=1024)
 
     agent.pb_learn(num_training_timesteps=args.num_rl_timesteps,

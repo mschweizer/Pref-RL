@@ -11,7 +11,7 @@ class PbRLAgent(RLAgent):
     # TODO: add type hints to injected components
     def __init__(self, policy_model, pretraining_query_generator, query_generator, preference_querent,
                  preference_collector, reward_model_trainer, reward_model, query_schedule_cls,
-                 pb_step_freq, num_pretraining_epochs=10, num_training_iteration_epochs=10):
+                 pb_step_freq, num_epochs_in_pretraining=10, num_epochs_in_training=10):
 
         super(PbRLAgent, self).__init__(policy_model)
 
@@ -26,8 +26,8 @@ class PbRLAgent(RLAgent):
         self.reward_model_trainer = reward_model_trainer
 
         self.pb_step_freq = pb_step_freq
-        self.num_pretraining_epochs = num_pretraining_epochs
-        self.num_training_iteration_epochs = num_training_iteration_epochs
+        self.num_epochs_in_pretraining = num_epochs_in_pretraining
+        self.num_epochs_in_training = num_epochs_in_training
 
     def predict_reward(self, observation):
         return self.reward_model(observation)
@@ -44,7 +44,7 @@ class PbRLAgent(RLAgent):
         self._query_pretraining_preferences(num_preferences)
         self._collect_until_threshold_is_reached(num_preferences, wait_threshold=.8)
 
-        for _ in range(self.num_pretraining_epochs):
+        for _ in range(self.num_epochs_in_pretraining):
             self.reward_model_trainer.train(epochs=1, pretraining=True)
             self._collect_preferences()
 
@@ -54,6 +54,7 @@ class PbRLAgent(RLAgent):
         self.preference_collector.pending_queries.extend(newly_pending_queries)
 
     def _collect_until_threshold_is_reached(self, num_pretraining_preferences, wait_threshold=.8):
+        # TODO: remove threshold and check that len(pending_queries) == 0
         while len(self.reward_model_trainer.preferences) < int(wait_threshold * num_pretraining_preferences):
             self._collect_preferences()
             time.sleep(15)
@@ -73,8 +74,9 @@ class PbRLAgent(RLAgent):
         self._query_preferences(query_candidates, num_queries)
         self._collect_preferences()
 
+        # TODO: check that `episodes since last training` is (!) at least (!) 100
         if episode_count >= 100 and episode_count % 100 == 0:  # TODO: replace constant=100 by param
-            self.reward_model_trainer.train(self.num_training_iteration_epochs)
+            self.reward_model_trainer.train(self.num_epochs_in_training)
 
     def _query_preferences(self, query_candidates, num_queries):
         newly_pending_queries = self.preference_querent.query_preferences(query_candidates, num_queries)
