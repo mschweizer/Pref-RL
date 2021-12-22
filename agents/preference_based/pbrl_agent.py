@@ -14,10 +14,9 @@ class PbRLAgent(RLAgent):
         self.reward_model = agent_factory.create_reward_model(
             env, reward_model_name)
 
-        wrapped_env = agent_factory.create_env(env, self.reward_model)
-        super(PbRLAgent, self).__init__(env=wrapped_env)
+        policy_model = agent_factory.create_policy_model(env, self.reward_model)
+        super(PbRLAgent, self).__init__(policy_model)
 
-        self.policy_model = agent_factory.create_policy_model(self.env)
         self.pretraining_query_generator = agent_factory.create_pretraining_query_generator()
         self.query_generator = agent_factory.create_query_generator()
         self.preference_collector = agent_factory.create_preference_collector()
@@ -77,18 +76,16 @@ class PbRLAgent(RLAgent):
 
     def _pbrl_iteration_fn(self, episode_count, current_timestep):
         num_queries = self._calculate_num_desired_queries(current_timestep)
-        self._query_preferences(num_queries)
+        # TODO: Generate num_query_candidates > num_queries for active learning
+        query_candidates = self.query_generator.generate_queries(self.policy_model, num_queries)
+        self._query_preferences(query_candidates, num_queries)
         self._collect_preferences()
 
         if episode_count >= 100 and episode_count % 100 == 0:  # TODO: replace constant=100 by param
             self.reward_model_trainer.train(self.num_training_iteration_epochs)
 
-    def _query_preferences(self, num_queries):
-        # TODO: Generate num_query_candidates > num_queries for active learning
-        query_candidates = self.query_generator.generate_queries(
-            self.policy_model, num_queries)
-        newly_pending_queries = self.preference_querent.query_preferences(
-            query_candidates, num_queries)
+    def _query_preferences(self, query_candidates, num_queries):
+        newly_pending_queries = self.preference_querent.query_preferences(query_candidates, num_queries)
         self.preference_collector.pending_queries.extend(newly_pending_queries)
 
     def _collect_preferences(self):

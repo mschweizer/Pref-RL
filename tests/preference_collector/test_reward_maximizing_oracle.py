@@ -1,5 +1,6 @@
 import pytest
 
+from environment_wrappers.info_dict_keys import PENALIZED_TRUE_REW
 from environment_wrappers.internal.trajectory_buffer import Segment
 from preference_collector.binary_choice import BinaryChoice
 from preference_collector.synthetic_preference.preference_oracle import RewardMaximizingOracle
@@ -16,9 +17,9 @@ def test_raises_assertion_error_when_query_set_size_is_not_2():
 
 def test_prefers_higher_reward():
     segment_1 = Segment(observations=[1, 1], actions=[1, 1], rewards=[1, 1], dones=[1, 1],
-                        infos=[{"external_reward": 0}, {"external_reward": 0}])
+                        infos=[{PENALIZED_TRUE_REW: 0}, {PENALIZED_TRUE_REW: 0}])
     segment_2 = Segment(observations=[1, 1], actions=[1, 1], rewards=[1, 1], dones=[1, 1],
-                        infos=[{"external_reward": 25}, {"external_reward": 25}])
+                        infos=[{PENALIZED_TRUE_REW: 25}, {PENALIZED_TRUE_REW: 25}])
     query = ChoiceQuery(choice_set=[segment_1, segment_2])
 
     oracle = RewardMaximizingOracle()

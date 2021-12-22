@@ -19,11 +19,7 @@ class AbstractAgentFactory(ABC):
         return reward_model_cls(env)
 
     @abstractmethod
-    def create_env(self, env, reward_model):
-        """ Returns the prepared (= wrapped) environment. """
-
-    @abstractmethod
-    def create_policy_model(self, env) -> PolicyModel:
+    def create_policy_model(self, env, reward_model) -> PolicyModel:
         """ Returns policy model. """
 
     @abstractmethod
@@ -48,4 +44,4 @@ class AbstractAgentFactory(ABC):
 
     @abstractmethod
     def create_query_schedule_cls(self) -> Type[AbstractQuerySchedule]:
-        """ Returns query schedule. """
+        """ Returns query schedule class. """

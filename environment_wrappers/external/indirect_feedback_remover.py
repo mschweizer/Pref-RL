@@ -1,6 +1,8 @@
 from gym import Wrapper
 from gym.envs.atari import AtariEnv
 
+from environment_wrappers.info_dict_keys import TRUE_REW, TRUE_DONE
+
 
 class IndirectFeedbackRemover(Wrapper):
     def __init__(self, env, termination_penalty=0.):
@@ -12,8 +14,8 @@ class IndirectFeedbackRemover(Wrapper):
 
     def step(self, action):
         observation, reward, done, info = self.env.step(action)
-        info['original_done'] = done
-        info['original_reward'] = reward
+        info[TRUE_DONE] = done
+        info[TRUE_REW] = reward
         if done:
             reward = self._apply_penalty(reward)
             observation = self.reset()
