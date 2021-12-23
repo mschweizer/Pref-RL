@@ -2,12 +2,12 @@ from unittest.mock import Mock
 
 import pytest
 
-from agents.preference_based.pbrl_callback import PbRLCallback
+from agents.preference_based.pbrl_callback import PbStepCallback
 
 
 @pytest.fixture()
 def pbrl_callback():
-    return PbRLCallback(pbrl_iteration_method=Mock(), pb_step_freq=100)
+    return PbStepCallback(pb_step_function=Mock(), pb_step_freq=100)
 
 
 def test_should_trigger_pb_step_after_correct_number_of_steps(pbrl_callback):

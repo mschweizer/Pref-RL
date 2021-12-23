@@ -31,7 +31,7 @@ class RewardModelTrainer(AbstractRewardModelTrainer):
         self.preferences = PreferenceDataset(capacity=dataset_capacity)
 
     # TODO: Rename param `pretraining` to `reset_training_steps`
-    def train(self, epochs, pretraining=False, *args, **kwargs):
+    def train(self, epochs, reset_logging_timesteps_afterwards=False, *args, **kwargs):
         # TODO: Remove preferences parameter and switch dataset=preferences to dataset=self.preferences
         train_loader = torch.utils.data.DataLoader(dataset=self.preferences, batch_size=self.batch_size)
 
@@ -52,12 +52,12 @@ class RewardModelTrainer(AbstractRewardModelTrainer):
                 running_loss += loss.item()
 
                 if self._is_writing_iteration(self.global_training_step):
-                    self._write_summary(running_loss, pretraining)
+                    self._write_summary(running_loss, reset_logging_timesteps_afterwards)
                     running_loss = 0.0
 
                 self.global_training_step += 1
 
-        if pretraining:
+        if reset_logging_timesteps_afterwards:
             # reset global step after every round of pretraining
             self.global_training_step = 0
 

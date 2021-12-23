@@ -2,11 +2,11 @@ import numpy as np
 from stable_baselines3.common.callbacks import BaseCallback
 
 
-class PbRLCallback(BaseCallback):
+class PbStepCallback(BaseCallback):
 
-    def __init__(self, pbrl_iteration_method, pb_step_freq, verbose=1):
+    def __init__(self, pb_step_function, pb_step_freq, verbose=1):
         super().__init__(verbose)
-        self._pbrl_iteration_method = pbrl_iteration_method
+        self._pb_step_fn = pb_step_function
         self._episode_count = 0
         self._num_timesteps_at_start_of_run = self.num_timesteps
         self._pb_step_freq = pb_step_freq
@@ -30,7 +30,7 @@ class PbRLCallback(BaseCallback):
         return self.num_timesteps - self._num_timesteps_at_start_of_run
 
     def _trigger_pb_step(self):
-        self._pbrl_iteration_method(self._episode_count, self._num_timesteps_in_this_run())
+        self._pb_step_fn(self._episode_count, self._num_timesteps_in_this_run())
         self._last_pb_step = self._num_timesteps_in_this_run()
 
     def _steps_since_last_pb_step(self):
