@@ -24,33 +24,33 @@ from reward_model_trainer.reward_model_trainer import RewardModelTrainer
 
 class SyntheticRLTeacherFactory(PbRLAgentFactory):
 
-    def __init__(self, policy_train_freq, pb_step_freq, segment_length=25):
-        super().__init__()
+    def __init__(self, policy_train_freq, pb_step_freq, num_epochs_in_pretraining, num_epochs_in_training,
+                 segment_length=25):
+        super().__init__(pb_step_freq, num_epochs_in_pretraining, num_epochs_in_training)
         self.segment_length = segment_length
         self.policy_train_freq = policy_train_freq
-        self.pb_step_freq = pb_step_freq
 
-    def create_policy_model(self, env, reward_model) -> PolicyModel:
+    def _create_policy_model(self, env, reward_model) -> PolicyModel:
         return BufferedPolicyModel(env=self._wrap_env(env, reward_model), train_freq=self.policy_train_freq)
 
-    def create_reward_model_trainer(self, reward_model) -> RewardModelTrainer:
+    def _create_reward_model_trainer(self, reward_model) -> RewardModelTrainer:
         return RewardModelTrainer(reward_model)
 
-    def create_pretraining_query_generator(self) -> AbstractQueryGenerator:
+    def _create_pretraining_query_generator(self) -> AbstractQueryGenerator:
         return ChoiceSetGenerator(item_generator=RandomPretrainingSegmentSampler(segment_length=self.segment_length),
                                   item_selector=RandomItemSelector())
 
-    def create_query_generator(self) -> AbstractQueryGenerator:
+    def _create_query_generator(self) -> AbstractQueryGenerator:
         return ChoiceSetGenerator(item_generator=RandomSegmentSampler(segment_length=self.segment_length),
                                   item_selector=RandomItemSelector())
 
-    def create_preference_collector(self) -> AbstractPreferenceCollector:
+    def _create_preference_collector(self) -> AbstractPreferenceCollector:
         return SyntheticPreferenceCollector(oracle=RewardMaximizingOracle())
 
-    def create_preference_querent(self) -> AbstractPreferenceQuerent:
+    def _create_preference_querent(self) -> AbstractPreferenceQuerent:
         return DummyPreferenceQuerent(query_selector=RandomQuerySelector())
 
-    def create_query_schedule_cls(self) -> Type[AbstractQuerySchedule]:
+    def _create_query_schedule_cls(self) -> Type[AbstractQuerySchedule]:
         return ConstantQuerySchedule
 
     def _wrap_env(self, env, reward_model):

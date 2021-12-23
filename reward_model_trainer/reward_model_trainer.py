@@ -30,6 +30,7 @@ class RewardModelTrainer(AbstractRewardModelTrainer):
         self.global_training_step = 0
         self.preferences = PreferenceDataset(capacity=dataset_capacity)
 
+    # TODO: Rename param `pretraining` to `reset_training_steps`
     def train(self, epochs, pretraining=False, *args, **kwargs):
         # TODO: Remove preferences parameter and switch dataset=preferences to dataset=self.preferences
         train_loader = torch.utils.data.DataLoader(dataset=self.preferences, batch_size=self.batch_size)
