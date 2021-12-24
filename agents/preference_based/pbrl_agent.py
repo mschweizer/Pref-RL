@@ -1,46 +1,47 @@
 import logging
 import time
-from typing import Union
 
 from agents.preference_based.pbrl_callback import PbStepCallback
 from agents.rl_agent import RLAgent
-from preference_collector.preference_collector import AbstractPreferenceCollector
-from preference_querent.preference_querent import AbstractPreferenceQuerent
-from query_generator.query_generator import AbstractQueryGenerator
 from query_schedule.query_schedule import AbstractQuerySchedule
-from reward_model_trainer.reward_model_trainer import RewardModelTrainer
-from reward_models.base import BaseModel
 
 
 class PbRLAgent(RLAgent):
     def __init__(self, policy_model, pretraining_query_generator, query_generator, preference_querent,
                  preference_collector, reward_model_trainer, reward_model, query_schedule_cls,
-                 pb_step_freq, num_epochs_in_pretraining=10, num_epochs_in_training=10):
+                 pb_step_freq, reward_train_freq=None, num_epochs_in_pretraining=8, num_epochs_in_training=16):
 
         super(PbRLAgent, self).__init__(policy_model)
 
         self.query_schedule_cls: type[AbstractQuerySchedule] = query_schedule_cls
-        self.query_schedule: Union[AbstractQuerySchedule, None] = None
+        self.query_schedule = None
 
-        self.pretraining_query_generator: AbstractQueryGenerator = pretraining_query_generator
-        self.query_generator: AbstractQueryGenerator = query_generator
-        self.preference_querent: AbstractPreferenceQuerent = preference_querent
-        self.preference_collector: AbstractPreferenceCollector = preference_collector
-        self.reward_model: BaseModel = reward_model
-        self.reward_model_trainer: RewardModelTrainer = reward_model_trainer
+        self.pretraining_query_generator = pretraining_query_generator
+        self.query_generator = query_generator
+        self.preference_querent = preference_querent
+        self.preference_collector = preference_collector
+        self.reward_model = reward_model
+        self.reward_model_trainer = reward_model_trainer
 
         self.pb_step_freq: int = pb_step_freq
+
+        if reward_train_freq:
+            self.reward_train_freq: int = reward_train_freq
+        else:
+            self.reward_train_freq = 8 * pb_step_freq
+        self._last_reward_model_training_step = 0
+
         self.num_epochs_in_pretraining: int = num_epochs_in_pretraining
         self.num_epochs_in_training: int = num_epochs_in_training
 
     def predict_reward(self, observation):
         return self.reward_model(observation)
 
-    def pb_learn(self, num_training_timesteps, num_training_preferences, num_pretraining_preferences=200):
+    def pb_learn(self, num_training_timesteps, num_training_preferences, num_pretraining_preferences):
+        self._prepare_for_training(num_training_timesteps, num_training_preferences, num_pretraining_preferences)
         logging.info("Start reward model pretraining")
         self._pretrain(num_pretraining_preferences)
         logging.info("Start reward model training")
-        self._setup_query_schedule(num_training_timesteps, num_training_preferences, num_pretraining_preferences)
         self._train(num_training_timesteps)
         logging.info("Completed reward model training")
 
@@ -65,7 +66,7 @@ class PbRLAgent(RLAgent):
     def _collect_preferences(self, wait_until_all_collected=False):
         self._collect()
 
-        while len(self.preference_collector.pending_queries) > 0 and wait_until_all_collected:
+        while self._num_pending_queries() > 0 and wait_until_all_collected:
             time.sleep(15)
             self._collect()
 
@@ -73,29 +74,56 @@ class PbRLAgent(RLAgent):
         newly_collected_preferences = self.preference_collector.collect_preferences()
         self.reward_model_trainer.preferences.extend(newly_collected_preferences)
 
+    def _prepare_for_training(self, num_training_timesteps, num_training_preferences, num_pretraining_preferences):
+        self._set_last_reward_model_training_step_to(0)
+        self.reward_model_trainer.preferences.reset_lifetime_preference_count()  # for schedule to work correctly
+        self._setup_query_schedule(num_training_timesteps, num_training_preferences, num_pretraining_preferences)
+
+    def _set_last_reward_model_training_step_to(self, value):
+        self._last_reward_model_training_step = value
+
     def _setup_query_schedule(self, num_training_steps, num_training_preferences, num_pretraining_preferences):
         self.query_schedule = self.query_schedule_cls(num_pretraining_preferences=num_pretraining_preferences,
                                                       num_training_preferences=num_training_preferences,
                                                       num_training_steps=num_training_steps)
 
     def _train(self, total_timesteps):
-        self.policy_model.learn(total_timesteps, callback=PbStepCallback(self._pb_step, self.pb_step_freq))
+        self.policy_model.learn(total_timesteps, callback=PbStepCallback(pb_step_function=self._pb_step,
+                                                                         pb_step_freq=self.pb_step_freq))
 
-    def _pb_step(self, episode_count, current_timestep):
-        num_queries = self._calculate_num_desired_queries(current_timestep)
+    def _pb_step(self, current_timestep):
+        num_queries = self._num_desired_queries(current_timestep)
         self._send_preference_queries(num_queries)
         self._collect_preferences()
 
-        # TODO: check that `episodes since last training` is (!) at least (!) 100
-        if episode_count >= 100 and episode_count % 100 == 0:  # TODO: replace constant=100 by param
+        if self._is_reward_training_step(current_timestep):
             self.reward_model_trainer.train(self.num_epochs_in_training)
+            self._set_last_reward_model_training_step_to(current_timestep)
 
-    def _calculate_num_desired_queries(self, current_timestep):
-        num_scheduled_prefs = self.query_schedule.retrieve_num_scheduled_preferences(current_timestep)
-        num_actual_prefs = self.reward_model_trainer.preferences.lifetime_preference_count \
-                           - self.query_schedule.num_pretraining_preferences
-        num_pending_queries = len(self.preference_collector.pending_queries)
+    def _num_desired_queries(self, current_timestep):
+        return self._calculate_num_desired_queries(self._num_scheduled_preferences(current_timestep),
+                                                   self._total_num_collected_preferences(),
+                                                   self._num_collected_pretraining_preferences(),
+                                                   self._num_pending_queries())
 
-        num_desired_queries = num_scheduled_prefs - (num_actual_prefs + num_pending_queries)
+    def _is_reward_training_step(self, current_timestep):
+        return self._steps_since_last_reward_training(current_timestep) >= self.reward_train_freq
 
-        return max(0, num_desired_queries)
+    def _steps_since_last_reward_training(self, current_timestep):
+        return current_timestep - self._last_reward_model_training_step
+
+    @staticmethod
+    def _calculate_num_desired_queries(scheduled_prefs, total_prefs, pretraining_prefs, pending_queries):
+        return scheduled_prefs - (total_prefs - pretraining_prefs + pending_queries)
+
+    def _num_scheduled_preferences(self, current_timestep):
+        return self.query_schedule.retrieve_num_scheduled_preferences(current_timestep)
+
+    def _num_collected_pretraining_preferences(self):
+        return self.query_schedule.num_pretraining_preferences
+
+    def _total_num_collected_preferences(self):
+        return self.reward_model_trainer.preferences.lifetime_preference_count
+
+    def _num_pending_queries(self):
+        return len(self.preference_collector.pending_queries)

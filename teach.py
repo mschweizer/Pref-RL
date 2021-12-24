@@ -23,7 +23,7 @@ def main():
     logging.basicConfig(level=logging.INFO)
 
     env = create_env(args.env_id, termination_penalty=10.)
-    factory = SyntheticRLTeacherFactory(policy_train_freq=5, pb_step_freq=1024,
+    factory = SyntheticRLTeacherFactory(policy_train_freq=5, pb_step_freq=1024, reward_training_freq=8192,
                                         num_epochs_in_pretraining=8, num_epochs_in_training=16)
     agent = factory.create_agent(env=env, reward_model_name="Mlp")
 

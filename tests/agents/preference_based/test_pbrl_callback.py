@@ -31,6 +31,7 @@ def test_calculates_timesteps_in_this_run(pbrl_callback):
 
 
 def test_keeps_track_of_steps_since_last_pb_step(pbrl_callback):
-    pbrl_callback._trigger_pb_step()
+    pbrl_callback._pb_step_fn(pbrl_callback._num_timesteps_in_this_run())
+    pbrl_callback._last_pb_step = pbrl_callback._num_timesteps_in_this_run()
     pbrl_callback.num_timesteps = 120
     assert pbrl_callback._steps_since_last_pb_step() == 120

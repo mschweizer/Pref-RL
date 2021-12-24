@@ -24,9 +24,11 @@ from reward_model_trainer.reward_model_trainer import RewardModelTrainer
 
 class SyntheticRLTeacherFactory(PbRLAgentFactory):
 
-    def __init__(self, policy_train_freq, pb_step_freq, num_epochs_in_pretraining, num_epochs_in_training,
+    def __init__(self,
+                 policy_train_freq, pb_step_freq, reward_training_freq,
+                 num_epochs_in_pretraining, num_epochs_in_training,
                  segment_length=25):
-        super().__init__(pb_step_freq, num_epochs_in_pretraining, num_epochs_in_training)
+        super().__init__(pb_step_freq, reward_training_freq, num_epochs_in_pretraining, num_epochs_in_training)
         self.segment_length = segment_length
         self.policy_train_freq = policy_train_freq
 
