@@ -67,3 +67,6 @@ class PreferenceDataset(torch.utils.data.Dataset):
     def _prepare_query(preference):
         choice_set = preference.query.choice_set
         return np.array([choice_set[0].observations, choice_set[1].observations])
+
+    def reset_lifetime_preference_count(self):
+        self.lifetime_preference_count = 0

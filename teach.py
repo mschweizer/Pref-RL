@@ -1,9 +1,7 @@
 import argparse
 import logging
 
-from agent_factory.rl_teacher_factory import RLTeacherFactory
-from agent_factory.synthetic_rl_teacher_factory import SyntheticRLTeacherFactory
-from agents.preference_based.pbrl_agent import PbRLAgent
+from agent_factory.rl_teacher_factory import SyntheticRLTeacherFactory
 from environment_wrappers.utils import create_env
 
 
@@ -26,17 +24,9 @@ def main():
     logging.basicConfig(level=logging.INFO)
 
     env = create_env(args.env_id, termination_penalty=10.)
-
-    if args.preference_type == "human":
-        agent_factory = RLTeacherFactory(segment_length=25)
-    else:
-        agent_factory = SyntheticRLTeacherFactory(segment_length=25)
-
-    agent = PbRLAgent(env=env,
-                      agent_factory=agent_factory,
-                      reward_model_name=args.reward_model,
-                      num_pretraining_epochs=8,
-                      num_training_iteration_epochs=16)
+    factory = SyntheticRLTeacherFactory(policy_train_freq=5, pb_step_freq=1024, reward_training_freq=8192,
+                                        num_epochs_in_pretraining=8, num_epochs_in_training=16)
+    agent = factory.create_agent(env=env, reward_model_name="Mlp")
 
     agent.pb_learn(num_training_timesteps=args.num_rl_timesteps,
                    num_training_preferences=args.num_training_preferences,

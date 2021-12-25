@@ -56,22 +56,10 @@ On Windows, you may encounter issues running OpenAI Gym Atari environments.
 could help. 
 
 ## Example
-Here is an example of how to run and train the base PbRL agent in the mountaincar environment:
-
-```python
-
-from agents.preference_based.pbrl_agent import PbRLAgent
-
-from environment_wrappers.utils import create_env
-
-env = create_env("MountainCar-v0", termination_penalty=10.)
-
-agent = PbRLAgent(env=env, reward_model_name="Mlp", num_pretraining_epochs=8, 
-                  num_training_iteration_epochs=16)
-
-agent.pb_learn(num_training_timesteps=200000, num_training_preferences=1000, num_pretraining_preferences=512)
-
-env.close()
+See teach.py for an example of how to instantiate and run an agent. 
+When you're at the project's root, use the following to run a default agent from the command line:
+```
+python teach.py --env_id "CartPole-v1" --reward_model "Mlp" --num_rl_timesteps 200000 --num_pretraining_preferences 100
 ```
 
 You can monitor agent training with TensorBoard. Start it with:

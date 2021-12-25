@@ -1,5 +1,6 @@
 from typing import Type
 
+from agent_factory.agent_factory import PbRLAgentFactory
 from agents.policy_model import PolicyModel
 from agents.preference_based.buffered_policy_model import BufferedPolicyModel
 from environment_wrappers.internal.reward_monitor import RewardMonitor
@@ -29,39 +30,42 @@ from reward_model_trainer.reward_model_trainer import RewardModelTrainer
 
 from agent_factory.agent_factory import AbstractAgentFactory
 
-def _wrap_env(env, reward_model):
-    env = FrameTrajectoryBuffer(env)
-    env = RewardPredictor(env, reward_model)
-    env = RewardStandardizer(env)
-    env = RewardMonitor(env)
-    return env
+class SyntheticRLTeacherFactory(PbRLAgentFactory):
     
-
-class RLTeacherFactory(AbstractAgentFactory):
-    def __init__(self, segment_length=25):
-        super().__init__()
+    def __init__(self,
+                 policy_train_freq, pb_step_freq, reward_training_freq,
+                 num_epochs_in_pretraining, num_epochs_in_training,
+                 segment_length=25):
+        super().__init__(pb_step_freq, reward_training_freq, num_epochs_in_pretraining, num_epochs_in_training)
         self.segment_length = segment_length
+        self.policy_train_freq = policy_train_freq
 
-    def create_policy_model(self, env, reward_model) -> PolicyModel:
-        env = _wrap_env(env, reward_model)
-        return BufferedPolicyModel(env)
+    def _create_policy_model(self, env, reward_model) -> PolicyModel:
+        return BufferedPolicyModel(env=self._wrap_env(env, reward_model), train_freq=self.policy_train_freq)
 
-    def create_reward_model_trainer(self, reward_model) -> RewardModelTrainer:
+    def _create_reward_model_trainer(self, reward_model) -> RewardModelTrainer:
         return RewardModelTrainer(reward_model)
 
-    def create_pretraining_query_generator(self) -> AbstractQueryGenerator:
+    def _create_pretraining_query_generator(self) -> AbstractQueryGenerator:
         return ChoiceSetGenerator(item_generator=RandomPretrainingSegmentSampler(segment_length=self.segment_length),
                                   item_selector=RandomItemSelector())
 
-    def create_query_generator(self) -> AbstractQueryGenerator:
+    def _create_query_generator(self) -> AbstractQueryGenerator:
         return ChoiceSetGenerator(item_generator=RandomSegmentSampler(segment_length=self.segment_length),
                                   item_selector=RandomItemSelector())
 
-    def create_preference_collector(self) -> AbstractPreferenceCollector:
-        return HumanPreferenceCollector()
+    def _create_preference_collector(self) -> AbstractPreferenceCollector:
+        return SyntheticPreferenceCollector(oracle=RewardMaximizingOracle())
 
-    def create_preference_querent(self) -> AbstractPreferenceQuerent:
-        return HumanPreferenceQuerent(query_selector=RandomQuerySelector())
+    def _create_preference_querent(self) -> AbstractPreferenceQuerent:
+        return DummyPreferenceQuerent(query_selector=RandomQuerySelector())
 
-    def create_query_schedule_cls(self) -> Type[AbstractQuerySchedule]:
+    def _create_query_schedule_cls(self) -> Type[AbstractQuerySchedule]:
         return ConstantQuerySchedule
+
+    def _wrap_env(self, env, reward_model):
+        env = TrajectoryBuffer(env, trajectory_buffer_size=max(self.pb_step_freq, self.policy_train_freq))
+        env = RewardPredictor(env, reward_model)
+        env = RewardStandardizer(env)
+        env = RewardMonitor(env)
+        return env
