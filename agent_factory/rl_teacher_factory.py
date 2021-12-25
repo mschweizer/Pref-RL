@@ -35,10 +35,7 @@ def _wrap_env(env, reward_model):
     env = RewardStandardizer(env)
     env = RewardMonitor(env)
     return env
-
-
-class SyntheticRLTeacherFactory(AbstractAgentFactory):
-    pass
+    
 
 class RLTeacherFactory(AbstractAgentFactory):
     def __init__(self, segment_length=25):
