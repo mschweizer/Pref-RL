@@ -7,12 +7,15 @@ from environment_wrappers.internal.reward_monitor import RewardMonitor
 from environment_wrappers.internal.reward_predictor import RewardPredictor
 from environment_wrappers.internal.reward_standardizer import \
     RewardStandardizer
+from environment_wrappers.internal.trajectory_buffer import TrajectoryBuffer
 from environment_wrappers.internal.trajectory_buffer import \
     FrameTrajectoryBuffer
+from preference_collector.preference_collector import AbstractPreferenceCollector
 from preference_collector.human_preference.human_preference_collector import \
     HumanPreferenceCollector
-from preference_collector.preference_collector import \
-    AbstractPreferenceCollector
+from preference_collector.synthetic_preference.synthetic_preference_collector import SyntheticPreferenceCollector
+from preference_collector.synthetic_preference.preference_oracle import RewardMaximizingOracle
+from preference_querent.dummy_preference_querent import DummyPreferenceQuerent
 from preference_querent.human_preference.human_preference_querent import HumanPreferenceQuerent
 from preference_querent.preference_querent import AbstractPreferenceQuerent
 from preference_querent.query_selector.query_selector import \
@@ -28,15 +31,15 @@ from query_schedule.query_schedule import (AbstractQuerySchedule,
                                            ConstantQuerySchedule)
 from reward_model_trainer.reward_model_trainer import RewardModelTrainer
 
-from agent_factory.agent_factory import AbstractAgentFactory
 
 class SyntheticRLTeacherFactory(PbRLAgentFactory):
-    
+
     def __init__(self,
                  policy_train_freq, pb_step_freq, reward_training_freq,
                  num_epochs_in_pretraining, num_epochs_in_training,
                  segment_length=25):
-        super().__init__(pb_step_freq, reward_training_freq, num_epochs_in_pretraining, num_epochs_in_training)
+        super().__init__(pb_step_freq, reward_training_freq,
+                         num_epochs_in_pretraining, num_epochs_in_training)
         self.segment_length = segment_length
         self.policy_train_freq = policy_train_freq
 
@@ -64,7 +67,33 @@ class SyntheticRLTeacherFactory(PbRLAgentFactory):
         return ConstantQuerySchedule
 
     def _wrap_env(self, env, reward_model):
-        env = TrajectoryBuffer(env, trajectory_buffer_size=max(self.pb_step_freq, self.policy_train_freq))
+        env = TrajectoryBuffer(env, trajectory_buffer_size=max(
+            self.pb_step_freq, self.policy_train_freq))
+        env = RewardPredictor(env, reward_model)
+        env = RewardStandardizer(env)
+        env = RewardMonitor(env)
+        return env
+
+
+class HumanPreferenceRLTeacherFactory(SyntheticRLTeacherFactory):
+
+    def __init__(self, policy_train_freq, pb_step_freq, reward_training_freq, num_epochs_in_pretraining, num_epochs_in_training, segment_length=25, video_output_dir=None):
+        super().__init__(policy_train_freq, pb_step_freq, reward_training_freq,
+                         num_epochs_in_pretraining, num_epochs_in_training, segment_length=segment_length)
+        self.video_output_dir = video_output_dir
+
+    def _create_preference_collector(self) -> AbstractPreferenceCollector:
+        return HumanPreferenceCollector()
+
+    def _create_preference_querent(self) -> AbstractPreferenceQuerent:
+        if self.video_output_dir == None:
+            return HumanPreferenceQuerent(query_selector=RandomQuerySelector())
+        else:
+            return HumanPreferenceQuerent(query_selector=RandomQuerySelector(), video_root_output_dir=self.video_output_dir)
+
+    def _wrap_env(self, env, reward_model):
+        env = FrameTrajectoryBuffer(env, trajectory_buffer_size=max(
+            self.pb_step_freq, self.policy_train_freq))
         env = RewardPredictor(env, reward_model)
         env = RewardStandardizer(env)
         env = RewardMonitor(env)
