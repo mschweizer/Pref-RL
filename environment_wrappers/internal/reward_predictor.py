@@ -19,10 +19,13 @@ class RewardPredictor(Wrapper):
 
     def reward(self, observation):
         input_data = self._prepare_for_model(observation)
-        return float(self.reward_model(input_data))
+        return float(self.reward_model.predict(input_data))
 
     @staticmethod
     def _prepare_for_model(observation):
         # TODO: converting the list to a single numpy.ndarray with numpy.array() before converting to a tensor.
         #  (See Rob's mail)
-        return torch.as_tensor([np.array(observation)])
+        return torch.as_tensor(np.array([np.array(observation)]))
+        # return torch.as_tensor([np.array(observation)])
+
+

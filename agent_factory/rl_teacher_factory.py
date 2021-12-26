@@ -1,4 +1,4 @@
-from typing import Type
+from typing import Type, Union
 
 from agent_factory.agent_factory import PbRLAgentFactory
 from agents.policy_model import PolicyModel
@@ -11,7 +11,7 @@ from preference_collector.preference_collector import AbstractPreferenceCollecto
 from preference_collector.synthetic_preference.preference_oracle import RewardMaximizingOracle
 from preference_collector.synthetic_preference.synthetic_preference_collector import SyntheticPreferenceCollector
 from preference_querent.preference_querent import AbstractPreferenceQuerent
-from preference_querent.query_selector.query_selector import RandomQuerySelector
+from preference_querent.query_selector.query_selector import RandomQuerySelector, MaximumVarianceQuerySelector
 from preference_querent.dummy_preference_querent import DummyPreferenceQuerent
 from query_generator.choice_set.choice_set_generator import ChoiceSetGenerator
 from query_generator.choice_set.segment.pretraining_segment_sampler import RandomPretrainingSegmentSampler
@@ -19,6 +19,7 @@ from query_generator.choice_set.segment.segment_sampler import RandomSegmentSamp
 from query_generator.query_generator import AbstractQueryGenerator
 from query_generator.query_item_selector import RandomItemSelector
 from query_schedule.query_schedule import AbstractQuerySchedule, ConstantQuerySchedule
+from reward_model_trainer.prediction_model_trainer import EnsemblePredictionModelTrainer, StandardPredictionModelTrainer
 from reward_model_trainer.reward_model_trainer import RewardModelTrainer
 
 
@@ -35,8 +36,11 @@ class SyntheticRLTeacherFactory(PbRLAgentFactory):
     def _create_policy_model(self, env, reward_model) -> PolicyModel:
         return BufferedPolicyModel(env=self._wrap_env(env, reward_model), train_freq=self.policy_train_freq)
 
-    def _create_reward_model_trainer(self, reward_model) -> RewardModelTrainer:
-        return RewardModelTrainer(reward_model)
+    def _create_reward_model_trainer(self, reward_model) -> Union[StandardPredictionModelTrainer, EnsemblePredictionModelTrainer]:
+        if len(reward_model) == 1:
+            return StandardPredictionModelTrainer(reward_model)
+        else:
+            return EnsemblePredictionModelTrainer(reward_model)
 
     def _create_pretraining_query_generator(self) -> AbstractQueryGenerator:
         return ChoiceSetGenerator(item_generator=RandomPretrainingSegmentSampler(segment_length=self.segment_length),
@@ -49,8 +53,12 @@ class SyntheticRLTeacherFactory(PbRLAgentFactory):
     def _create_preference_collector(self) -> AbstractPreferenceCollector:
         return SyntheticPreferenceCollector(oracle=RewardMaximizingOracle())
 
-    def _create_preference_querent(self) -> AbstractPreferenceQuerent:
-        return DummyPreferenceQuerent(query_selector=RandomQuerySelector())
+    def _create_preference_querent(self, reward_model) -> AbstractPreferenceQuerent:
+        if len(reward_model) == 1:
+            query_selector = RandomQuerySelector()
+        else:
+            query_selector = MaximumVarianceQuerySelector(reward_model)
+        return DummyPreferenceQuerent(query_selector=query_selector)
 
     def _create_query_schedule_cls(self) -> Type[AbstractQuerySchedule]:
         return ConstantQuerySchedule

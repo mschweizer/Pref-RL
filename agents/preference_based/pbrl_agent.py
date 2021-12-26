@@ -3,6 +3,7 @@ import time
 
 from agents.preference_based.pbrl_callback import PbStepCallback
 from agents.rl_agent import RLAgent
+from query_generator.query import ChoiceQuery
 from query_schedule.query_schedule import AbstractQuerySchedule
 
 
@@ -52,7 +53,7 @@ class PbRLAgent(RLAgent):
 
     def _send_preference_queries(self, num_queries, pretraining=False):
         # TODO: Generate num_query_candidates > num_queries for active learning
-        query_candidates = self._generate_query_candidates(num_queries, pretraining)
+        query_candidates = self._generate_query_candidates(num_queries, pretraining) # factor 10 from Christiano
         newly_pending_queries = self.preference_querent.query_preferences(query_candidates, num_queries)
         self.preference_collector.pending_queries.extend(newly_pending_queries)
 
@@ -116,6 +117,7 @@ class PbRLAgent(RLAgent):
     def _calculate_num_desired_queries(scheduled_prefs, total_prefs, pretraining_prefs, pending_queries):
         return scheduled_prefs - (total_prefs - pretraining_prefs + pending_queries)
 
+    # current_timestep has to be at least 5000 to make scheduled_prefs > 0
     def _num_scheduled_preferences(self, current_timestep):
         return self.query_schedule.retrieve_num_scheduled_preferences(current_timestep)
 
