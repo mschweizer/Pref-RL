@@ -1,5 +1,6 @@
 import logging
 import time
+import os
 
 from agents.preference_based.pbrl_callback import PbStepCallback
 from agents.rl_agent import RLAgent
@@ -37,13 +38,15 @@ class PbRLAgent(RLAgent):
     def predict_reward(self, observation):
         return self.reward_model(observation)
 
-    def pb_learn(self, num_training_timesteps, num_training_preferences, num_pretraining_preferences):
+    def pb_learn(self, num_training_timesteps, num_training_preferences, num_pretraining_preferences, save_dir, agent_name):
         self._prepare_for_training(num_training_timesteps, num_training_preferences, num_pretraining_preferences)
         logging.info("Start reward model pretraining")
         self._pretrain(num_pretraining_preferences)
         logging.info("Start reward model training")
         self._train(num_training_timesteps)
-        logging.info("Completed reward model training")
+        logging.info("Completed reward model training; saving model...")
+        self._save_agent(save_dir, agent_name)
+        logging.info("Agent saved.")
 
     def _pretrain(self, num_preferences):
         self._send_preference_queries(num_preferences, pretraining=True)
@@ -67,6 +70,7 @@ class PbRLAgent(RLAgent):
         self._collect()
 
         while self._num_pending_queries() > 0 and wait_until_all_collected:
+            logging.info(f"Waiting until all queries are collected. {self._num_pending_queries()} queries pending.")
             time.sleep(15)
             self._collect()
 
@@ -90,6 +94,11 @@ class PbRLAgent(RLAgent):
     def _train(self, total_timesteps):
         self.policy_model.learn(total_timesteps, callback=PbStepCallback(pb_step_function=self._pb_step,
                                                                          pb_step_freq=self.pb_step_freq))
+
+    def _save_agent(self, save_dir, agent_name):
+        if not os.path.exists(save_dir):
+            os.makedirs(save_dir)
+        self.policy_model.rl_algo.save(f"{save_dir}{agent_name}")
 
     def _pb_step(self, current_timestep):
         num_queries = self._num_desired_queries(current_timestep)
