@@ -53,11 +53,11 @@ class SyntheticRLTeacherFactory(PbRLAgentFactory):
     def _create_preference_collector(self) -> AbstractPreferenceCollector:
         return SyntheticPreferenceCollector(oracle=RewardMaximizingOracle())
 
-    def _create_preference_querent(self, reward_model) -> AbstractPreferenceQuerent:
-        if len(reward_model) == 1:
+    def _create_preference_querent(self, reward_model, active_selecting) -> AbstractPreferenceQuerent:
+        if len(reward_model) == 1 or active_selecting == False:
             query_selector = RandomQuerySelector()
         else:
-            query_selector = MaximumVarianceQuerySelector(reward_model)
+            query_selector = MaximumVarianceQuerySelector(reward_model) # ensemble + active learning
         return DummyPreferenceQuerent(query_selector=query_selector)
 
     def _create_query_schedule_cls(self) -> Type[AbstractQuerySchedule]:

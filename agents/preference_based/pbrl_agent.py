@@ -3,7 +3,6 @@ import time
 
 from agents.preference_based.pbrl_callback import PbStepCallback
 from agents.rl_agent import RLAgent
-from query_generator.query import ChoiceQuery
 from query_schedule.query_schedule import AbstractQuerySchedule
 
 
@@ -38,12 +37,12 @@ class PbRLAgent(RLAgent):
     def predict_reward(self, observation):
         return self.reward_model(observation)
 
-    def pb_learn(self, num_training_timesteps, num_training_preferences, num_pretraining_preferences):
+    def pb_learn(self, num_training_timesteps, num_training_preferences, num_pretraining_preferences, active_learning_factor=1):
         self._prepare_for_training(num_training_timesteps, num_training_preferences, num_pretraining_preferences)
         logging.info("Start reward model pretraining")
         self._pretrain(num_pretraining_preferences)
         logging.info("Start reward model training")
-        self._train(num_training_timesteps)
+        self._train(num_training_timesteps, active_learning_factor)
         logging.info("Completed reward model training")
 
     def _pretrain(self, num_preferences):
@@ -51,17 +50,18 @@ class PbRLAgent(RLAgent):
         self._collect_preferences(wait_until_all_collected=True)
         self.reward_model_trainer.train(epochs=self.num_epochs_in_pretraining, reset_logging_timesteps_afterwards=True)
 
-    def _send_preference_queries(self, num_queries, pretraining=False):
+    def _send_preference_queries(self, num_queries, factor=1, pretraining=False):
         # TODO: Generate num_query_candidates > num_queries for active learning
-        query_candidates = self._generate_query_candidates(num_queries, pretraining) # factor 10 from Christiano
+        query_candidates = self._generate_query_candidates(num_queries, factor, pretraining)
         newly_pending_queries = self.preference_querent.query_preferences(query_candidates, num_queries)
         self.preference_collector.pending_queries.extend(newly_pending_queries)
 
-    def _generate_query_candidates(self, num_queries, pretraining):
+    def _generate_query_candidates(self, num_queries, factor, pretraining):
+        num_candidates = num_queries * factor
         if pretraining:
-            query_candidates = self.pretraining_query_generator.generate_queries(self.policy_model, num_queries)
+            query_candidates = self.pretraining_query_generator.generate_queries(self.policy_model, num_candidates)
         else:
-            query_candidates = self.query_generator.generate_queries(self.policy_model, num_queries)
+            query_candidates = self.query_generator.generate_queries(self.policy_model, num_candidates)
         return query_candidates
 
     def _collect_preferences(self, wait_until_all_collected=False):
@@ -88,13 +88,14 @@ class PbRLAgent(RLAgent):
                                                       num_training_preferences=num_training_preferences,
                                                       num_training_steps=num_training_steps)
 
-    def _train(self, total_timesteps):
+    def _train(self, total_timesteps, active_learning_factor): # assert
         self.policy_model.learn(total_timesteps, callback=PbStepCallback(pb_step_function=self._pb_step,
-                                                                         pb_step_freq=self.pb_step_freq))
+                                                                         pb_step_freq=self.pb_step_freq,
+                                                                         query_candidates_factor=active_learning_factor))
 
-    def _pb_step(self, current_timestep):
+    def _pb_step(self, current_timestep, query_candidates_factor):
         num_queries = self._num_desired_queries(current_timestep)
-        self._send_preference_queries(num_queries)
+        self._send_preference_queries(num_queries, factor=query_candidates_factor)
         self._collect_preferences()
 
         if self._is_reward_training_step(current_timestep):
@@ -117,7 +118,6 @@ class PbRLAgent(RLAgent):
     def _calculate_num_desired_queries(scheduled_prefs, total_prefs, pretraining_prefs, pending_queries):
         return scheduled_prefs - (total_prefs - pretraining_prefs + pending_queries)
 
-    # current_timestep has to be at least 5000 to make scheduled_prefs > 0
     def _num_scheduled_preferences(self, current_timestep):
         return self.query_schedule.retrieve_num_scheduled_preferences(current_timestep)
 

@@ -12,9 +12,7 @@ class RewardPredictor(Wrapper):
 
     def step(self, action):
         observation, reward, done, info = self.env.step(action)
-
         info[PENALIZED_TRUE_REW] = reward
-
         return observation, self.reward(observation), done, info
 
     def reward(self, observation):

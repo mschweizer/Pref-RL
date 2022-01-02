@@ -54,8 +54,7 @@ class MaximumVarianceQuerySelector(AbstractQuerySelector):
             selected_queries = itemgetter(*list(variance_order_desc.numpy())[:num_queries])(query_candidates)
             if num_queries == 1:
                 # if there is only one query, make sure return a ChoiceQuery type but not two Segments
-                list_for_single_query = []
-                list_for_single_query.append(selected_queries)
+                list_for_single_query = [selected_queries]
                 return list_for_single_query
             else:
                 return list(selected_queries)

@@ -51,20 +51,20 @@ class PbRLAgentFactory(ABC):
         """ Returns preference collector. """
 
     @abstractmethod
-    def _create_preference_querent(self) -> AbstractPreferenceQuerent:
+    def _create_preference_querent(self, reward_model, active_selecting) -> AbstractPreferenceQuerent:
         """ Returns preference querent. """
 
     @abstractmethod
     def _create_query_schedule_cls(self) -> Type[AbstractQuerySchedule]:
         """ Returns query schedule class. """
 
-    def create_agent(self, env, reward_model_name, ensemble = False, ensemble_size = 3) -> PbRLAgent:
-        reward_model = self._create_reward_model(env, reward_model_name, ensemble = ensemble, ensemble_size = ensemble_size)
+    def create_agent(self, env, reward_model_name, ensemble=False, ensemble_size=3, active_selecting=False) -> PbRLAgent:
+        reward_model = self._create_reward_model(env, reward_model_name, ensemble=ensemble, ensemble_size=ensemble_size)
         policy_model = self._create_policy_model(env, reward_model)
         pretraining_query_generator = self._create_pretraining_query_generator()
         query_generator = self._create_query_generator()
         preference_collector = self._create_preference_collector()
-        preference_querent = self._create_preference_querent(reward_model)
+        preference_querent = self._create_preference_querent(reward_model, active_selecting)
         reward_model_trainer = self._create_reward_model_trainer(reward_model)
         query_schedule_cls = self._create_query_schedule_cls()
 
