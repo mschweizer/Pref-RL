@@ -44,7 +44,7 @@ class PbRLAgent(RLAgent):
         self._pretrain(num_pretraining_preferences)
         logging.info("Start reward model training")
         self._train(num_training_timesteps)
-        logging.info("Completed reward model training; saving model...")
+        logging.info("Completed reward model training; saving agent...")
         self._save_agent(save_dir, agent_name)
         logging.info("Agent saved.")
 
@@ -58,6 +58,7 @@ class PbRLAgent(RLAgent):
         query_candidates = self._generate_query_candidates(num_queries, pretraining)
         newly_pending_queries = self.preference_querent.query_preferences(query_candidates, num_queries)
         self.preference_collector.pending_queries.extend(newly_pending_queries)
+        logging.info(f"{len(self.preference_collector.pending_queries)} queries pending")
 
     def _generate_query_candidates(self, num_queries, pretraining):
         if pretraining:

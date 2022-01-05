@@ -2,24 +2,23 @@ import gym
 from gym import Wrapper
 from gym.envs.atari import AtariEnv
 from stable_baselines3.common.atari_wrappers import AtariWrapper
-
+from stable_baselines3.common.env_util import make_vec_env
+from stable_baselines3.common.vec_env.vec_frame_stack import VecFrameStack
 from environment_wrappers.external.indirect_feedback_remover import IndirectFeedbackRemover
 from environment_wrappers.external.visual_feedback_remover import VisualFeedbackRemover
 
 
-def create_env(env_id, termination_penalty=0., frame_stack_depth=4):
-    env = gym.make(env_id)
-    env = add_external_env_wrappers(env, termination_penalty, frame_stack_depth)
+def create_env(env_id, frame_stack_depth=4):
+    env = make_vec_env(env_id=env_id, wrapper_class=add_external_env_wrappers)
+    env = VecFrameStack(env, n_stack=frame_stack_depth)
     return env
 
 
-def add_external_env_wrappers(env, termination_penalty, frame_stack_depth=4):
+def add_external_env_wrappers(env):
     if is_atari_env(env):
         env = AtariWrapper(env, frame_skip=4)
         env = VisualFeedbackRemover(env)
-    env = IndirectFeedbackRemover(env, termination_penalty)
-    if frame_stack_depth:
-        env = gym.wrappers.FrameStack(env, num_stack=frame_stack_depth)
+    env = IndirectFeedbackRemover(env)
     return env
 
 

@@ -4,7 +4,7 @@ from stable_baselines3 import A2C
 class PolicyModel:
     def __init__(self, env, train_freq):
         self.env = env
-        self.rl_algo = A2C('MlpPolicy', env=env, n_steps=train_freq, tensorboard_log="runs")
+        self.rl_algo = A2C.load('./EnduroNoFrameskip-v4.zip')
 
     def learn(self, *args, **kwargs):
         return self.rl_algo.learn(*args, **kwargs)
