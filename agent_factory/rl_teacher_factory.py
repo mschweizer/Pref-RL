@@ -1,5 +1,7 @@
 from typing import Type
 
+from stable_baselines3.common.vec_env import DummyVecEnv, VecFrameStack
+
 from agent_factory.agent_factory import PbRLAgentFactory
 from agents.policy_model import PolicyModel
 from agents.preference_based.buffered_policy_model import BufferedPolicyModel
@@ -72,6 +74,8 @@ class SyntheticRLTeacherFactory(PbRLAgentFactory):
         env = RewardPredictor(env, reward_model)
         env = RewardStandardizer(env)
         env = RewardMonitor(env)
+        env = DummyVecEnv([lambda: env])
+        env = VecFrameStack(env, n_stack=4)
         return env
 
 

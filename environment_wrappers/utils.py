@@ -9,12 +9,7 @@ from environment_wrappers.external.visual_feedback_remover import VisualFeedback
 
 
 def create_env(env_id, frame_stack_depth=4):
-    env = make_vec_env(env_id=env_id, wrapper_class=add_external_env_wrappers)
-    env = VecFrameStack(env, n_stack=frame_stack_depth)
-    return env
-
-
-def add_external_env_wrappers(env):
+    env = gym.make(env_id)
     if is_atari_env(env):
         env = AtariWrapper(env, frame_skip=4)
         env = VisualFeedbackRemover(env)

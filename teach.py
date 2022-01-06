@@ -30,7 +30,9 @@ def main():
 
     agent.pb_learn(num_training_timesteps=args.num_rl_timesteps,
                    num_training_preferences=args.num_training_preferences,
-                   num_pretraining_preferences=args.num_pretraining_preferences)
+                   num_pretraining_preferences=args.num_pretraining_preferences,
+                   agent_name="test",
+                   save_dir="test")
 
     env.close()
 

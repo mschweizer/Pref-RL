@@ -8,10 +8,6 @@ from reward_models.base import BaseModel
 
 class AtariCnnRewardModel(BaseModel):
     def __init__(self, env):
-        assert env.observation_space.shape == (4, 84, 84, 1), \
-            f"Invalid input shape for reward model: " \
-            f"Input shape {env.observation_space.shape} but expected (4, 84, 84, 1). " \
-            f"Use this reward model only for Atari environments with screen size 84x84 (or compatible environments)."
         super().__init__(env)
         self.conv1 = nn.Conv2d(4, 16, kernel_size=7, stride=3)
         self.batchnorm1 = nn.BatchNorm2d(16)
@@ -33,7 +29,6 @@ class AtariCnnRewardModel(BaseModel):
         self.fc2 = nn.Linear(64, 1)
 
     def forward(self, observation):
-        observation = observation.reshape(-1, 4, 1, 84, 84)
         observation = observation.reshape(-1, 4, 84, 84)
         observation = observation.type(torch.float32)
 
