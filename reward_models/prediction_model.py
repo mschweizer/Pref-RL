@@ -3,8 +3,6 @@ import copy
 import numpy as np
 
 
-
-
 class PredictionModel(ABC):
 
     @abstractmethod
@@ -12,13 +10,13 @@ class PredictionModel(ABC):
         pass
 
 
-class StandardPreditionModel(PredictionModel):
+class StandardPredictionModel(PredictionModel):
 
     def __init__(self, atomic_model):
         self.atomic_model = atomic_model
 
     def __len__(self):
-        return 1 # hard coded, for purpose of creating prediction_model_trainer
+        return 1  # hard coded, for purpose of creating prediction_model_trainer
 
     def predict(self, *args, **kwargs):
         return self.atomic_model(*args, **kwargs)
@@ -26,8 +24,7 @@ class StandardPreditionModel(PredictionModel):
 
 class EnsemblePredictionModel(PredictionModel):
 
-    def __init__(self, atomic_model, ensemble_size = 3):
-        # self.ensemble_size = ensemble_size
+    def __init__(self, atomic_model, ensemble_size=3):
         self.models = [copy.copy(atomic_model) for _ in range(ensemble_size)]
 
     def __getitem__(self, item):

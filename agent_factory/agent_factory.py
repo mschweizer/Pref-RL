@@ -8,7 +8,7 @@ from preference_querent.preference_querent import AbstractPreferenceQuerent
 from query_generator.query_generator import AbstractQueryGenerator
 from query_schedule.query_schedule import AbstractQuerySchedule
 from reward_model_trainer.reward_model_trainer import RewardModelTrainer
-from reward_models.prediction_model import EnsemblePredictionModel, StandardPreditionModel
+from reward_models.prediction_model import EnsemblePredictionModel, StandardPredictionModel
 from reward_models.utils import get_model_by_name
 
 
@@ -28,7 +28,7 @@ class PbRLAgentFactory(ABC):
         if ensemble:
             return EnsemblePredictionModel(reward_model, ensemble_size=int(ensemble_size))
         else:
-            return StandardPreditionModel(reward_model)
+            return StandardPredictionModel(reward_model)
 
     @abstractmethod
     def _create_policy_model(self, env, reward_model) -> PolicyModel:
