@@ -1,8 +1,18 @@
+from django.views.generic.list import ListView
 from django.http.response import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .models import Preference
 
+class QueryListView(ListView):
+
+    model = Preference
+    paginated_by = 100
+    ordering = 'created_timestamp'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
 
 def index(request):
     

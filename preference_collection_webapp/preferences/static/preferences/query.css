@@ -9,17 +9,16 @@ h2 {
 }
 
 video {
-    width: 45vw;
+    width: 400px;
     border: 5px solid whitesmoke;
     border-radius: 15px;
     margin: 1vw;
 }
 
 #videoDiv {
-    width: 95vw;
     display: flex;
     flex-direction: row;
-    justify-content: flex-end;
+    justify-content: center;
 }
 
 #buttonDiv {
@@ -33,8 +32,11 @@ video {
 button {
     border-radius: 1vw;
     font-family: Noto sans;
-    font-size: .5vw;
+    
+}
 
+button:active {
+    background-color: aqua;
 }
 
 #leftButton {

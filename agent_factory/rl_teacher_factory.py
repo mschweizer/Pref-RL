@@ -43,8 +43,8 @@ class SyntheticRLTeacherFactory(PbRLAgentFactory):
         self.segment_length = segment_length
         self.policy_train_freq = policy_train_freq
 
-    def _create_policy_model(self, env, reward_model) -> PolicyModel:
-        return BufferedPolicyModel(env=self._wrap_env(env, reward_model), train_freq=self.policy_train_freq)
+    def _create_policy_model(self, env, reward_model, load_file=None) -> PolicyModel:
+        return BufferedPolicyModel(env=self._wrap_env(env, reward_model), train_freq=self.policy_train_freq, load_file=load_file)
 
     def _create_reward_model_trainer(self, reward_model) -> RewardModelTrainer:
         return RewardModelTrainer(reward_model)

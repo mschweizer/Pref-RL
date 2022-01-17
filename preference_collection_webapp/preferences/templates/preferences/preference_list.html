@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    {% load static %}
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Pref-RL Index</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link rel='stylesheet' type='text/css' media='screen' href="{% static 'preferences/preference_list.css' %}">
+</head>
+
+<body>
+    <div>
+        <h1>Queries</h1>
+        <a id="startLink" href="/preferences/next">Start answering</a>
+        <div id="tableDiv">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Created timestamp</th>
+                        <th>Label</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for query in object_list %}
+                    <tr>
+                        <td><a href="/preferences/{{query.uuid}}">{{ query.uuid }}</a></td>
+                        <td>{{ query.created_timestamp }}</td>
+                        <td>{{ query.label }}</td>
+
+                    </tr>
+                    {% empty %}
+                    <td>No queries yet.</td>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+
+</html>

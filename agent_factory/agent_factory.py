@@ -26,7 +26,7 @@ class PbRLAgentFactory(ABC):
         return reward_model_cls(env)
 
     @abstractmethod
-    def _create_policy_model(self, env, reward_model) -> PolicyModel:
+    def _create_policy_model(self, env, reward_model, load_file=None) -> PolicyModel:
         """ Returns policy model. """
 
     @abstractmethod
@@ -53,9 +53,10 @@ class PbRLAgentFactory(ABC):
     def _create_query_schedule_cls(self) -> Type[AbstractQuerySchedule]:
         """ Returns query schedule class. """
 
-    def create_agent(self, env, reward_model_name) -> PbRLAgent:
+    def create_agent(self, env, reward_model_name, save_dir, agent_name, load_file=None) -> PbRLAgent:
         reward_model = self._create_reward_model(env, reward_model_name)
-        policy_model = self._create_policy_model(env, reward_model)
+        policy_model = self._create_policy_model(
+            env, reward_model, load_file=load_file)
         pretraining_query_generator = self._create_pretraining_query_generator()
         query_generator = self._create_query_generator()
         preference_collector = self._create_preference_collector()
@@ -65,5 +66,5 @@ class PbRLAgentFactory(ABC):
 
         return PbRLAgent(policy_model, pretraining_query_generator, query_generator, preference_querent,
                          preference_collector, reward_model_trainer, reward_model, query_schedule_cls,
-                         self.pb_step_freq, self.reward_training_freq,
+                         self.pb_step_freq, save_dir, agent_name, self.reward_training_freq,
                          self.num_epochs_in_pretraining, self.num_epochs_in_training)

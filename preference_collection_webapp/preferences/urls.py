@@ -7,7 +7,7 @@ from preferences import views
 from pbrlwebapp import settings
 
 urlpatterns = [
-    path('', views.index, name='index'),
+    path('', views.QueryListView.as_view(), name='index'),
     path('next', views.next_query, name='next'),
     path('next/', views.next_query, name='next'),
     path('<uuid:query_id>', views.query, name='query'),
