@@ -14,9 +14,10 @@ from gym_gridworld import create_gridworld_env
 
 
 def main():
+    print('\n\n==================== Executing Program ====================\n')
     logging.basicConfig(level=logging.INFO)
 
-    # ---- General Pref-RL Definitions ------------------------------- #
+    print('------ Configuring Pref-RL --------------------------------\n')
     policy_train_freq = 5
     # pb_step_freq = 1024
     pb_step_freq = 100
@@ -27,8 +28,11 @@ def main():
     segment_length = 25
     reward_model = "Mlp"
     num_training_preferences = 200
+    num_training_preferences = 10
     num_pretraining_preferences = 20
+    num_pretraining_preferences = 1
     num_rl_timesteps = 10000
+    num_rl_timesteps = 100
     termination_penalty = 0.
     frame_stack_depth = 4
 
@@ -55,7 +59,7 @@ def main():
     env = add_external_env_wrappers(gridworld, termination_penalty,
                                     frame_stack_depth)
 
-    # ---- Agent Creation -------------------------------------------- #
+    print('------ Creating Agent -------------------------------------\n')
     factory = RiskSensitiveRLTeacherFactory(
         policy_train_freq=policy_train_freq,
         pb_step_freq=pb_step_freq,
@@ -66,11 +70,12 @@ def main():
         segment_length=segment_length)
     agent = factory.create_agent(env=env, reward_model_name=reward_model)
 
-    # ---- PbRL run -------------------------------------------------- #
+    print('------ Starting PbRL Run ----------------------------------\n')
     agent.pb_learn(num_training_timesteps=num_rl_timesteps,
                    num_training_preferences=num_training_preferences,
                    num_pretraining_preferences=num_pretraining_preferences)
 
+    print('------ Run Finished. Cleaning Up --------------------------\n')
     env.close()
 
 
