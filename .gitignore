@@ -147,3 +147,7 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+# TEMP -- DO NOT MERGE!
+.idea/*
+gym_gridworld
