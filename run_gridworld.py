@@ -19,22 +19,26 @@ def main():
 
     print('------ Configuring Pref-RL --------------------------------\n')
     policy_train_freq = 5
-    # pb_step_freq = 1024
-    pb_step_freq = 100
-    # reward_training_freq = 8192
-    reward_training_freq = 1024
-    pretraining_epochs = 1
-    training_epochs = 4
+    pb_step_freq = 1024
+    # pb_step_freq = 100
+    reward_training_freq = 8192
+    # reward_training_freq = 1024
+    pretraining_epochs = 8
+    # pretraining_epochs = 1
+    training_epochs = 16
+    # training_epochs = 4
     segment_length = 25
     reward_model = "Mlp"
     num_training_preferences = 200
-    num_training_preferences = 10
+    # num_training_preferences = 10
     num_pretraining_preferences = 20
-    num_pretraining_preferences = 1
+    # num_pretraining_preferences = 1
     num_rl_timesteps = 10000
-    num_rl_timesteps = 100
+    # num_rl_timesteps = 100
     termination_penalty = 0.
-    frame_stack_depth = 4
+    frame_stack_depth = 0
+    obs_to_grayscale_wrapper = True
+    # obs_to_grayscale_wrapper = False
 
     prospect_theory_params = ProspectTheoryParams(
         exponent_gain=.5, exponent_loss=.5,
@@ -53,11 +57,13 @@ def main():
             'ext_settings': {
                 # 'verbose': True,
                 'slip_probability': 0.1,
-            }
+                'gym_env_wrapper_grayscale': obs_to_grayscale_wrapper,
+            },
         }
     )
     env = add_external_env_wrappers(gridworld, termination_penalty,
-                                    frame_stack_depth)
+                                    frame_stack_depth,
+                                    obs_to_grayscale_wrapper)
 
     print('------ Creating Agent -------------------------------------\n')
     factory = RiskSensitiveRLTeacherFactory(
