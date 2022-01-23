@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from collections import namedtuple
-from typing import Generator, Union, Any
+from typing import Dict, Generator, Union, Any
+import numpy as np
 
 from environment_wrappers.info_dict_keys import (
     PENALIZED_TRUE_REW,
@@ -218,7 +219,8 @@ class RiskSensitiveOracle(OracleBase):
     See base class.
     """
 
-    def __init__(self, utility_provider: ProspectTheoryUtilityProvider):
+    def __init__(self, utility_provider: ProspectTheoryUtilityProvider,
+                 tile_reward_mapping: Dict[Any, Any]):
         """Instantiate with reference to utility provider instance.
 
         Args:
@@ -230,6 +232,11 @@ class RiskSensitiveOracle(OracleBase):
         assert utility_provider is not None, \
             'A utility provider must be given.'
         self._utility_provider = utility_provider
+
+        assert tile_reward_mapping is not None, \
+            'No tile-to-reward mapping given.'
+        self._tile_reward_mapping = tile_reward_mapping
+
         super().__init__()
 
     def compute_utilities_penalized_reward(
@@ -249,14 +256,14 @@ class RiskSensitiveOracle(OracleBase):
 
         Todo: Correctly type-hint `query` and adapt docs.
         """
-        # for segment in query.choice_set:
-            # print(f'== new segment: {segment=}')
+        print(f'{self._tile_reward_mapping=}')
+        for segment in query.choice_set:
+            print(f'== new segment: {segment=}')
             # print(f'---- segment infos: {dir(segment.infos)}')
             # observation: numpy.ndarray
             # -------------------------
-            # for observation in segment.observations:
-            #     print(f'segment observation: {observation=}')
-
+            for observation in segment.observations:
+                self.observation_to_rewards(observation)
         return (provider.compute_utility(value) for value in
                 self.compute_total_original_penalized_rewards(query))
 
@@ -273,3 +280,8 @@ class RiskSensitiveOracle(OracleBase):
         Todo: Correctly type-hint `query` and adapt docs."""
         return self.compute_utilities_penalized_reward(self._utility_provider,
                                                        query)
+
+    def observation_to_rewards(self, observation):
+        print(f'{observation[144:160,32:48]=}')
+        # print(f'segment observation: {np.array_equal(observation[0:16,0:16], self._tile_reward_mapping["wall"]["observation"])=}')
+

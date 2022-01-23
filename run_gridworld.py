@@ -36,8 +36,8 @@ def main():
     # num_rl_timesteps = 10000
     num_rl_timesteps = 100
     termination_penalty = 0.
-    frame_stack_depth = 4
-    # frame_stack_depth = 0
+    # frame_stack_depth = 4
+    frame_stack_depth = 0
     obs_to_grayscale_wrapper = True
     # obs_to_grayscale_wrapper = False
 
@@ -74,8 +74,8 @@ def main():
     env = add_external_env_wrappers(gridworld, termination_penalty,
                                     frame_stack_depth,
                                     obs_to_grayscale_wrapper)
-
     print('------ 3. Creating Agent ----------------------------------\n')
+    tile_to_reward_mapping = gridworld.tile_to_reward_mapping
     factory = RiskSensitiveRLTeacherFactory(
         policy_train_freq=policy_train_freq,
         pb_step_freq=pb_step_freq,
@@ -83,6 +83,7 @@ def main():
         num_epochs_in_pretraining=pretraining_epochs,
         num_epochs_in_training=training_epochs,
         utility_provider=utility_provider,
+        tile_reward_mapping=tile_to_reward_mapping,
         segment_length=segment_length)
     agent = factory.create_agent(env=env, reward_model_name=reward_model)
 

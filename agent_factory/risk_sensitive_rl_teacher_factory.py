@@ -1,3 +1,4 @@
+from typing import Any, Dict
 from agent_factory.rl_teacher_factory import SyntheticRLTeacherFactory
 
 from preference_collector.preference_collector import \
@@ -20,7 +21,7 @@ class RiskSensitiveRLTeacherFactory(SyntheticRLTeacherFactory):
     def __init__(self, policy_train_freq, pb_step_freq, reward_training_freq,
                  num_epochs_in_pretraining, num_epochs_in_training,
                  utility_provider: ProspectTheoryUtilityProvider,
-                 segment_length=25):
+                 tile_reward_mapping: Dict[str, Any], segment_length=25):
         """Initialize.
 
         See base class.
@@ -33,6 +34,8 @@ class RiskSensitiveRLTeacherFactory(SyntheticRLTeacherFactory):
             num_epochs_in_training: See base class.
             utility_provider (ProspectTheoryUtilityProvider):
                 Computes utility values for outcomes.
+            tile_reward_mapping (Dict[str, Any]): Mapping of tile shapes
+                to rewards yielded by them.
             segment_length: See base class.
 
         Raises:
@@ -41,6 +44,8 @@ class RiskSensitiveRLTeacherFactory(SyntheticRLTeacherFactory):
         assert utility_provider is not None, \
             'Utility provider must be given.'
         self._utility_provider = utility_provider
+        self._tile_reward_mapping = tile_reward_mapping
+
         super().__init__(policy_train_freq, pb_step_freq, reward_training_freq,
                          num_epochs_in_pretraining, num_epochs_in_training,
                          segment_length=segment_length)
@@ -54,4 +59,8 @@ class RiskSensitiveRLTeacherFactory(SyntheticRLTeacherFactory):
         Returns:
             AbstractPreferenceCollector
         """
-        return SyntheticPreferenceCollector(oracle=RiskSensitiveOracle(self._utility_provider))
+        # exit()
+        return SyntheticPreferenceCollector(
+            oracle=RiskSensitiveOracle(self._utility_provider,
+                                       self._tile_reward_mapping)
+        )
