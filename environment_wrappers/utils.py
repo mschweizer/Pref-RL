@@ -20,12 +20,7 @@ def add_external_env_wrappers(env, termination_penalty, frame_stack_depth=4,
         env = VisualFeedbackRemover(env)
     env = IndirectFeedbackRemover(env, termination_penalty)
     if frame_stack_depth:
-        print(f'{frame_stack_depth=}')
         env = gym.wrappers.FrameStack(env, num_stack=frame_stack_depth)
-    else: print('no frame stack')
-
-    print(f'{len(env.observation_space.shape)=}')
-    print(f'{env.observation_space.shape[-1]=}')
     if grayscale_observation:
         env = gym.wrappers.GrayScaleObservation(env)
     return env
