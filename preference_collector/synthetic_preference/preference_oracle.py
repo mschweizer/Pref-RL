@@ -220,7 +220,7 @@ class RiskSensitiveOracle(OracleBase):
     """
 
     def __init__(self, utility_provider: ProspectTheoryUtilityProvider,
-                 tile_reward_mapping: Dict[Any, Any]):
+                 level_properties: Dict[str, Any]):
         """Instantiate with reference to utility provider instance.
 
         Args:
@@ -233,10 +233,19 @@ class RiskSensitiveOracle(OracleBase):
             'A utility provider must be given.'
         self._utility_provider = utility_provider
 
-        assert tile_reward_mapping is not None, \
-            'No tile-to-reward mapping given.'
-        self._tile_reward_mapping = tile_reward_mapping
+        assert isinstance(level_properties['tile_size'], int) and \
+            level_properties['tile_size'] > 0, 'Tile size must be an integer '\
+            f'> 0. {level_properties["tile_size"]} given.'
 
+        assert all(isinstance(d, int) and d > 0
+                   for d in level_properties['dimensions']), \
+            'Level dimensions must be integers > 0. '\
+            f'{level_properties["dimensions"]} given.'
+
+        assert level_properties['tile_to_reward_mapping'] is not None, \
+            'No tile-to-reward mapping given.'
+
+        self._level_properties = level_properties
         super().__init__()
 
     def compute_utilities_penalized_reward(
@@ -256,7 +265,6 @@ class RiskSensitiveOracle(OracleBase):
 
         Todo: Correctly type-hint `query` and adapt docs.
         """
-        print(f'{self._tile_reward_mapping=}')
         for segment in query.choice_set:
             print(f'== new segment: {segment=}')
             # print(f'---- segment infos: {dir(segment.infos)}')
@@ -282,6 +290,35 @@ class RiskSensitiveOracle(OracleBase):
                                                        query)
 
     def observation_to_rewards(self, observation):
-        print(f'{observation[144:160,32:48]=}')
-        # print(f'segment observation: {np.array_equal(observation[0:16,0:16], self._tile_reward_mapping["wall"]["observation"])=}')
+        dimensions = self._level_properties['dimensions']
+        tile_size = self._level_properties['tile_size']
+        tile_reward_map = self._level_properties["tile_to_reward_mapping"]
+        # tiles = np.empty((dimensions[0], dimensions[1]), np.str_)
+        rewards = np.zeros((dimensions[0], dimensions[1]))
+        position = np.zeros(2, np.ubyte)
+        # print(f'{tile_reward_map=}')
+        for row in range(dimensions[0]):
+            for col in range(dimensions[1]):
+                for (name, mapping) in tile_reward_map.items():
+                    if np.array_equal(
+                        observation[row * tile_size : (row + 1) * tile_size,
+                                    col * tile_size : (col + 1) * tile_size],
+                        tile_reward_map[name]['observation']['tile']
+                    ):
+                        # tiles[row][col] = '+'
+                        rewards[row][col] = tile_reward_map[name]['reward']
+                    elif np.array_equal(
+                        observation[row * tile_size : (row + 1) * tile_size,
+                                    col * tile_size : (col + 1) * tile_size],
+                        tile_reward_map[name]['observation']['curr_pos']
+                    ):
+                        # tiles[row][col] = 'O'
+                        position[:] = [row, col]
+                        rewards[row][col] = tile_reward_map[name]['reward']
+
+        # print(f'{tiles=}')
+        print(f'{rewards=}')
+        print(f'{position=}')
+
+        # print(f'segment observation: {np.array_equal(observation[0:16,0:16], tile_reward_map["wall"]["observation"])=}')
 

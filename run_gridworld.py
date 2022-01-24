@@ -75,7 +75,12 @@ def main():
                                     frame_stack_depth,
                                     obs_to_grayscale_wrapper)
     print('------ 3. Creating Agent ----------------------------------\n')
-    tile_to_reward_mapping = gridworld.tile_to_reward_mapping
+    
+    level_props = {
+        'tile_size': gridworld.level.sprite_size,
+        'dimensions': gridworld.level.dimensions,
+        'tile_to_reward_mapping': gridworld.tile_to_reward_mapping
+    }
     factory = RiskSensitiveRLTeacherFactory(
         policy_train_freq=policy_train_freq,
         pb_step_freq=pb_step_freq,
@@ -83,7 +88,7 @@ def main():
         num_epochs_in_pretraining=pretraining_epochs,
         num_epochs_in_training=training_epochs,
         utility_provider=utility_provider,
-        tile_reward_mapping=tile_to_reward_mapping,
+        level_properties=level_props,
         segment_length=segment_length)
     agent = factory.create_agent(env=env, reward_model_name=reward_model)
 
