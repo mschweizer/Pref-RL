@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 from collections import namedtuple
-from typing import Dict, Generator, Union, Any
-import numpy as np
+from typing import Generator, Union, Any
 
 from environment_wrappers.info_dict_keys import (
     PENALIZED_TRUE_REW,
@@ -219,8 +218,7 @@ class RiskSensitiveOracle(OracleBase):
     See base class.
     """
 
-    def __init__(self, utility_provider: ProspectTheoryUtilityProvider,
-                 level_properties: Dict[str, Any]):
+    def __init__(self, utility_provider: ProspectTheoryUtilityProvider):
         """Instantiate with reference to utility provider instance.
 
         Args:
@@ -233,19 +231,6 @@ class RiskSensitiveOracle(OracleBase):
             'A utility provider must be given.'
         self._utility_provider = utility_provider
 
-        assert isinstance(level_properties['tile_size'], int) and \
-            level_properties['tile_size'] > 0, 'Tile size must be an integer '\
-            f'> 0. {level_properties["tile_size"]} given.'
-
-        assert all(isinstance(d, int) and d > 0
-                   for d in level_properties['dimensions']), \
-            'Level dimensions must be integers > 0. '\
-            f'{level_properties["dimensions"]} given.'
-
-        assert level_properties['tile_to_reward_mapping'] is not None, \
-            'No tile-to-reward mapping given.'
-
-        self._level_properties = level_properties
         super().__init__()
 
     def compute_utilities_penalized_reward(
@@ -270,8 +255,11 @@ class RiskSensitiveOracle(OracleBase):
             # print(f'---- segment infos: {dir(segment.infos)}')
             # observation: numpy.ndarray
             # -------------------------
-            for observation in segment.observations:
-                self.observation_to_rewards(observation)
+            # for observation in segment.observations:
+                # print(f'segment {observation=}')
+            for (i, info) in enumerate(segment.infos):
+                print(f'reward in frame {i:>2}: {info[PENALIZED_TRUE_REW]:>4}')
+            
         return (provider.compute_utility(value) for value in
                 self.compute_total_original_penalized_rewards(query))
 
@@ -288,37 +276,3 @@ class RiskSensitiveOracle(OracleBase):
         Todo: Correctly type-hint `query` and adapt docs."""
         return self.compute_utilities_penalized_reward(self._utility_provider,
                                                        query)
-
-    def observation_to_rewards(self, observation):
-        dimensions = self._level_properties['dimensions']
-        tile_size = self._level_properties['tile_size']
-        tile_reward_map = self._level_properties["tile_to_reward_mapping"]
-        # tiles = np.empty((dimensions[0], dimensions[1]), np.str_)
-        rewards = np.zeros((dimensions[0], dimensions[1]))
-        position = np.zeros(2, np.ubyte)
-        # print(f'{tile_reward_map=}')
-        for row in range(dimensions[0]):
-            for col in range(dimensions[1]):
-                for (name, mapping) in tile_reward_map.items():
-                    if np.array_equal(
-                        observation[row * tile_size : (row + 1) * tile_size,
-                                    col * tile_size : (col + 1) * tile_size],
-                        tile_reward_map[name]['observation']['tile']
-                    ):
-                        # tiles[row][col] = '+'
-                        rewards[row][col] = tile_reward_map[name]['reward']
-                    elif np.array_equal(
-                        observation[row * tile_size : (row + 1) * tile_size,
-                                    col * tile_size : (col + 1) * tile_size],
-                        tile_reward_map[name]['observation']['curr_pos']
-                    ):
-                        # tiles[row][col] = 'O'
-                        position[:] = [row, col]
-                        rewards[row][col] = tile_reward_map[name]['reward']
-
-        # print(f'{tiles=}')
-        print(f'{rewards=}')
-        print(f'{position=}')
-
-        # print(f'segment observation: {np.array_equal(observation[0:16,0:16], tile_reward_map["wall"]["observation"])=}')
-
