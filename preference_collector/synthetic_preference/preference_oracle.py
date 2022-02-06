@@ -17,12 +17,19 @@ ProspectTheoryParams = namedtuple(
 )
 
 
-class ProspectTheoryUtilityProvider(object):
-    """Class to define specific attitudes towards risk and compute
-    corresponding utility values over outcomes.
+class AbstractUtilityModel(ABC):
+    """Class to specify how utility values are computed based on the
+    values of outcomes given.
+    """
 
-    This provider implements the `basic prospect theoretic utility
-    function`_.
+    @abstractmethod
+    def compute_utility(self, value) -> Any:
+        pass
+
+
+class ProspectTheoryUtility(AbstractUtilityModel):
+    """Define specific attitudes towards risk using the `basic prospect
+    theoretic utility function`_.
 
     .. _`basic prospect theoretic utility function`:
         published in Kahneman & Tversky (1979)"""
@@ -204,35 +211,36 @@ class RiskSensitiveOracle(OracleBase):
     """Oracle that expresses preferences according to the configured
     attitude towards risk.
 
-    Uses `ProspectTheoryUtilityProvider` as source for utility values.
+    Uses the provided utility model for utility computation.
 
     See base class.
     """
 
-    def __init__(self, utility_provider: ProspectTheoryUtilityProvider):
-        """Instantiate with reference to utility provider instance.
+    _utility_model: AbstractUtilityModel
+
+    def __init__(self, utility_model: AbstractUtilityModel):
+        """Instantiate with reference to utility model instance.
 
         Args:
-            utility_provider (ProspectTheoryUtilityProvider)
+            utility_model (AbstractUtilityModel)
 
         Raises:
-            AssertionError: No utility provider given.
+            AssertionError: No utility model given.
         """
-        assert utility_provider is not None, \
-            'A utility provider must be given.'
-        self._utility_provider = utility_provider
+        assert utility_model is not None, 'A utility model must be provided.'
+        self._utility_model = utility_model
 
         super().__init__()
 
     def compute_utilities_penalized_reward(
-            self, provider: ProspectTheoryUtilityProvider, query: ChoiceQuery
+            self, utility_model: AbstractUtilityModel, query: ChoiceQuery
     ) -> Generator[Union[float, Any], Any, None]:
-        """Computes the prospect theoretic utility values for each of
-        the query's segments, based on the accumulated penalized reward.
+        """Computes the utility values for each of the query's segments,
+        based on the accumulated penalized reward.
 
         Args:
-            provider (ProspectTheoryUtilityProvider): Computes the
-                prospect theoretic utility.
+            utility_model (AbstractUtilityModel):
+                Computes the prospect theoretic utility.
             query (ChoiceQuery)
 
         Returns:
@@ -249,7 +257,7 @@ class RiskSensitiveOracle(OracleBase):
             for (i, info) in enumerate(segment.infos):
                 print(f'reward in frame {i:>2}: {info[PENALIZED_TRUE_REW]:>4}')
 
-        return (provider.compute_utility(value) for value in
+        return (utility_model.compute_utility(value) for value in
                 self.compute_total_original_penalized_rewards(query))
 
     def compute_values(self, query: ChoiceQuery):
@@ -262,5 +270,5 @@ class RiskSensitiveOracle(OracleBase):
             Generator[Union[float, Any], Any, None]: Utility of each query
                 segment.
         """
-        return self.compute_utilities_penalized_reward(self._utility_provider,
+        return self.compute_utilities_penalized_reward(self._utility_model,
                                                        query)

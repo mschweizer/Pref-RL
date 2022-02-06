@@ -7,7 +7,7 @@ from agent_factory.risk_sensitive_rl_teacher_factory import \
 # from environment_wrappers.utils import create_env
 from preference_collector.synthetic_preference.preference_oracle import (
     ProspectTheoryParams,
-    ProspectTheoryUtilityProvider
+    ProspectTheoryUtility
 )
 from environment_wrappers.utils import add_external_env_wrappers
 
@@ -47,7 +47,7 @@ def main():
     prospect_theory_params = ProspectTheoryParams(
         exponent_gain=.5, exponent_loss=.5,
         coefficient_gain=1, coefficient_loss=1)
-    utility_provider = ProspectTheoryUtilityProvider(prospect_theory_params)
+    utility_model = ProspectTheoryUtility(prospect_theory_params)
 
     # print('------ 2. CartPole Env Creation --------------------------\n')
     # env_id = "CartPole-v1"
@@ -89,7 +89,7 @@ def main():
         reward_training_freq=reward_training_freq,
         num_epochs_in_pretraining=pretraining_epochs,
         num_epochs_in_training=training_epochs,
-        utility_provider=utility_provider,
+        utility_model=utility_model,
         segment_length=segment_length)
     agent = factory.create_agent(env=env, reward_model_name=reward_model)
 
