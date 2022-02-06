@@ -229,12 +229,12 @@ class RiskSensitiveOracle(OracleBase):
         """
         assert utility_model is not None, 'A utility model must be provided.'
         self._utility_model = utility_model
-
         super().__init__()
 
-    def compute_utilities_penalized_reward(
-            self, utility_model: AbstractUtilityModel, query: ChoiceQuery
-    ) -> Generator[Union[float, Any], Any, None]:
+    @staticmethod
+    def compute_utilities_penalized_reward(utility_model: AbstractUtilityModel,
+                                           query: ChoiceQuery) \
+            -> Generator[Union[float, Any], Any, None]:
         """Computes the utility values for each of the query's segments,
         based on the accumulated penalized reward.
 
@@ -247,18 +247,9 @@ class RiskSensitiveOracle(OracleBase):
             Generator[Union[float, Any], Any, None]: Utility of each query
                 segment.
         """
-        for segment in query.choice_set:
-            print(f'== new segment: {segment=}')
-            # print(f'---- segment infos: {dir(segment.infos)}')
-            # observation: numpy.ndarray
-            # -------------------------
-            # for observation in segment.observations:
-                # print(f'segment {observation=}')
-            for (i, info) in enumerate(segment.infos):
-                print(f'reward in frame {i:>2}: {info[PENALIZED_TRUE_REW]:>4}')
-
-        return (utility_model.compute_utility(value) for value in
-                self.compute_total_original_penalized_rewards(query))
+        return (sum(utility_model.compute_utility(info[PENALIZED_TRUE_REW])
+                for info in segment.infos)
+                for segment in query.choice_set)
 
     def compute_values(self, query: ChoiceQuery):
         """Compute utility values for the given query.

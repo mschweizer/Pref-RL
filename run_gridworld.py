@@ -44,10 +44,20 @@ def main():
     obs_to_grayscale_wrapper = True
     # obs_to_grayscale_wrapper = False
 
-    prospect_theory_params = ProspectTheoryParams(
-        exponent_gain=.5, exponent_loss=.5,
-        coefficient_gain=1, coefficient_loss=1)
-    utility_model = ProspectTheoryUtility(prospect_theory_params)
+    # Parameters taken from Ratliff & Mazumdar (2020)
+    utility_params_risk_neutral = ProspectTheoryParams(
+        coefficient_gain=1, exponent_gain=1,
+        coefficient_loss=1, exponent_loss=1)
+    utility_params_risk_seeking = ProspectTheoryParams(
+        coefficient_gain=1, exponent_gain=1.5,
+        coefficient_loss=.1, exponent_loss=.5)
+    utility_params_risk_averse_weak = ProspectTheoryParams(
+        coefficient_gain=1, exponent_gain=.9,
+        coefficient_loss=1, exponent_loss=1.1)
+    utility_params_risk_averse = ProspectTheoryParams(
+        coefficient_gain=1, exponent_gain=.8,
+        coefficient_loss=5, exponent_loss=1.1)
+    utility_model = ProspectTheoryUtility(utility_params_risk_neutral)
 
     # print('------ 2. CartPole Env Creation --------------------------\n')
     # env_id = "CartPole-v1"
@@ -79,7 +89,8 @@ def main():
                                     obs_to_grayscale_wrapper)
 
     # Add dummy dimension via wrapper
-    env = TransformObservation(env, lambda obs: np.array([obs]))
+    if frame_stack_depth and obs_to_grayscale_wrapper:
+        env = TransformObservation(env, lambda obs: np.array([obs]))
 
     print('------ 3. Creating Agent ----------------------------------\n')
     # factory = SyntheticRLTeacherFactory(
