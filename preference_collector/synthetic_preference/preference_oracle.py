@@ -7,6 +7,7 @@ from environment_wrappers.info_dict_keys import (
     TRUE_REW
 )
 from preference_collector.binary_choice import BinaryChoice
+from query_generator.query import ChoiceQuery
 
 
 ProspectTheoryParams = namedtuple(
@@ -86,68 +87,60 @@ class OracleBase(AbstractOracle):
     """
 
     @staticmethod
-    def validate_query(query: object) -> None:
+    def validate_query(query: ChoiceQuery) -> None:
         """Asserts the compatibility of received queries for further
         computation.
 
         Args:
-            query (object)
+            query (ChoiceQuery)
 
         Raises:
             AssertionError:
                 The length of `query.choice_set` does not equal 2.
-
-        Todo: Correctly type-hint `query` and adapt docs.
         """
         assert len(query.choice_set) == 2, \
             "Preference oracle assumes choice sets of size 2, but found {num}"\
             " items.".format(num=len(query.choice_set))
 
-    def compute_values(self, query: object) \
+    def compute_values(self, query: ChoiceQuery) \
             -> Generator[Union[float, Any], Any, None]:
         """Compute the values of the query's segments.
 
         Args:
-            query (object): Query with a choice set each of which
+            query (ChoiceQuery): Query with a choice set each of which
                 contains the segment to iterate over.
 
         Returns:
             Generator[Union[float, Any], Any, None]: Segment values.
-
-        Todo: Correctly type-hint `query` and adapt docs.
         """
         return self.compute_total_original_rewards(query)
 
     @staticmethod
-    def compute_total_original_rewards(query: object) \
+    def compute_total_original_rewards(query: ChoiceQuery) \
             -> Generator[Union[float, Any], Any, None]:
         """Accumulate the reward for each of the query's segments.
 
         Args:
-            query (object)
+            query (ChoiceQuery)
 
         Returns:
             Generator[Union[float, Any], Any, None]:
                 Accumulated rewards comprehended by segments.
-
-        Todo: Correctly type-hint `query` and adapt docs.
         """
         return (sum(info[TRUE_REW] for info in segment.infos)
                 for segment in query.choice_set)
 
     @staticmethod
-    def compute_total_original_penalized_rewards(query: object) \
+    def compute_total_original_penalized_rewards(query: ChoiceQuery) \
             -> Generator[Union[float, Any], Any, None]:
         """Accumulate the penalized reward for each segment.
 
         Args:
-            query (object)
+            query (ChoiceQuery)
 
         Returns:
             Generator[Union[float, Any], Any, None]:
                 Accumulated rewards comprehended by segments.
-
-        Todo: Correctly type-hint `query` and adapt docs.
         """
         return (sum(info[PENALIZED_TRUE_REW] for info in segment.infos)
                 for segment in query.choice_set)
@@ -175,21 +168,19 @@ class OracleBase(AbstractOracle):
         else:
             return BinaryChoice.INDIFFERENT
 
-    def answer(self, query: object) -> BinaryChoice:
+    def answer(self, query: ChoiceQuery) -> BinaryChoice:
         """Answer the preference query.
 
         After the query is validated, the values of its segments are
         computed and the preference between these values is returned.
 
         Args:
-            query (object)
+            query (ChoiceQuery)
 
         Returns:
             BinaryChoice: Enum representing the preference. See
                 preference_collector.binary_choice.BinaryChoice for
                 further information.
-
-        Todo: Correctly type-hint `query` and adapt docs.
         """
         self.validate_query(query)
         value_1, value_2 = self.compute_values(query)
@@ -234,7 +225,7 @@ class RiskSensitiveOracle(OracleBase):
         super().__init__()
 
     def compute_utilities_penalized_reward(
-            self, provider: ProspectTheoryUtilityProvider, query: object
+            self, provider: ProspectTheoryUtilityProvider, query: ChoiceQuery
     ) -> Generator[Union[float, Any], Any, None]:
         """Computes the prospect theoretic utility values for each of
         the query's segments, based on the accumulated penalized reward.
@@ -242,13 +233,11 @@ class RiskSensitiveOracle(OracleBase):
         Args:
             provider (ProspectTheoryUtilityProvider): Computes the
                 prospect theoretic utility.
-            query (object)
+            query (ChoiceQuery)
 
         Returns:
             Generator[Union[float, Any], Any, None]: Utility of each query
                 segment.
-
-        Todo: Correctly type-hint `query` and adapt docs.
         """
         for segment in query.choice_set:
             print(f'== new segment: {segment=}')
@@ -259,20 +248,19 @@ class RiskSensitiveOracle(OracleBase):
                 # print(f'segment {observation=}')
             for (i, info) in enumerate(segment.infos):
                 print(f'reward in frame {i:>2}: {info[PENALIZED_TRUE_REW]:>4}')
-            
+
         return (provider.compute_utility(value) for value in
                 self.compute_total_original_penalized_rewards(query))
 
-    def compute_values(self, query: object):
+    def compute_values(self, query: ChoiceQuery):
         """Compute utility values for the given query.
 
         Args:
-            query (object)
+            query (ChoiceQuery)
 
         Returns:
             Generator[Union[float, Any], Any, None]: Utility of each query
                 segment.
-
-        Todo: Correctly type-hint `query` and adapt docs."""
+        """
         return self.compute_utilities_penalized_reward(self._utility_provider,
                                                        query)
