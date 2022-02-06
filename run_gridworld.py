@@ -1,4 +1,5 @@
 import logging
+import numpy as np
 
 # from agent_factory.rl_teacher_factory import SyntheticRLTeacherFactory
 from agent_factory.risk_sensitive_rl_teacher_factory import \
@@ -11,6 +12,8 @@ from preference_collector.synthetic_preference.preference_oracle import (
 from environment_wrappers.utils import add_external_env_wrappers
 
 from gym_gridworld import create_gridworld_env
+
+from gym.wrappers import TransformObservation
 
 
 def main():
@@ -36,8 +39,8 @@ def main():
     # num_rl_timesteps = 10000
     num_rl_timesteps = 100
     termination_penalty = 0.
-    # frame_stack_depth = 4
-    frame_stack_depth = 0
+    frame_stack_depth = 4
+    # frame_stack_depth = 0
     obs_to_grayscale_wrapper = True
     # obs_to_grayscale_wrapper = False
 
@@ -75,7 +78,11 @@ def main():
                                     frame_stack_depth,
                                     obs_to_grayscale_wrapper)
 
+    # Add dummy dimension via wrapper
+    env = TransformObservation(env, lambda obs: np.array([obs]))
+
     print('------ 3. Creating Agent ----------------------------------\n')
+    # factory = SyntheticRLTeacherFactory(
     factory = RiskSensitiveRLTeacherFactory(
         policy_train_freq=policy_train_freq,
         pb_step_freq=pb_step_freq,

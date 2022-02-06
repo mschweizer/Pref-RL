@@ -19,10 +19,10 @@ def add_external_env_wrappers(env, termination_penalty, frame_stack_depth=4,
         env = AtariWrapper(env, frame_skip=4)
         env = VisualFeedbackRemover(env)
     env = IndirectFeedbackRemover(env, termination_penalty)
-    if frame_stack_depth:
-        env = gym.wrappers.FrameStack(env, num_stack=frame_stack_depth)
     if grayscale_observation:
         env = gym.wrappers.GrayScaleObservation(env)
+    if frame_stack_depth:
+        env = gym.wrappers.FrameStack(env, num_stack=frame_stack_depth)
     return env
 
 
