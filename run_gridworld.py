@@ -31,7 +31,9 @@ def main():
     # training_epochs = 16
     training_epochs = 4
     segment_length = 25
-    reward_model = "Mlp"
+    # reward_model = "Mlp"
+    # reward_model = "AtariCnn"
+    reward_model = "GridworldCnn"
     # num_training_preferences = 200
     num_training_preferences = 10
     # num_pretraining_preferences = 20
