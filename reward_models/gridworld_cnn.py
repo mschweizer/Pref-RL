@@ -6,13 +6,92 @@ from reward_models.base import BaseModel
 
 
 class GridworldCnnRewardModel(BaseModel):
+    frame_stack_depth = 4
+    OUTPUT = 16
+    DROPOUT_PROB = .5
+    LAYERS = [
+        {
+            'conv2d': {
+                'channels_in': frame_stack_depth,
+                'channels_out': OUTPUT,
+                'kernel_size': 7,
+                'stride': 3
+            },
+            'batchnorm_features': OUTPUT,
+            'dropout_probability': DROPOUT_PROB,
+        },
+        {
+            'conv2d': {
+                'channels_in': OUTPUT,
+                'channels_out': OUTPUT,
+                'kernel_size': 5,
+                'stride': 2
+            },
+            'batchnorm_features': OUTPUT,
+            'dropout_probability': DROPOUT_PROB,
+        },
+        {
+            'conv2d': {
+                'channels_in': OUTPUT,
+                'channels_out': OUTPUT,
+                'kernel_size': 3,
+                'stride': 1
+            },
+            'batchnorm_features': OUTPUT,
+            'dropout_probability': DROPOUT_PROB,
+        },
+        {
+            'conv2d': {
+                'channels_in': OUTPUT,
+                'channels_out': OUTPUT,
+                'kernel_size': 3,
+                'stride': 1
+            },
+            'batchnorm_features': OUTPUT,
+            'dropout_probability': DROPOUT_PROB,
+        },
+        {
+            'linear': {
+                'features_in': OUTPUT * 23 * 23,
+                'features_out': 64,
+            }
+        },
+        {
+            'linear': {
+                'features_in': 64,
+                'features_out': 1,
+            }
+        }
+    ]
+
+    _layers: list = []
+
     def __init__(self, env):
         # assert env.observation_space.shape == (4, 84, 84, 1), \
         #     f"Invalid input shape for reward model: " \
         #     f"Input shape {env.observation_space.shape} but expected (4, 84, 84, 1). " \
         #     f"Use this reward model only for Atari environments with screen size 84x84 (or compatible environments)."
-        print('GridworldCNN active')
         super().__init__(env)
+
+        for layer in self.LAYERS:
+            level = {}
+            for key, params in layer.items():
+                print(f'{key=} -- {params=}')
+                if key == 'conv2d':
+                    level['handler'] = nn.Conv2d(
+                        params['channels_in'], params['channels_out'],
+                        kernel_size=params['kernel_size'],
+                        stride=params['stride'])
+                elif key == 'batchnorm_features':
+                    level['batchnorm'] = nn.BatchNorm2d(params)
+                elif key == 'dropout_probability':
+                    level['dropout'] = nn.Dropout(p=params)
+                elif key == 'linear':
+                    level['handler'] = nn.Linear(params['features_in'],
+                                                 params['features_out'])
+            self._layers.append(level)
+        print(f'{self._layers}')
+
         self.conv1 = nn.Conv2d(4, 16, kernel_size=7, stride=3)
         self.batchnorm1 = nn.BatchNorm2d(16)
         self.dropout1 = nn.Dropout(p=0.5)
