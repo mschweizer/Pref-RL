@@ -90,7 +90,7 @@ class GridworldCnnRewardModel(BaseModel):
                     level['handler'] = nn.Linear(params['features_in'],
                                                  params['features_out'])
             self._layers.append(level)
-        print(f'{self._layers}')
+        # print(f'{self._layers}')
 
         self.conv1 = nn.Conv2d(4, 16, kernel_size=7, stride=3)
         self.batchnorm1 = nn.BatchNorm2d(16)
@@ -117,17 +117,30 @@ class GridworldCnnRewardModel(BaseModel):
 
         x = F.leaky_relu(self.batchnorm1(self.conv1(observation)), 0.01)
         x = self.dropout1(x)
+        y = F.leaky_relu(self._layers[0]['batchnorm'](self._layers[0]['handler'](observation)), 0.01)
+        y = self._layers[0]['dropout'](y)
 
         x = F.leaky_relu(self.batchnorm2(self.conv2(x)), 0.01)
         x = self.dropout2(x)
+        y = F.leaky_relu(self._layers[1]['batchnorm'](self._layers[1]['handler'](y)), 0.01)
+        y = self._layers[1]['dropout'](y)
 
         x = F.leaky_relu(self.batchnorm3(self.conv3(x)), 0.01)
         x = self.dropout3(x)
+        y = F.leaky_relu(self._layers[2]['batchnorm'](self._layers[2]['handler'](y)), 0.01)
+        y = self._layers[2]['dropout'](y)
 
         x = F.leaky_relu(self.batchnorm4(self.conv4(x)), 0.01)
         x = self.dropout4(x)
+        y = F.leaky_relu(self._layers[3]['batchnorm'](self._layers[3]['handler'](y)), 0.01)
+        y = self._layers[3]['dropout'](y)
 
         x = x.reshape(-1, 16 * 23 * 23)
         x = F.relu(self.fc1(x))
+        y = y.reshape(-1, 16 * 23 * 23)
+        y = F.relu(self._layers[4]['handler'](y))
+
         x = self.fc2(x)
+        y = self._layers[5]['handler'](y)
+
         return x
