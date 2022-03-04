@@ -191,6 +191,7 @@ class OracleBase(AbstractOracle):
         """
         self.validate_query(query)
         value_1, value_2 = self.compute_values(query)
+        print(f'{value_1=} | {value_2=}')
         return self.compute_preference(value_1, value_2)
 
 
@@ -247,6 +248,8 @@ class RiskSensitiveOracle(OracleBase):
             Generator[Union[float, Any], Any, None]: Utility of each query
                 segment.
         """
+        for segment in query.choice_set:
+            print(f'{segment.rewards}')
         return (sum(utility_model.compute_utility(info[PENALIZED_TRUE_REW])
                 for info in segment.infos)
                 for segment in query.choice_set)

@@ -1,6 +1,7 @@
 import argparse
 import logging
 import numpy as np
+import time
 
 # from agent_factory.rl_teacher_factory import SyntheticRLTeacherFactory
 from agent_factory.risk_sensitive_rl_teacher_factory import \
@@ -25,11 +26,11 @@ def create_cli():
     parser.add_argument('--env_id', default="Lab2D-risky-v0")
     parser.add_argument('--reward_model', default="GridworldCnn")
     parser.add_argument('--num_training_preferences', default=200, type=int)
-    parser.add_argument('--num_pretraining_preferences', default=20, type=int)
+    parser.add_argument('--num_pretraining_preferences', default=100, type=int)
     parser.add_argument('--num_training_epochs', default=16, type=int)
     parser.add_argument('--num_pretrain_epochs', default=5, type=int)
     parser.add_argument('--num_rl_timesteps', default=10000, type=int)
-    parser.add_argument('--segment_length', default=25, type=int)
+    parser.add_argument('--segment_length', default=15, type=int)
     parser.add_argument('--policy_train_freq', default=5, type=int)
     parser.add_argument('--pb_step_freq', default=1024, type=int)
     parser.add_argument('--reward_training_freq', default=8192, type=int)
@@ -38,6 +39,9 @@ def create_cli():
     parser.add_argument('--obs_to_grayscale', default=1, type=int)
     # wrap_grayscale_obs = 0
     parser.add_argument('--risk_attitude', default=0, type=int)
+    parser.add_argument('--episode_length', default=50, type=int)
+    parser.add_argument('--num_posttraining_episodes', default=100, type=int)
+    parser.add_argument('--verbose', default=0, type=int)
     return parser
 
 
@@ -46,23 +50,24 @@ def main():
     args = cli.parse_args()
 
     print('\n\n==================== Executing Program ====================\n')
-    logging.basicConfig(level=logging.INFO)
+    # logging.basicConfig(level=logging.INFO)
+    logging.basicConfig(level=logging.DEBUG)
 
     print('------ 1. Parsing Arguments, Configuring Pref-RL ----------\n')
     # Parameters taken from Ratliff & Mazumdar (2020)
     risk_sensitive_profiles = [
-        # risk-neutral
-        ProspectTheoryParams(coefficient_gain=1, exponent_gain=1,
-                             coefficient_loss=1, exponent_loss=1),
+        # standard risk-neutral
+        ProspectTheoryParams(coefficient_gain=1, exponent_gain=.9,
+                             coefficient_loss=1, exponent_loss=1.1),
         # risk-seeking
         ProspectTheoryParams(coefficient_gain=1, exponent_gain=1.5,
                              coefficient_loss=.1, exponent_loss=.5),
-        # slightly risk-averse
-        ProspectTheoryParams(coefficient_gain=1, exponent_gain=.9,
-                             coefficient_loss=1, exponent_loss=1.1),
         # risk-averse
         ProspectTheoryParams(coefficient_gain=1, exponent_gain=.8,
-                             coefficient_loss=5, exponent_loss=1.1)
+                             coefficient_loss=5, exponent_loss=1.1),
+        # true risk-neutral
+        ProspectTheoryParams(coefficient_gain=1, exponent_gain=1,
+                             coefficient_loss=1, exponent_loss=1)
     ]
 
     env_id: str = args.env_id
@@ -78,6 +83,8 @@ def main():
     num_rl_timesteps: int = args.num_rl_timesteps
     termination_penalty: float = args.termination_penalty
     frame_stack_depth: int = args.frame_stack_depth
+    episode_length: int = args.episode_length
+    posttraining_episodes: int = args.num_posttraining_episodes
 
     obs_to_grayscale_wrapper: bool
     assert args.obs_to_grayscale in [0, 1], \
@@ -91,6 +98,12 @@ def main():
     utility_model = ProspectTheoryUtility(
         risk_sensitive_profiles[args.risk_attitude])
 
+    verbose: bool
+    assert args.verbose in [0, 1], \
+        f"Values 0 and 1 allowed for argument '--verbose', {args.verbose} " \
+        "given."
+    verbose = True if args.verbose == 1 else False
+
     # print('------ 2. CartPole Env Creation --------------------------\n')
     # env_id = "CartPole-v1"
     # env = create_env(env_id, termination_penalty=10.)
@@ -103,14 +116,14 @@ def main():
     #                                 frame_stack_depth,
     #                                 obs_to_grayscale_wrapper)
 
-    print('------ 2. Env Creation ------------------------------------\n')
+    print('------ 2. Environment Creation ----------------------------\n')
     if env_id.startswith('Lab2D-'):
         gridworld = create_gridworld_env(
             env_id=env_id,
             env_settings={
-                'max_episode_steps': 50,
+                'max_episode_steps': episode_length,
                 'ext_settings': {
-                    # 'verbose': True,
+                    'verbose': verbose,
                     'slip_probability': 0.1,
                     'gym_env_wrapper_grayscale': obs_to_grayscale_wrapper,
                     'frame_stack_depth': frame_stack_depth,
@@ -147,13 +160,18 @@ def main():
 
     print('------ 5. Training Finished. Observing Results ------------\n')
     obs = env.reset()
-    for i in range(1000):
-        # action, _state = model.predict(obs, deterministic=True)
-        action, _state = agent.choose_action(obs)
-        obs, reward, done, info = env.step(action)
-        env.render()
-        if done:
-            obs = env.reset()
+    for ep in range(posttraining_episodes):
+        done = False
+        while not done:
+            action, _state = agent.choose_action(obs)
+            logging.getLogger().debug(f'chosen action: {action}')
+            _, _, _, info = env.step(action)
+            env.render(mode='WORLD.RGB')
+            done = info['original_done']
+            time.sleep(0.1)
+        obs = env.reset()
+        print(f'-- Episode {ep+1} finished, environment reset.')
+        time.sleep(2)
 
     print('------ 6. Run Finished. Cleaning Up -----------------------\n')
     env.close()
