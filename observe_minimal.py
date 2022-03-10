@@ -23,8 +23,9 @@ from gym.wrappers import (
     TransformObservation
 )
 
-MODEL = '20220309_212725_a2c_risky_gridworld'
-MODEL_DIR = 'runs'
+MODEL = '20220310_070949_a2c_risky_gridworld'   # name for the ZIP file
+MODEL_DIR = 'models_sb'  # model directory
+TB_LOG_DIR = 'tensorboard_logs'     # directory for tensorboard logs
 
 def create_cli():
     parser = argparse.ArgumentParser()
@@ -51,6 +52,7 @@ def create_cli():
     parser.add_argument('--verbose', default=0, type=int)
     parser.add_argument('--rebound_on_block', default=1, type=int)
     parser.add_argument('--file', default=MODEL)
+    parser.add_argument('--tb_log_dir', default=TB_LOG_DIR)
     return parser
 
 
@@ -94,6 +96,7 @@ def main():
     episode_length: int = args.episode_length
     posttraining_episodes: int = args.num_posttraining_episodes
     file: str = args.file
+    tb_log_dir: str = args.tb_log_dir
 
     obs_to_grayscale_wrapper: bool
     assert args.obs_to_grayscale in [0, 1], \
@@ -163,7 +166,7 @@ def main():
 
     print('------ 3. Creating Agent, Loading Model -------------------\n')
     assert file.strip(), 'No model file given.'
-    model = A2C.load(MODEL_DIR + '/' + MODEL)
+    model = A2C.load(MODEL_DIR + '/' + file)
 
     print('------ 4. Observing Model ---------------------------------\n')
     obs = env.reset()

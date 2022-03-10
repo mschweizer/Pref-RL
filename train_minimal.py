@@ -23,6 +23,11 @@ from gym.wrappers import (
     TransformObservation
 )
 
+MODEL_DIR = 'models_sb'  # directory to save models
+# name of saved model: 'YYYYMMDD_hhmmss_<name>'
+MODEL_NAME_PREFIX = time.strftime('%Y%m%d_%H%M%S')
+MODEL_NAME = 'a2c_risky_gridworld'
+TB_LOG_DIR = 'runs_sb'     # directory for tensorboard logs
 
 def create_cli():
     parser = argparse.ArgumentParser()
@@ -48,6 +53,8 @@ def create_cli():
     parser.add_argument('--num_posttraining_episodes', default=100, type=int)
     parser.add_argument('--verbose', default=0, type=int)
     parser.add_argument('--rebound_on_block', default=1, type=int)
+    parser.add_argument('--model_name', default=MODEL_NAME)
+    parser.add_argument('--tb_log_dir', default=TB_LOG_DIR)
     return parser
 
 
@@ -90,6 +97,8 @@ def main():
     frame_stack_depth: int = args.frame_stack_depth
     episode_length: int = args.episode_length
     posttraining_episodes: int = args.num_posttraining_episodes
+    model_name: str = args.model_name
+    tb_log_dir: str = args.tb_log_dir
 
     obs_to_grayscale_wrapper: bool
     assert args.obs_to_grayscale in [0, 1], \
@@ -158,12 +167,14 @@ def main():
     # check_env(env)
 
     print('------ 3. Creating Agent ----------------------------------\n')
-    model = A2C('CnnPolicy', env, verbose=True)
+    if not tb_log_dir.strip(): tb_log_dir = None
+    model = A2C('CnnPolicy', env, verbose=True, tensorboard_log=tb_log_dir + '/')
 
     print('------ 4. Starting RL Run ---------------------------------\n')
-    filename = f"{time.strftime('%Y%m%d_%H%M%S')}_a2c_risky_gridworld"
     model.learn(total_timesteps=num_rl_timesteps)
-    model.save(filename)
+    filename = MODEL_NAME_PREFIX
+    if model_name.strip(): filename = f'{filename}_{model_name}'
+    model.save(MODEL_DIR + '/' + filename)
 
     # print('------ 5. Training Finished. Observing Results ------------\n')
     # obs = env.reset()
