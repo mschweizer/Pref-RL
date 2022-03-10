@@ -3,6 +3,7 @@ import logging
 import numpy as np
 import time
 from stable_baselines3 import A2C
+from stable_baselines3.common.env_checker import check_env
 
 # from agent_factory.rl_teacher_factory import SyntheticRLTeacherFactory
 # from agent_factory.risk_sensitive_rl_teacher_factory import \
@@ -46,6 +47,7 @@ def create_cli():
     parser.add_argument('--absorbing_states', default=0, type=int)
     parser.add_argument('--num_posttraining_episodes', default=100, type=int)
     parser.add_argument('--verbose', default=0, type=int)
+    parser.add_argument('--rebound_on_block', default=1, type=int)
     return parser
 
 
@@ -56,7 +58,7 @@ def main():
     print('\n\n==================== Executing Program ====================\n')
     logging.basicConfig(level=logging.INFO)
 
-    print('------ 1. Parsing Arguments, Configuring Pref-RL ----------\n')
+    print('------ 1. Parsing Arguments -------------------------------\n')
     # Parameters taken from Ratliff & Mazumdar (2020)
     # risk_sensitive_profiles = [
     #     # standard risk-neutral
@@ -113,6 +115,12 @@ def main():
         f'Slip probability must be in [0, 1), {args.slip_probab} given.'
     slip_probability = args.slip_probab
 
+    rebound_on_block: bool
+    assert args.rebound_on_block in [0, 1], \
+        f"Values 0 and 1 allowed for argument '--rebound_on_block', " \
+        f"{args.rebound_on_block} given."
+    rebound_on_block = True if args.rebound_on_block == 1 else False
+
     verbose: bool
     assert args.verbose in [0, 1], \
         f"Values 0 and 1 allowed for argument '--verbose', {args.verbose} " \
@@ -131,7 +139,8 @@ def main():
                     'slip_probability': slip_probability,
                     'gym_env_wrapper_grayscale': obs_to_grayscale_wrapper,
                     'frame_stack_depth': frame_stack_depth,
-                    'absorbing_states': absorbing_states
+                    'absorbing_states': absorbing_states,
+                    'rebound_on_block': rebound_on_block
                 },
             }
         )
@@ -146,22 +155,33 @@ def main():
         env = create_env(args.env_id, termination_penalty=termination_penalty,
                          frame_stack_depth=frame_stack_depth)
 
-    model = A2C('MlpPolicy', env, verbose=verbose)
-    model.learn(total_timesteps=num_rl_timesteps)
+    # check_env(env)
 
-    obs = env.reset()
-    for ep in range(posttraining_episodes):
-        done = False
-        while not done:
-            action, _state = model.predict(obs)
-            # logging.getLogger().info(f'chosen action: {action}')
-            obs, reward, done, info = env.step(action)
-            # logging.getLogger().info(f'step reward: {reward}')
-            env.render(mode='WORLD.RGB')
-            time.sleep(0.1)
-        obs = env.reset()
-        print(f'-- Episode {ep+1} finished, environment reset.')
-        time.sleep(2)
+    print('------ 3. Creating Agent ----------------------------------\n')
+    model = A2C('CnnPolicy', env, verbose=True)
+
+    print('------ 4. Starting RL Run ---------------------------------\n')
+    filename = f"{time.strftime('%Y%m%d_%H%M%S')}_a2c_risky_gridworld"
+    model.learn(total_timesteps=num_rl_timesteps)
+    model.save(filename)
+
+    # print('------ 5. Training Finished. Observing Results ------------\n')
+    # obs = env.reset()
+    # for ep in range(posttraining_episodes):
+    #     done = False
+    #     while not done:
+    #         action, _state = model.predict(obs)
+    #         logging.getLogger().info(f'chosen action: {action}')
+    #         obs, reward, done, info = env.step(action)
+    #         logging.getLogger().info(f'step reward: {reward}')
+    #         # env.render(mode='WORLD.RGB')
+    #         # time.sleep(0.1)
+    #     obs = env.reset()
+    #     print(f'-- Episode {ep+1} finished, environment reset.')
+    #     # time.sleep(2)
+
+    print('------ 6. Run Finished. Cleaning Up -----------------------\n')
+    env.close()
 
 
 if __name__ == '__main__':

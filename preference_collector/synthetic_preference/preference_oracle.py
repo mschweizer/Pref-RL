@@ -35,7 +35,7 @@ class ProspectTheoryUtility(AbstractUtilityModel):
         published in Kahneman & Tversky (1979)"""
 
     _params: ProspectTheoryParams
-    _threshold = 0
+    _threshold: float = 0
 
     def __init__(self, params: ProspectTheoryParams,  threshold: float = None)\
             -> None:
@@ -191,7 +191,7 @@ class OracleBase(AbstractOracle):
         """
         self.validate_query(query)
         value_1, value_2 = self.compute_values(query)
-        print(f'{value_1=} | {value_2=}')
+        print(f'value_1 = {value_1} | value_2 = {value_2}')
         return self.compute_preference(value_1, value_2)
 
 
@@ -254,7 +254,8 @@ class RiskSensitiveOracle(OracleBase):
                 for info in segment.infos)
                 for segment in query.choice_set)
 
-    def compute_values(self, query: ChoiceQuery):
+    def compute_values(self, query: ChoiceQuery) \
+            -> Generator[Union[float, Any], Any, None]:
         """Compute utility values for the given query.
 
         Args:
