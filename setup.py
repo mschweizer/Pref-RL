@@ -1,13 +1,13 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(name='pref_rl',
       version='0.1',
-      description='Provides ready-to-use PbRL agents that are easily extensible.',
+      description='Provides ready-to-use preference-based reinforcement learning agents that are easily extensible.',
       url='https://github.com/mschweizer/Pref-RL',
       author='Marvin Schweizer',
       author_email='schweizer@kit.edu',
       license='MIT',
-      packages=['pref_rl'],
+      packages=find_packages(),
       install_requires=[
           'stable-baselines3[extra]==1.3.0',
           'torch==1.10.0',
