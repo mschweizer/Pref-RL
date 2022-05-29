@@ -1,10 +1,10 @@
 # Pytest
-/tests/pytest.ini
-/tests/.coveragerc
-/tests/htmlcov/
+/pref_rl/tests/pytest.ini
+/pref_rl/tests/.coveragerc
+/pref_rl/tests/htmlcov/
 
 # Tensor board logs
-/tests/runs/
+/pref_rl/tests/runs/
 /runs/
 
 # Django app
