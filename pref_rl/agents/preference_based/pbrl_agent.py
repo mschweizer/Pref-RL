@@ -1,6 +1,6 @@
 import logging
-import time
 import os
+import time
 
 from .pbrl_callback import PbStepCallback
 from ..rl_agent import RLAgent
@@ -10,7 +10,8 @@ from ...query_schedule.query_schedule import AbstractQuerySchedule
 class PbRLAgent(RLAgent):
     def __init__(self, policy_model, pretraining_query_generator, query_generator, preference_querent,
                  preference_collector, reward_model_trainer, reward_model, query_schedule_cls,
-                 pb_step_freq, save_dir, agent_name, reward_train_freq=None, num_epochs_in_pretraining=8, num_epochs_in_training=16):
+                 pb_step_freq, save_dir=None, agent_name=None, reward_train_freq=None, num_epochs_in_pretraining=8,
+                 num_epochs_in_training=16):
 
         super(PbRLAgent, self).__init__(policy_model)
 
@@ -48,7 +49,8 @@ class PbRLAgent(RLAgent):
         logging.info("Start reward model training")
         self._train(num_training_timesteps)
         logging.info("Completed reward model training; saving model...")
-        self._save_agent(self.save_dir, self.agent_name)
+        if self.save_dir and self.agent_name:
+            self._save_agent(self.save_dir, self.agent_name)
 
     def _pretrain(self, num_preferences):
         self._send_preference_queries(num_preferences, pretraining=True)
@@ -73,7 +75,7 @@ class PbRLAgent(RLAgent):
             input("More than 50 queries pending. Press Enter to continue.")
 
         self._collect()
-        
+
         while self._num_pending_queries() > 0 and wait_until_all_collected:
             logging.info(f"Waiting until all queries are collected. {self._num_pending_queries()} queries pending.")
             time.sleep(15)
@@ -115,7 +117,8 @@ class PbRLAgent(RLAgent):
             self.reward_model_trainer.train(self.num_epochs_in_training)
             self._set_last_reward_model_training_step_to(current_timestep)
 
-            self._save_agent(save_dir=self.save_dir, agent_name=self.agent_name)
+            if self.save_dir and self.agent_name:
+                self._save_agent(save_dir=self.save_dir, agent_name=self.agent_name)
 
     def _num_desired_queries(self, current_timestep):
         return self._calculate_num_desired_queries(self._num_scheduled_preferences(current_timestep),

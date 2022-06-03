@@ -1,7 +1,10 @@
 from typing import List
-from preference_collector.preference import Preference
-from preference_collector.preference_collector import AbstractPreferenceCollector
-from preference_collector.binary_choice import BinaryChoice
+
+import requests
+
+from pref_rl.preference_collector.binary_choice import BinaryChoice
+from pref_rl.preference_collector.preference import Preference
+from pref_rl.preference_collector.preference_collector import AbstractPreferenceCollector
 
 
 class HumanPreferenceCollector(AbstractPreferenceCollector):
@@ -10,14 +13,15 @@ class HumanPreferenceCollector(AbstractPreferenceCollector):
         super().__init__()
 
     def collect_preferences(self) -> List:
-        from preferences import models
 
         just_collected_preferences = []
 
         for query in list(self.pending_queries):
-            db_pref = models.Preference.objects.get(uuid=str(query.id))
+            # TODO: make address configurable
+            response = requests.get('http://127.0.0.1:8000/preferences/query/{}'.format(query.id))
+            answered_query = response.json()
 
-            if (retrieved_label := db_pref.label) is None:
+            if (retrieved_label := answered_query["label"]) is None:
                 continue
 
             pref_rl_label: BinaryChoice
