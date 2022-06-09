@@ -20,7 +20,7 @@ from ..query_generator.choice_set.segment.pretraining_segment_sampler import Ran
 from ..query_generator.choice_set.segment.segment_sampler import RandomSegmentSampler
 from ..query_generator.query_generator import AbstractQueryGenerator
 from ..query_generator.query_item_selector import RandomItemSelector
-from ..query_schedule.query_schedule import AbstractQuerySchedule, ConstantQuerySchedule
+from ..query_schedule.query_schedule import AbstractQuerySchedule, AnnealingQuerySchedule
 from ..reward_model_trainer.reward_model_trainer import RewardModelTrainer
 
 
@@ -55,7 +55,7 @@ class SyntheticRLTeacherFactory(PbRLAgentFactory):
         return DummyPreferenceQuerent(query_selector=RandomQuerySelector())
 
     def _create_query_schedule_cls(self) -> Type[AbstractQuerySchedule]:
-        return ConstantQuerySchedule
+        return AnnealingQuerySchedule
 
     def _wrap_env(self, env, reward_model):
         env = TrajectoryBuffer(env, trajectory_buffer_size=max(self.pb_step_freq, self.policy_train_freq))
