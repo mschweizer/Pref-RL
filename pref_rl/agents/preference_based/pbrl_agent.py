@@ -13,6 +13,8 @@ class PbRLAgent(RLAgent):
                  pb_step_freq, save_dir=None, agent_name=None, reward_train_freq=None, num_epochs_in_pretraining=8,
                  num_epochs_in_training=16):
 
+        self.logger = logging.getLogger('pref_rl.agents.preference_based.pbrl_agent.PbRLAgent')
+
         super(PbRLAgent, self).__init__(policy_model)
 
         self.query_schedule_cls: type[AbstractQuerySchedule] = query_schedule_cls
@@ -43,14 +45,11 @@ class PbRLAgent(RLAgent):
         return self.reward_model(observation)
 
     def pb_learn(self, num_training_timesteps, num_training_preferences, num_pretraining_preferences):
-        self._prepare_for_training(num_training_timesteps, num_training_preferences, num_pretraining_preferences)
-        logging.info("Start reward model pretraining")
+        self.logger.info("PBRL PRETRAINING")
         self._pretrain(num_pretraining_preferences)
-        logging.info("Start reward model training")
+        self.logger.info("PBRL TRAINING")
+        self._prepare_for_training(num_training_timesteps, num_training_preferences, num_pretraining_preferences)
         self._train(num_training_timesteps)
-        logging.info("Completed reward model training; saving model...")
-        if self.save_dir and self.agent_name:
-            self._save_agent(self.save_dir, self.agent_name)
 
     def _pretrain(self, num_preferences):
         self._send_preference_queries(num_preferences, pretraining=True)
@@ -60,8 +59,12 @@ class PbRLAgent(RLAgent):
     def _send_preference_queries(self, num_queries, pretraining=False):
         # TODO: Generate num_query_candidates > num_queries for active learning
         query_candidates = self._generate_query_candidates(num_queries, pretraining)
+        self.logger.info("{} query candidates generated".format(len(query_candidates)))
         newly_pending_queries = self.preference_querent.query_preferences(query_candidates, num_queries)
+        self.logger.info("{} newly pending queries".format(len(newly_pending_queries)))
         self.preference_collector.pending_queries.extend(newly_pending_queries)
+        self.logger.info("{} pending queries in total".format(
+            len(self.preference_collector.pending_queries)))
 
     def _generate_query_candidates(self, num_queries, pretraining):
         if pretraining:
@@ -76,14 +79,18 @@ class PbRLAgent(RLAgent):
 
         self._collect()
 
+        sleep_seconds = 15
         while self._num_pending_queries() > 0 and wait_until_all_collected:
-            logging.info(f"Waiting until all queries are collected. {self._num_pending_queries()} queries pending.")
-            time.sleep(15)
+            self.logger.info("waiting for all pretraining queries to be answered - sleeping for {} seconds".format(
+                sleep_seconds))
+            time.sleep(sleep_seconds)
             self._collect()
 
     def _collect(self):
         newly_collected_preferences = self.preference_collector.collect_preferences()
         self.reward_model_trainer.preferences.extend(newly_collected_preferences)
+        self.logger.info("{collected} newly collected preferences".format(
+            collected=len(newly_collected_preferences)))
 
     def _prepare_for_training(self, num_training_timesteps, num_training_preferences, num_pretraining_preferences):
         self._set_last_reward_model_training_step_to(0)
@@ -110,15 +117,23 @@ class PbRLAgent(RLAgent):
 
     def _pb_step(self, current_timestep):
         num_queries = self._num_desired_queries(current_timestep)
+        self.logger.info("PREFERENCE STEP // {} scheduled preference queries".format(num_queries))
         self._send_preference_queries(num_queries)
         self._collect_preferences()
 
         if self._is_reward_training_step(current_timestep):
+            self.logger.info("REWARD MODEL TRAINING // with {} preferences".format(
+                len(self.reward_model_trainer.preferences)))
             self.reward_model_trainer.train(self.num_epochs_in_training)
             self._set_last_reward_model_training_step_to(current_timestep)
 
             if self.save_dir and self.agent_name:
                 self._save_agent(save_dir=self.save_dir, agent_name=self.agent_name)
+
+        self.logger.info("POLICY MODEL TRAINING // {completed}% completed [{current} / {total} total steps]".format(
+            completed=current_timestep / self.query_schedule.num_training_steps,
+            current=current_timestep,
+            total=int(self.query_schedule.num_training_steps)))
 
     def _num_desired_queries(self, current_timestep):
         return self._calculate_num_desired_queries(self._num_scheduled_preferences(current_timestep),

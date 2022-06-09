@@ -90,6 +90,7 @@ def test_should_set_last_training_timestep_to_current_after_training():
                       reward_train_freq=100)
 
     agent._num_desired_queries = Mock(return_value=10)
+    agent.query_schedule = MagicMock()
 
     current_timestep = 500
 
@@ -111,6 +112,7 @@ def test_should_train_reward_model_if_more_than_specified_number_of_steps_have_p
                       reward_train_freq=100)
 
     agent._num_desired_queries = Mock(return_value=10)
+    agent.query_schedule = MagicMock()
 
     agent._pb_step(current_timestep=500)
 
@@ -130,6 +132,7 @@ def test_should_not_train_reward_model_if_not_enough_steps_have_passed():
                       reward_train_freq=100)
 
     agent._num_desired_queries = Mock(return_value=10)
+    agent.query_schedule = MagicMock()
 
     agent._pb_step(current_timestep=80)
 

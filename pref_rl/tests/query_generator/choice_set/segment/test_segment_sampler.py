@@ -1,3 +1,4 @@
+import logging
 from unittest.mock import Mock, MagicMock
 
 from .....agents.preference_based.buffered_policy_model import BufferedPolicyModel
@@ -6,6 +7,10 @@ from .....query_generator.choice_set.segment.segment_sampler import AbstractSegm
 
 
 class ConcreteSegmentSampler(AbstractSegmentSampler):
+    def __init__(self, segment_length):
+        super().__init__(segment_length)
+        self.logger = logging.getLogger()
+
     def _sample_segment(self, trajectory_buffer, segment_length):
         return "sample"
 
@@ -14,6 +19,7 @@ def test_sampler_samples_correct_number_of_samples():
     policy_model = MagicMock(spec_set=BufferedPolicyModel, **{"trajectory_buffer.__len__.return_value": 200})
 
     segment_sampler = ConcreteSegmentSampler(segment_length=1)
+    segment_sampler.logger = MagicMock()
     num_samples = 10
 
     samples = segment_sampler.generate(policy_model, num_samples)

@@ -21,8 +21,7 @@ class AbstractSegmentSampler(AbstractQueryItemGenerator, ABC):
                 samples.append(self._sample_segment(policy_model.trajectory_buffer, self.segment_length))
             return samples
         except AssertionError as e:
-            logging.warning("Trajectory segment sampling failed. " + str(e) +
-                            " Returning empty set of samples.")
+            self.logger.warning("Trajectory segment sampling failed. " + str(e) + " Returning empty set of samples.")
             return []
 
     def _log_duplicate_warning(self, num_items, policy_model):
@@ -33,7 +32,7 @@ class AbstractSegmentSampler(AbstractQueryItemGenerator, ABC):
                   "Be aware of potential (near) duplicate segment samples.".format(num_items=num_items,
                                                                                    seg_len=self.segment_length,
                                                                                    traj_len=trajectory_buffer_length)
-            logging.warning(msg)
+            self.logger.warning(msg)
 
     @abstractmethod
     def _sample_segment(self, trajectory_buffer, segment_length):
@@ -41,4 +40,7 @@ class AbstractSegmentSampler(AbstractQueryItemGenerator, ABC):
 
 
 class RandomSegmentSampler(RandomSamplingMixin, AbstractSegmentSampler):
-    pass
+    def __init__(self, segment_length):
+        super().__init__(segment_length)
+        self.logger = logging.getLogger(
+            'pref_rl.query_generator.choice_set.segment.segment_sampler.RandomSegmentSampler')
