@@ -56,10 +56,10 @@ class PbRLAgent(RLAgent):
         query_candidates = self._generate_query_candidates(num_queries, pretraining)
         self.logger.info("{} query candidates generated".format(len(query_candidates)))
         newly_pending_queries = self.preference_querent.query_preferences(query_candidates, num_queries)
-        self.logger.info("{} newly pending queries".format(len(newly_pending_queries)))
         self.preference_collector.pending_queries.extend(newly_pending_queries)
-        self.logger.info("{} pending queries in total".format(
-            len(self.preference_collector.pending_queries)))
+        self.logger.info("{new} newly pending queries [{total} in total]".format(
+            new=len(newly_pending_queries),
+            total=len(self.preference_collector.pending_queries)))
 
     def _generate_query_candidates(self, num_queries, pretraining):
         if pretraining:
@@ -81,8 +81,9 @@ class PbRLAgent(RLAgent):
     def _collect(self):
         newly_collected_preferences = self.preference_collector.collect_preferences()
         self.reward_model_trainer.preferences.extend(newly_collected_preferences)
-        self.logger.info("{collected} newly collected preferences".format(
-            collected=len(newly_collected_preferences)))
+        self.logger.info("{new} newly collected preferences [{total} in the dataset]".format(
+            new=len(newly_collected_preferences),
+            total=len(self.reward_model_trainer.preferences)))
 
     def _prepare_for_training(self, num_training_timesteps, num_training_preferences, num_pretraining_preferences):
         self._set_last_reward_model_training_step_to(0)
