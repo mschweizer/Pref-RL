@@ -86,7 +86,6 @@ class PbRLAgent(RLAgent):
 
     def _prepare_for_training(self, num_training_timesteps, num_training_preferences, num_pretraining_preferences):
         self._set_last_reward_model_training_step_to(0)
-        self.reward_model_trainer.preferences.reset_lifetime_preference_count()  # for schedule to work correctly
         self._setup_query_schedule(num_training_timesteps, num_training_preferences, num_pretraining_preferences)
 
     def _set_last_reward_model_training_step_to(self, value):
@@ -104,7 +103,8 @@ class PbRLAgent(RLAgent):
     def _pb_step(self, current_timestep):
         num_queries = self._num_desired_queries(current_timestep)
         self.logger.info("PREFERENCE STEP // {} scheduled preference queries".format(num_queries))
-        self._send_preference_queries(num_queries)
+        if num_queries > 0:
+            self._send_preference_queries(num_queries)
         self._collect_preferences()
 
         if self._is_reward_training_step(current_timestep):
@@ -114,7 +114,7 @@ class PbRLAgent(RLAgent):
             self._set_last_reward_model_training_step_to(current_timestep)
 
         self.logger.info("POLICY MODEL TRAINING // {completed}% completed [{current} / {total} total steps]".format(
-            completed=current_timestep/self.query_schedule.num_training_steps,
+            completed=int((current_timestep/self.query_schedule.num_training_steps)*100),
             current=current_timestep,
             total=int(self.query_schedule.num_training_steps)))
 

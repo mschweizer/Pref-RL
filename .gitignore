@@ -4,8 +4,9 @@
 /pref_rl/tests/htmlcov/
 
 # Tensor board logs
-/pref_rl/tests/runs/
-/runs/
+*/runs/*
+*/*/runs/*
+
 
 # --- Based on https://github.com/github/gitignore/ ---
 
