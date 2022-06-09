@@ -12,7 +12,7 @@ def create_logger():
     ch = logging.StreamHandler()
     ch.setLevel(logging.INFO)
 
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    formatter = logging.Formatter('%(levelname)s - %(message)s')
     ch.setFormatter(formatter)
 
     logger.addHandler(ch)
@@ -42,7 +42,7 @@ def main():
     logger = create_logger()
 
     env = create_env(args.env_id, termination_penalty=10.)
-    logger.info("created environment '{}'".format(args.env_id))
+    logger.info("'{}' environment created".format(args.env_id))
 
     factory = SyntheticRLTeacherFactory(policy_train_freq=args.policy_train_freq,
                                         pb_step_freq=args.pb_step_freq,
@@ -52,14 +52,19 @@ def main():
 
     agent = factory.create_agent(env=env, reward_model_name="Mlp")
 
-    logger.info("beginning preference-based reinforcement learning with {rl_steps} rl steps, "
-                "{training_prefs} preferences for training and {pretrain_prefs} for pretraining"
-                .format(rl_steps=int(args.rl_steps),
-                        training_prefs=args.training_preferences,
-                        pretrain_prefs=args.pretraining_preferences))
-    logger.info("policy model will be trained every {} rl steps".format(args.policy_train_freq))
-    logger.info("preference step will be executed every {} rl steps".format(args.pb_step_freq))
-    logger.info("reward model will be trained every {} rl steps".format(args.reward_train_freq))
+    logger.info("preference-based reinforcement learning with \n "
+                "{rl_steps} rl steps, \n "
+                "{training_prefs} preferences for training and \n "
+                "{pretrain_prefs} for pretraining \n "
+                "{rl_freq} rl steps per policy model training \n "
+                "{pb_freq} rl steps per preference step \n "
+                "{rew_freq} rl steps per reward model training".format(rl_freq=args.policy_train_freq,
+                                                                       pb_freq=args.pb_step_freq,
+                                                                       rew_freq=args.reward_train_freq,
+                                                                       rl_steps=int(args.rl_steps),
+                                                                       training_prefs=args.training_preferences,
+                                                                       pretrain_prefs=args.pretraining_preferences))
+
     agent.pb_learn(num_training_timesteps=args.rl_steps,
                    num_training_preferences=args.training_preferences,
                    num_pretraining_preferences=args.pretraining_preferences)
