@@ -25,10 +25,10 @@ from ..query_generator.query_generator import AbstractQueryGenerator
 class SyntheticRLTeacherFactory(PbRLAgentFactory):
 
     def __init__(self,
-                 policy_train_freq, pb_step_freq, reward_training_freq,
+                 policy_train_freq, pb_step_freq, reward_train_freq,
                  num_epochs_in_pretraining, num_epochs_in_training,
                  segment_length=25):
-        super().__init__(pb_step_freq, reward_training_freq, num_epochs_in_pretraining, num_epochs_in_training)
+        super().__init__(pb_step_freq, reward_train_freq, num_epochs_in_pretraining, num_epochs_in_training)
         self.segment_length = segment_length
         self.policy_train_freq = policy_train_freq
 
