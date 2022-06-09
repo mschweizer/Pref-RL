@@ -67,9 +67,9 @@ class SyntheticRLTeacherFactory(PbRLAgentFactory):
 
 class RLTeacherFactory(SyntheticRLTeacherFactory):
 
-    def __init__(self, policy_train_freq, pb_step_freq, reward_training_freq, num_epochs_in_pretraining,
+    def __init__(self, policy_train_freq, pb_step_freq, reward_train_freq, num_epochs_in_pretraining,
                  num_epochs_in_training, segment_length=25, video_output_dir=None):
-        super().__init__(policy_train_freq, pb_step_freq, reward_training_freq,
+        super().__init__(policy_train_freq, pb_step_freq, reward_train_freq,
                          num_epochs_in_pretraining, num_epochs_in_training, segment_length=segment_length)
         self.video_output_dir = video_output_dir
 

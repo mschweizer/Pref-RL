@@ -33,6 +33,7 @@ def create_cli():
     parser.add_argument('--policy_train_freq', default=5, type=int)
     parser.add_argument('--reward_train_freq', default=8192, type=int)
     parser.add_argument('--preference_type', default="synthetic", type=str)
+    parser.add_argument('--query_segment_length', default=25, type=int)
     return parser
 
 
@@ -45,15 +46,14 @@ def main():
     env = create_env(args.env_id, termination_penalty=10.)
     logger.info("'{}' environment created".format(args.env_id))
 
-    if args.preference_type == "human":
-        factory = RLTeacherFactory(policy_train_freq=5, pb_step_freq=1024, reward_training_freq=8192,
-                                   num_epochs_in_pretraining=8, num_epochs_in_training=16)
-    else:
-        factory = SyntheticRLTeacherFactory(policy_train_freq=args.policy_train_freq,
-                                            pb_step_freq=args.pb_step_freq,
-                                            reward_training_freq=args.reward_train_freq,
-                                            num_epochs_in_pretraining=args.pretraining_epochs,
-                                            num_epochs_in_training=args.training_epochs)
+    factory_cls = RLTeacherFactory if args.preference_type == "human" else SyntheticRLTeacherFactory
+    factory = factory_cls(policy_train_freq=args.policy_train_freq,
+                          pb_step_freq=args.pb_step_freq,
+                          reward_train_freq=args.reward_train_freq,
+                          num_epochs_in_pretraining=args.pretraining_epochs,
+                          num_epochs_in_training=args.training_epochs,
+                          segment_length=args.query_segment_length)
+
     agent = factory.create_agent(env=env, reward_model_name="Mlp")
 
     logger.info("preference-based reinforcement learning with \n "
