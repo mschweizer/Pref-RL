@@ -68,13 +68,14 @@ class SyntheticRLTeacherFactory(PbRLAgentFactory):
 class RLTeacherFactory(SyntheticRLTeacherFactory):
 
     def __init__(self, policy_train_freq, pb_step_freq, reward_train_freq, num_epochs_in_pretraining,
-                 num_epochs_in_training, segment_length=25, video_output_dir=None):
+                 num_epochs_in_training, pref_collect_address, segment_length=25, video_output_dir=None):
         super().__init__(policy_train_freq, pb_step_freq, reward_train_freq,
                          num_epochs_in_pretraining, num_epochs_in_training, segment_length=segment_length)
+        self.pref_collect_address = pref_collect_address
         self.video_output_dir = video_output_dir
 
     def _create_preference_collector(self) -> AbstractPreferenceCollector:
-        return HumanPreferenceCollector()
+        return HumanPreferenceCollector(pref_collect_address=self.pref_collect_address)
 
     def _create_preference_querent(self) -> AbstractPreferenceQuerent:
         if self.video_output_dir is None:
