@@ -10,33 +10,26 @@ from pref_rl.preference_querent.preference_querent import AbstractPreferenceQuer
 
 class HumanPreferenceQuerent(AbstractPreferenceQuerent):
 
-    # TODO: remove output_dir / propagate param to agent config
-    def __init__(self, query_selector, video_root_output_dir='/home/yp5266/PycharmProjects/pref_collect/videofiles/'):
+    def __init__(self, query_selector, pref_collect_address, video_output_directory):
         super().__init__(query_selector)
-        self.root_output_dir = ensure_dir(video_root_output_dir)
+        self.video_output_dir = self._ensure_dir(video_output_directory)
+        self.query_endpoint = pref_collect_address + "/preferences/query/"
 
     def query_preferences(self, query_candidates, num_queries) -> List:
-        selected_queries = self.query_selector.select_queries(
-            query_candidates, num_queries)
+        selected_queries = self.query_selector.select_queries(query_candidates, num_queries)
 
         for query in selected_queries:
-            self._write_segment_video(
-                query[0], subdir=f'', name=f'{query.id}-left')
-            self._write_segment_video(
-                query[1], subdir=f'', name=f'{query.id}-right')
-
-            # TODO: make address configurable
-            response = requests.put('http://127.0.0.1:8000/preferences/query/{}'.format(query.id),
-                                    json={"uuid": "{}".format(query.id)})
+            self._write_segment_video(query[0], name=f'{query.id}-left')
+            self._write_segment_video(query[1], name=f'{query.id}-right')
+            requests.put(self.query_endpoint + query.id, json={"uuid": "{}".format(query.id)})
 
         return selected_queries
 
-    def _write_segment_video(self, segment, subdir, name, fps=20, fourcc=cv2.VideoWriter_fourcc(*'VP90'),
+    def _write_segment_video(self, segment, name, fps=20, fourcc=cv2.VideoWriter_fourcc(*'VP90'),
                              file_extension='.webm'):
 
-        _ensure_subdir(self.root_output_dir, subdir)
-        output_file_name = f'{self.root_output_dir}{subdir}{name}{file_extension}'
-        frame_shape = _get_frame_shape(segment)
+        output_file_name = f'{self.video_output_dir}{name}{file_extension}'
+        frame_shape = self._get_frame_shape(segment)
 
         video_writer = cv2.VideoWriter(output_file_name, fourcc, fps, frame_shape)
 
