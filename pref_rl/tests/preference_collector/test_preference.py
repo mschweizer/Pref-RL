@@ -15,3 +15,9 @@ def test_not_equal():
     query_1 = BinaryChoiceQuery(choice_set)
     query_2 = BinaryChoiceQuery(choice_set)
     assert Preference(query_1, choice) != Preference(query_2, choice)
+
+
+def test_string_repr():
+    choice = BinaryChoice(0)
+    pref = Preference(BinaryChoiceQuery(["segment_1", "segment_2"]), choice)
+    assert str(pref) == "Choice: " + str(choice)
