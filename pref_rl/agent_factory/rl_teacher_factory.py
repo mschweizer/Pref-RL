@@ -6,13 +6,14 @@ from ..agents.preference_based.buffered_policy_model import BufferedPolicyModel
 from ..environment_wrappers.internal.reward_monitor import RewardMonitor
 from ..environment_wrappers.internal.reward_predictor import RewardPredictor
 from ..environment_wrappers.internal.reward_standardizer import RewardStandardizer
-from ..environment_wrappers.internal.trajectory_observer import TrajectoryObserver, FrameTrajectoryObserver
+from ..environment_wrappers.internal.trajectory_observer.trajectory_observer import TrajectoryObserver, \
+    FrameTrajectoryObserver
 from ..preference_collector.human_preference.human_preference_collector import HumanPreferenceCollector
 from ..preference_collector.preference_collector import AbstractPreferenceCollector
 from ..preference_collector.synthetic_preference.preference_oracle import RewardMaximizingOracle
 from ..preference_collector.synthetic_preference.synthetic_preference_collector import SyntheticPreferenceCollector
 from ..preference_querent.dummy_preference_querent import DummyPreferenceQuerent
-from ..preference_querent.human_preference.human_preference_querent import HumanPreferenceQuerent
+from ..preference_querent.human_preference_querent import HumanPreferenceQuerent
 from ..preference_querent.preference_querent import AbstractPreferenceQuerent
 from ..preference_querent.query_selector.query_selector import RandomQuerySelector
 from ..query_generator.choice_set.choice_set_generator import ChoiceSetGenerator
