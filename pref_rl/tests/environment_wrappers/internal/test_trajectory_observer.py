@@ -1,8 +1,8 @@
-from ....environment_wrappers.internal.trajectory_buffer import TrajectoryBuffer
+from ....environment_wrappers.internal.trajectory_observer.trajectory_observer import TrajectoryObserver
 
 
 def test_wrapper_buffers_recent_behavior(cartpole_env):
-    wrapper = TrajectoryBuffer(cartpole_env)
+    wrapper = TrajectoryObserver(cartpole_env)
 
     buffer_size = wrapper.trajectory_buffer.size
 
