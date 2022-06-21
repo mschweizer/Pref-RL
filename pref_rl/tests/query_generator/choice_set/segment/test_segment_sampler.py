@@ -2,7 +2,7 @@ import logging
 from unittest.mock import Mock, MagicMock
 
 from .....agents.preference_based.buffered_policy_model import BufferedPolicyModel
-from .....environment_wrappers.internal.trajectory_buffer import Buffer
+from .....environment_wrappers.internal.trajectory_observer.buffer import Buffer
 from .....query_generator.choice_set.segment.segment_sampler import AbstractSegmentSampler
 
 

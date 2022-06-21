@@ -3,7 +3,8 @@ from unittest.mock import Mock
 import pytest
 
 from .....agents.preference_based.buffered_policy_model import BufferedPolicyModel
-from .....environment_wrappers.internal.trajectory_buffer import Buffer, Segment
+from .....environment_wrappers.internal.trajectory_observer.buffer import Buffer
+from .....environment_wrappers.internal.trajectory_observer.segment import Segment
 from .....query_generator.choice_set.segment.segment_sampler import RandomSegmentSampler
 
 

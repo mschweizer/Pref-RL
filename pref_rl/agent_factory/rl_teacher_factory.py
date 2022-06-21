@@ -6,7 +6,7 @@ from ..agents.preference_based.buffered_policy_model import BufferedPolicyModel
 from ..environment_wrappers.internal.reward_monitor import RewardMonitor
 from ..environment_wrappers.internal.reward_predictor import RewardPredictor
 from ..environment_wrappers.internal.reward_standardizer import RewardStandardizer
-from ..environment_wrappers.internal.trajectory_buffer import TrajectoryBuffer, FrameTrajectoryBuffer
+from ..environment_wrappers.internal.trajectory_observer import TrajectoryObserver, FrameTrajectoryObserver
 from ..preference_collector.human_preference.human_preference_collector import HumanPreferenceCollector
 from ..preference_collector.preference_collector import AbstractPreferenceCollector
 from ..preference_collector.synthetic_preference.preference_oracle import RewardMaximizingOracle
@@ -58,7 +58,7 @@ class SyntheticRLTeacherFactory(PbRLAgentFactory):
         return AnnealingQuerySchedule
 
     def _wrap_env(self, env, reward_model):
-        env = TrajectoryBuffer(env, trajectory_buffer_size=max(self.pb_step_freq, self.policy_train_freq))
+        env = TrajectoryObserver(env, trajectory_buffer_size=max(self.pb_step_freq, self.policy_train_freq))
         env = RewardPredictor(env, reward_model)
         env = RewardStandardizer(env)
         env = RewardMonitor(env)
@@ -83,7 +83,7 @@ class RLTeacherFactory(SyntheticRLTeacherFactory):
                                       video_output_directory=self.video_directory)
 
     def _wrap_env(self, env, reward_model):
-        env = FrameTrajectoryBuffer(env, trajectory_buffer_size=max(self.pb_step_freq, self.policy_train_freq))
+        env = FrameTrajectoryObserver(env, trajectory_buffer_size=max(self.pb_step_freq, self.policy_train_freq))
         env = RewardPredictor(env, reward_model)
         env = RewardStandardizer(env)
         env = RewardMonitor(env)

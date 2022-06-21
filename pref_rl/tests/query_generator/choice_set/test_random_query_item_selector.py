@@ -1,6 +1,6 @@
 import pytest
 
-from ....environment_wrappers.internal.trajectory_buffer import Segment
+from ....environment_wrappers.internal.trajectory_observer.segment import Segment
 from ....query_generator.query_item_selector import RandomItemSelector
 
 

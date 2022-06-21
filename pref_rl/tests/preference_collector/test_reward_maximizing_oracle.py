@@ -1,7 +1,7 @@
 import pytest
 
 from ...environment_wrappers.info_dict_keys import PENALIZED_TRUE_REW
-from ...environment_wrappers.internal.trajectory_buffer import Segment
+from ...environment_wrappers.internal.trajectory_observer.segment import Segment
 from ...preference_collector.binary_choice import BinaryChoice
 from ...preference_collector.synthetic_preference.preference_oracle import RewardMaximizingOracle
 from ...query_generator.query import ChoiceQuery
