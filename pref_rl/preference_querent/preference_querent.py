@@ -9,5 +9,3 @@ class AbstractPreferenceQuerent(ABC):
     @abstractmethod
     def query_preferences(self, query_candidates, num_queries) -> List:
         pass
-
-

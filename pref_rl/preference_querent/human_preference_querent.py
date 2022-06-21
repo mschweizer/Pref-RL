@@ -5,23 +5,7 @@ import cv2
 import numpy as np
 import requests
 
-from ..preference_querent import AbstractPreferenceQuerent
-
-
-def ensure_dir(dir):
-    if not os.path.exists(dir):
-        os.makedirs(dir)
-    return dir
-
-
-def _ensure_subdir(base_dir, subdir):
-    if not os.path.exists(f'{base_dir}{subdir}'):
-        os.mkdir(f'{base_dir}{subdir}')
-
-
-def _get_frame_shape(segment):
-    single_frame = np.array(segment.frames[0])
-    return single_frame.shape[1], single_frame.shape[0]
+from pref_rl.preference_querent.preference_querent import AbstractPreferenceQuerent
 
 
 class HumanPreferenceQuerent(AbstractPreferenceQuerent):
@@ -60,3 +44,14 @@ class HumanPreferenceQuerent(AbstractPreferenceQuerent):
             video_writer.write(cv2.cvtColor(frame, cv2.COLOR_RGB2BGR))
 
         video_writer.release()
+
+    @staticmethod
+    def _get_frame_shape(segment):
+        single_frame = np.array(segment.frames[0])
+        return single_frame.shape[1], single_frame.shape[0]
+
+    @staticmethod
+    def _ensure_dir(base_dir):
+        if not os.path.exists(base_dir):
+            os.makedirs(base_dir)
+        return base_dir

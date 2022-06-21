@@ -1,53 +1,70 @@
-import os
+from unittest.mock import Mock
+
 import numpy as np
-import gym
 import pytest
-from unittest.mock import Mock, MagicMock
 
-from preference_querent.human_preference.human_preference_querent import HumanPreferenceQuerent
-from preference_querent.query_selector.query_selector import RandomQuerySelector
-from query_generator.query import ChoiceQuery
+from pref_rl.preference_querent.human_preference_querent import HumanPreferenceQuerent
+from pref_rl.preference_querent.query_selector.query_selector import RandomQuerySelector
+from pref_rl.query_generator.query import ChoiceQuery
 
-
-def test_human_pref_querent(video_directory):
-
-    human_preference_querent = HumanPreferenceQuerent(
-        query_selector=RandomQuerySelector(), video_root_output_dir=video_directory)
-
-    dummy_frame = np.zeros((2, 2, 3), dtype=np.int8)
-    test=[[[[0, 0, 0], [0, 0, 0]]]]
-    dummy_segment = np.array([dummy_frame, dummy_frame, dummy_frame])
-
-    segment1 = Mock()
-    segment1.frames = MagicMock(return_value=dummy_segment)
-    segment2 = Mock()
-    segment2.frames = MagicMock(return_value=dummy_segment)
-
-    test_query = ChoiceQuery(choice_set=np.array([segment1, segment2]))
-
-    human_preference_querent.query_preferences(
-        query_candidates=[test_query], num_queries=1)
-
-    dir_count = 0
-    file_count = 0
-    for _, dirs, files in os.walk(video_directory):
-        for _ in dirs:
-            dir_count += 1
-        for _ in files:
-            file_count += 1
-    assert dir_count == 1
-    assert file_count == 2
+ADDRESS = "http://url"
 
 
 @pytest.fixture()
-def video_directory():
-    video_directory = '/tmp/videofiles/'
-    if not os.path.exists(video_directory):
-        os.makedirs(video_directory)
+def segment():
+    frame = np.random.randint(0, high=255, size=(2, 2, 3), dtype=np.uint8)
+    segment = Mock()
+    segment.frames = np.array([frame, frame, frame])
+    return segment
 
-    yield video_directory
 
-    for _, _, files in os.walk(video_directory):
-        for file in files:
-            os.remove(file)
-    os.rmdir(video_directory)
+@pytest.fixture()
+def query(segment):
+    return ChoiceQuery(choice_set=[segment, segment])
+
+
+@pytest.fixture()
+def querent(tmpdir):
+    return HumanPreferenceQuerent(query_selector=RandomQuerySelector(),
+                                  video_output_directory=str(tmpdir) + "/",
+                                  pref_collect_address=ADDRESS)
+
+
+def test_writes_video_file(querent, segment, tmpdir):
+    filename = "video"
+    querent._write_segment_video(segment, name=filename)
+
+    assert tmpdir.join("/{}.webm".format(filename)).exists()
+
+
+def test_queries_correct_number_of_queries(querent, query, tmpdir, requests_mock):
+    requests_mock.put(ADDRESS + "/preferences/query/{}".format(query.id))
+
+    num_queries = 1
+    newly_pending_queries = querent.query_preferences(query_candidates=[query], num_queries=num_queries)
+
+    assert len(newly_pending_queries) == num_queries
+
+
+def test_writes_videos_for_queries(querent, query, tmpdir, requests_mock):
+    requests_mock.put(ADDRESS + "/preferences/query/{}".format(query.id))
+    querent.query_preferences(query_candidates=[query], num_queries=1)
+
+    assert tmpdir.join("/{}-left.webm".format(query.id)).exists()
+    assert tmpdir.join("/{}-right.webm".format(query.id)).exists()
+
+
+def test_identifies_correct_frame_shape(querent):
+    frame_shape = [2, 2]
+    frame = np.random.randint(0, high=255, size=frame_shape + [3], dtype=np.uint8)
+    segment = Mock()
+    segment.frames = np.array([frame, frame, frame])
+
+    assert querent._get_frame_shape(segment) == tuple(frame_shape)
+
+
+def test_creates_video_dir_if_not_existent(querent, tmpdir):
+    does_not_exist_dir = str(tmpdir) + "/does_not_exist/"
+    assert not tmpdir.join("/does_not_exist/").exists()
+    querent._ensure_dir(does_not_exist_dir)
+    assert tmpdir.join("/does_not_exist/").exists()
