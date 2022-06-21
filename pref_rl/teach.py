@@ -1,23 +1,8 @@
 import argparse
-import logging
 
 from pref_rl.agent_factory.rl_teacher_factory import RLTeacherFactory, SyntheticRLTeacherFactory
 from pref_rl.environment_wrappers.utils import create_env
-
-
-def create_logger():
-    logger = logging.getLogger('pref_rl')
-    logger.setLevel(logging.DEBUG)
-
-    ch = logging.StreamHandler()
-    ch.setLevel(logging.INFO)
-
-    formatter = logging.Formatter('%(levelname)s - %(message)s')
-    ch.setFormatter(formatter)
-
-    logger.addHandler(ch)
-
-    return logger
+from pref_rl.utils.logging import create_logger
 
 
 def create_cli():
@@ -43,7 +28,7 @@ def main():
     parser = create_cli()
     args = parser.parse_args()
 
-    logger = create_logger()
+    logger = create_logger("pref_rl")
 
     env = create_env(args.env_id, termination_penalty=10.)
     logger.info("'{}' environment created".format(args.env_id))

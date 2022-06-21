@@ -1,0 +1,16 @@
+import logging
+
+
+def create_logger(location):
+    logger = logging.getLogger(location)
+    logger.setLevel(logging.DEBUG)
+
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.INFO)
+
+    formatter = logging.Formatter('%(levelname)s - %(message)s')
+    ch.setFormatter(formatter)
+
+    logger.addHandler(ch)
+
+    return logger
