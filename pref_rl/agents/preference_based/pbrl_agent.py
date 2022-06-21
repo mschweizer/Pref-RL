@@ -1,17 +1,17 @@
 import logging
-import os
 import time
 
 from .pbrl_callback import PbStepCallback
 from ..rl_agent import RLAgent
 from ...query_schedule.query_schedule import AbstractQuerySchedule
 
+SAVE_POLICY_MODEL_LOG_MSG = "saved policy model to {}/{}"
+
 
 class PbRLAgent(RLAgent):
     def __init__(self, policy_model, pretraining_query_generator, query_generator, preference_querent,
-                 preference_collector, reward_model_trainer, reward_model, query_schedule_cls,
-                 pb_step_freq, save_dir=None, agent_name=None, reward_train_freq=None, num_epochs_in_pretraining=8,
-                 num_epochs_in_training=16):
+                 preference_collector, reward_model_trainer, reward_model, query_schedule_cls, pb_step_freq,
+                 reward_train_freq, num_epochs_in_pretraining=8, num_epochs_in_training=16, agent_name="pbrl-agent"):
 
         self.logger = logging.getLogger('pref_rl.agents.preference_based.pbrl_agent.PbRLAgent')
 
@@ -29,8 +29,7 @@ class PbRLAgent(RLAgent):
 
         self.pb_step_freq: int = pb_step_freq
 
-        self.save_dir = save_dir
-        self.agent_name = agent_name
+        self.name = agent_name
 
         if reward_train_freq:
             self.reward_train_freq: int = reward_train_freq
@@ -74,9 +73,6 @@ class PbRLAgent(RLAgent):
         return query_candidates
 
     def _collect_preferences(self, wait_until_all_collected=False):
-        if self._num_pending_queries() > 50:
-            input("More than 50 queries pending. Press Enter to continue.")
-
         self._collect()
 
         sleep_seconds = 15
@@ -109,12 +105,6 @@ class PbRLAgent(RLAgent):
         self.policy_model.learn(total_timesteps, callback=PbStepCallback(pb_step_function=self._pb_step,
                                                                          pb_step_freq=self.pb_step_freq))
 
-    def _save_agent(self, save_dir, agent_name):
-        if not os.path.exists(save_dir):
-            os.makedirs(save_dir)
-        self.policy_model.rl_algo.save(f"{save_dir}{agent_name}")
-        logging.info("Saved agent.")
-
     def _pb_step(self, current_timestep):
         num_queries = self._num_desired_queries(current_timestep)
         self.logger.info("PREFERENCE STEP // {} scheduled preference queries".format(num_queries))
@@ -128,13 +118,15 @@ class PbRLAgent(RLAgent):
             self.reward_model_trainer.train(self.num_epochs_in_training)
             self._set_last_reward_model_training_step_to(current_timestep)
 
-            if self.save_dir and self.agent_name:
-                self._save_agent(save_dir=self.save_dir, agent_name=self.agent_name)
-
         self.logger.info("POLICY MODEL TRAINING // {completed}% completed [{current} / {total} total steps]".format(
             completed=int((current_timestep/self.query_schedule.num_training_steps)*100),
             current=current_timestep,
             total=int(self.query_schedule.num_training_steps)))
+
+    def save_policy_model(self, path):
+        model_name = self.name + "_policy-model"
+        self.policy_model.save(path, model_name)
+        self.logger.info(SAVE_POLICY_MODEL_LOG_MSG.format(path, model_name))
 
     def _num_desired_queries(self, current_timestep):
         return self._calculate_num_desired_queries(self._num_scheduled_preferences(current_timestep),

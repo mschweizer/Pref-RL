@@ -1,3 +1,5 @@
+import os
+
 from stable_baselines3 import A2C
 
 
@@ -20,3 +22,9 @@ class PolicyModel:
 
     def choose_action(self, *args, **kwargs):
         return self.rl_algo.predict(*args, **kwargs)
+
+    def save(self, directory, model_name):
+        if not os.path.exists(directory):
+            os.makedirs(directory)
+        save_path = f"{directory}{model_name}"
+        self.rl_algo.save(save_path)

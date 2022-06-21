@@ -66,5 +66,5 @@ class PbRLAgentFactory(ABC):
 
         return PbRLAgent(policy_model, pretraining_query_generator, query_generator, preference_querent,
                          preference_collector, reward_model_trainer, reward_model, query_schedule_cls,
-                         self.pb_step_freq, save_dir, agent_name, self.reward_training_freq,
-                         self.num_epochs_in_pretraining, self.num_epochs_in_training)
+                         self.pb_step_freq, self.reward_training_freq, self.num_epochs_in_pretraining,
+                         self.num_epochs_in_training, agent_name)
