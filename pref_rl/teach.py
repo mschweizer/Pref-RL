@@ -35,6 +35,7 @@ def create_cli():
     parser.add_argument('--preference_type', default="synthetic", type=str)
     parser.add_argument('--query_segment_length', default=25, type=int)
     parser.add_argument('--pref_collect_addr', default="http://127.0.0.1:8000", type=str)
+    parser.add_argument('--video_directory', type=str)
     return parser
 
 
@@ -52,8 +53,8 @@ def main():
                                    reward_train_freq=args.reward_train_freq,
                                    num_epochs_in_pretraining=args.pretraining_epochs,
                                    num_epochs_in_training=args.training_epochs,
-                                   pref_collect_address=args.pref_collect_addr,
-                                   segment_length=args.query_segment_length)
+                                   pref_collect_address=args.pref_collect_addr, video_directory=args.video_directory,
+                                   video_segment_length=args.query_segment_length)
     else:
         factory = SyntheticRLTeacherFactory(policy_train_freq=args.policy_train_freq,
                                             pb_step_freq=args.pb_step_freq,

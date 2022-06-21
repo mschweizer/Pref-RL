@@ -68,21 +68,19 @@ class SyntheticRLTeacherFactory(PbRLAgentFactory):
 class RLTeacherFactory(SyntheticRLTeacherFactory):
 
     def __init__(self, policy_train_freq, pb_step_freq, reward_train_freq, num_epochs_in_pretraining,
-                 num_epochs_in_training, pref_collect_address, segment_length=25, video_output_dir=None):
+                 num_epochs_in_training, pref_collect_address, video_directory, video_segment_length=25):
         super().__init__(policy_train_freq, pb_step_freq, reward_train_freq,
-                         num_epochs_in_pretraining, num_epochs_in_training, segment_length=segment_length)
+                         num_epochs_in_pretraining, num_epochs_in_training, segment_length=video_segment_length)
         self.pref_collect_address = pref_collect_address
-        self.video_output_dir = video_output_dir
+        self.video_directory = video_directory
 
     def _create_preference_collector(self) -> AbstractPreferenceCollector:
         return HumanPreferenceCollector(pref_collect_address=self.pref_collect_address)
 
     def _create_preference_querent(self) -> AbstractPreferenceQuerent:
-        if self.video_output_dir is None:
-            return HumanPreferenceQuerent(query_selector=RandomQuerySelector())
-        else:
-            return HumanPreferenceQuerent(query_selector=RandomQuerySelector(),
-                                          video_root_output_dir=self.video_output_dir)
+        return HumanPreferenceQuerent(query_selector=RandomQuerySelector(),
+                                      pref_collect_address=self.pref_collect_address,
+                                      video_output_directory=self.video_directory)
 
     def _wrap_env(self, env, reward_model):
         env = FrameTrajectoryBuffer(env, trajectory_buffer_size=max(self.pb_step_freq, self.policy_train_freq))
