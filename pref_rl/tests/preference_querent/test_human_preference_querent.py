@@ -25,9 +25,8 @@ def query(segment):
 
 @pytest.fixture()
 def querent(tmpdir):
-    return HumanPreferenceQuerent(query_selector=RandomQuerySelector(),
-                                  video_output_directory=str(tmpdir) + "/",
-                                  pref_collect_address=ADDRESS)
+    return HumanPreferenceQuerent(query_selector=RandomQuerySelector(), pref_collect_address=ADDRESS,
+                                  video_output_directory=str(tmpdir) + "/")
 
 
 def test_writes_video_file(querent, segment, tmpdir):
