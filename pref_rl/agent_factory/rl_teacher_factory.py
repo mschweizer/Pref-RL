@@ -69,11 +69,13 @@ class SyntheticRLTeacherFactory(PbRLAgentFactory):
 class RLTeacherFactory(SyntheticRLTeacherFactory):
 
     def __init__(self, policy_train_freq, pb_step_freq, reward_train_freq, num_epochs_in_pretraining,
-                 num_epochs_in_training, pref_collect_address, video_directory, video_segment_length=25):
+                 num_epochs_in_training, pref_collect_address, video_directory, video_segment_length=25,
+                 frames_per_second=20):
         super().__init__(policy_train_freq, pb_step_freq, reward_train_freq,
                          num_epochs_in_pretraining, num_epochs_in_training, segment_length=video_segment_length)
         self.pref_collect_address = pref_collect_address
         self.video_directory = video_directory
+        self.fps = frames_per_second
 
     def _create_preference_collector(self) -> AbstractPreferenceCollector:
         return HumanPreferenceCollector(pref_collect_address=self.pref_collect_address)
@@ -81,7 +83,8 @@ class RLTeacherFactory(SyntheticRLTeacherFactory):
     def _create_preference_querent(self) -> AbstractPreferenceQuerent:
         return HumanPreferenceQuerent(query_selector=RandomQuerySelector(),
                                       pref_collect_address=self.pref_collect_address,
-                                      video_output_directory=self.video_directory)
+                                      video_output_directory=self.video_directory,
+                                      frames_per_second=self.fps)
 
     def _wrap_env(self, env, reward_model):
         env = FrameTrajectoryObserver(env, trajectory_buffer_size=max(self.pb_step_freq, self.policy_train_freq))

@@ -10,8 +10,9 @@ from pref_rl.preference_querent.preference_querent import AbstractPreferenceQuer
 
 class HumanPreferenceQuerent(AbstractPreferenceQuerent):
 
-    def __init__(self, query_selector, pref_collect_address, video_output_directory):
+    def __init__(self, query_selector, pref_collect_address, video_output_directory, frames_per_second=20):
         super().__init__(query_selector)
+        self.fps = frames_per_second
         self.video_output_dir = self._ensure_dir(video_output_directory)
         self.query_endpoint = pref_collect_address + "/preferences/query/"
 
@@ -25,13 +26,12 @@ class HumanPreferenceQuerent(AbstractPreferenceQuerent):
 
         return selected_queries
 
-    def _write_segment_video(self, segment, name, fps=20, fourcc=cv2.VideoWriter_fourcc(*'VP90'),
-                             file_extension='.webm'):
+    def _write_segment_video(self, segment, name, fourcc=cv2.VideoWriter_fourcc(*'VP90'), file_extension='.webm'):
 
         output_file_name = f'{self.video_output_dir}{name}{file_extension}'
         frame_shape = self._get_frame_shape(segment)
 
-        video_writer = cv2.VideoWriter(output_file_name, fourcc, fps, frame_shape)
+        video_writer = cv2.VideoWriter(output_file_name, fourcc, self.fps, frame_shape)
 
         for frame in segment.frames:
             video_writer.write(cv2.cvtColor(frame, cv2.COLOR_RGB2BGR))
