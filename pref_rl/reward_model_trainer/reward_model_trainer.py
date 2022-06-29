@@ -30,6 +30,9 @@ class RewardModelTrainer(AbstractRewardModelTrainer):
         self.global_training_step = 0
         self.preferences = PreferenceDataset(capacity=dataset_capacity)
 
+        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        self.choice_model.to(self.device)
+
     # TODO: Rename param `pretraining` to `reset_training_steps`
     def train(self, epochs, reset_logging_timesteps_afterwards=False, *args, **kwargs):
         # TODO: Remove preferences parameter and switch dataset=preferences to dataset=self.preferences
@@ -39,7 +42,8 @@ class RewardModelTrainer(AbstractRewardModelTrainer):
         for epoch in range(epochs):
 
             for i, data in enumerate(train_loader, 0):
-                queries, choices = data
+                _queries, _choices = data
+                queries, choices = _queries.to(self.device), _choices.to(self.device)
 
                 self.optimizer.zero_grad()
 
