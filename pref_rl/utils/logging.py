@@ -9,7 +9,7 @@ def create_logger(location):
     ch = logging.StreamHandler()
     ch.setLevel(logging.INFO)
 
-    formatter = logging.Formatter('%(levelname)s - %(message)s')
+    formatter = logging.Formatter('%(levelname)s [%(name)s] - %(message)s')
     ch.setFormatter(formatter)
 
     logger.addHandler(ch)

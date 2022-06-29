@@ -1,6 +1,6 @@
-import logging
 from abc import ABC, abstractmethod
 
+from pref_rl.utils.logging import create_logger
 from .common import RandomSamplingMixin
 from ...query_item_generator import AbstractQueryItemGenerator
 
@@ -8,6 +8,7 @@ from ...query_item_generator import AbstractQueryItemGenerator
 class AbstractSegmentSampler(AbstractQueryItemGenerator, ABC):
     def __init__(self, segment_length):
         self.segment_length = segment_length
+        self.logger = create_logger("SegmentSampler")
 
     def generate(self, policy_model, num_items):
         try:
@@ -42,5 +43,4 @@ class AbstractSegmentSampler(AbstractQueryItemGenerator, ABC):
 class RandomSegmentSampler(RandomSamplingMixin, AbstractSegmentSampler):
     def __init__(self, segment_length):
         super().__init__(segment_length)
-        self.logger = logging.getLogger(
-            'pref_rl.query_generator.choice_set.segment.segment_sampler.RandomSegmentSampler')
+        self.logger = create_logger('RandomSegmentSampler')
