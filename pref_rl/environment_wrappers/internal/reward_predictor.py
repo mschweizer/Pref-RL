@@ -9,6 +9,7 @@ class RewardPredictor(Wrapper):
     def __init__(self, env, reward_model):
         super().__init__(env)
         self.reward_model = reward_model
+        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     def step(self, action):
         observation, reward, done, info = self.env.step(action)
@@ -21,8 +22,7 @@ class RewardPredictor(Wrapper):
         input_data = self._prepare_for_model(observation)
         return float(self.reward_model(input_data))
 
-    @staticmethod
-    def _prepare_for_model(observation):
+    def _prepare_for_model(self, observation):
         # TODO: converting the list to a single numpy.ndarray with numpy.array() before converting to a tensor.
         #  (See Rob's mail)
-        return torch.as_tensor([np.array(observation)])
+        return torch.as_tensor([np.array(observation)], device=self.device)
