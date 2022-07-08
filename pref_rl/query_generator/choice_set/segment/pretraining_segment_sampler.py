@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 
+from pref_rl.utils.logging import create_logger
 from .common import RandomSamplingMixin
 from ...query_item_generator import AbstractQueryItemGenerator
 
@@ -7,8 +8,10 @@ from ...query_item_generator import AbstractQueryItemGenerator
 class AbstractPretrainingSegmentSampler(AbstractQueryItemGenerator, ABC):
     def __init__(self, segment_length):
         self.segment_length = segment_length
+        self.logger = create_logger("PretrainingSegmentSampler")
 
     def generate(self, policy_model, num_items):
+        self.logger.info("{} segment samples requested".format(num_items))
         samples = []
 
         # Determine number of samples so that the probability of duplicate segment samples is fairly low
@@ -18,9 +21,15 @@ class AbstractPretrainingSegmentSampler(AbstractQueryItemGenerator, ABC):
         samples_per_rollout = max(1, int(0.3 * trajectory_buffer_length / self.segment_length))
 
         while len(samples) < num_items:
-            policy_model.run(steps=policy_model.trajectory_buffer.size)
+            self.logger.info(
+                "Collecting rollout of length {} from randomly initialized policy for segment sampling".format(
+                    trajectory_buffer_length))
+            policy_model.run(steps=trajectory_buffer_length)
             for _ in range(samples_per_rollout):
                 samples.append(self._sample_segment(policy_model.trajectory_buffer, self.segment_length))
+            self.logger.info(
+                "{sampled} segments sampled - {outstanding} left".format(sampled=samples_per_rollout,
+                                                                         outstanding=num_items - len(samples)))
         return samples
 
     @abstractmethod
