@@ -27,11 +27,10 @@ from ..reward_model_trainer.reward_model_trainer import RewardModelTrainer
 
 class SyntheticRLTeacherFactory(PbRLAgentFactory):
 
-    def __init__(self,
-                 policy_train_freq, pb_step_freq, reward_train_freq,
-                 num_epochs_in_pretraining, num_epochs_in_training,
-                 segment_length=25):
-        super().__init__(pb_step_freq, reward_train_freq, num_epochs_in_pretraining, num_epochs_in_training)
+    def __init__(self, policy_train_freq, pb_step_freq, reward_train_freq, num_epochs_in_pretraining,
+                 num_epochs_in_training, segment_length=25, dataset_buffer_size=3000):
+        super().__init__(pb_step_freq, reward_train_freq, num_epochs_in_pretraining, num_epochs_in_training,
+                         dataset_buffer_size)
         self.segment_length = segment_length
         self.policy_train_freq = policy_train_freq
 
@@ -39,7 +38,7 @@ class SyntheticRLTeacherFactory(PbRLAgentFactory):
         return BufferedPolicyModel(env=self._wrap_env(env, reward_model), train_freq=self.policy_train_freq)
 
     def _create_reward_model_trainer(self, reward_model) -> RewardModelTrainer:
-        return RewardModelTrainer(reward_model)
+        return RewardModelTrainer(reward_model, dataset_buffer_size=self.dataset_size)
 
     def _create_pretraining_query_generator(self) -> AbstractQueryGenerator:
         return ChoiceSetGenerator(item_generator=RandomPretrainingSegmentSampler(segment_length=self.segment_length),
@@ -70,9 +69,10 @@ class RLTeacherFactory(SyntheticRLTeacherFactory):
 
     def __init__(self, policy_train_freq, pb_step_freq, reward_train_freq, num_epochs_in_pretraining,
                  num_epochs_in_training, pref_collect_address, video_directory, video_segment_length=25,
-                 frames_per_second=20):
-        super().__init__(policy_train_freq, pb_step_freq, reward_train_freq,
-                         num_epochs_in_pretraining, num_epochs_in_training, segment_length=video_segment_length)
+                 frames_per_second=20, dataset_buffer_size=3000):
+        super().__init__(policy_train_freq, pb_step_freq, reward_train_freq, num_epochs_in_pretraining,
+                         num_epochs_in_training, segment_length=video_segment_length,
+                         dataset_buffer_size=dataset_buffer_size)
         self.pref_collect_address = pref_collect_address
         self.video_directory = video_directory
         self.fps = frames_per_second

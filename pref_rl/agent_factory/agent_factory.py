@@ -13,11 +13,13 @@ from ..reward_models.utils import get_model_by_name
 
 class PbRLAgentFactory(ABC):
 
-    def __init__(self, pb_step_freq, reward_training_freq, num_epochs_in_pretraining, num_epochs_in_training):
+    def __init__(self, pb_step_freq, reward_training_freq, num_epochs_in_pretraining, num_epochs_in_training,
+                 dataset_buffer_size=3000):
         self.pb_step_freq = pb_step_freq
         self.reward_training_freq = reward_training_freq
         self.num_epochs_in_pretraining = num_epochs_in_pretraining
         self.num_epochs_in_training = num_epochs_in_training
+        self.dataset_size = dataset_buffer_size
 
     @staticmethod
     def _create_reward_model(env, reward_model_name):

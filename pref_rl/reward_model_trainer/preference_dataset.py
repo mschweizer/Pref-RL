@@ -13,9 +13,9 @@ def make_discard_warning(num_elements, capacity):
 
 
 class PreferenceDataset(torch.utils.data.Dataset):
-    def __init__(self, capacity=4096, preferences=None):
-        self.queries = deque(maxlen=capacity)
-        self.choices = deque(maxlen=capacity)
+    def __init__(self, buffer_size=4096, preferences=None):
+        self.queries = deque(maxlen=buffer_size)
+        self.choices = deque(maxlen=buffer_size)
         self.lifetime_preference_count = 0
 
         if preferences:

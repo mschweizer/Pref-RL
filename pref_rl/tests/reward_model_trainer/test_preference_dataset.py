@@ -33,7 +33,7 @@ def test_has_correct_format(preferences, env):
 def test_initializes_with_data(preference):
     preferences = [preference]
 
-    dataset = PreferenceDataset(capacity=len(preferences), preferences=preferences)
+    dataset = PreferenceDataset(buffer_size=len(preferences), preferences=preferences)
 
     assert len(dataset) == len(preferences)
     assert dataset.choices[0] == dataset._prepare_choices(preferences)[0]
@@ -41,7 +41,7 @@ def test_initializes_with_data(preference):
 
 
 def test_initializes_without_data():
-    dataset = PreferenceDataset(capacity=2)
+    dataset = PreferenceDataset(buffer_size=2)
     assert len(dataset) == 0
 
 
@@ -50,7 +50,7 @@ def test_warns_when_discarding_records_from_batch(preferences):
     capacity = num_elements - 1
 
     with pytest.warns(None) as record:
-        PreferenceDataset(capacity=capacity, preferences=preferences)
+        PreferenceDataset(buffer_size=capacity, preferences=preferences)
 
     assert len(record) == 1
     assert str(record[0].message) == make_discard_warning(num_elements=num_elements, capacity=capacity)
@@ -58,7 +58,7 @@ def test_warns_when_discarding_records_from_batch(preferences):
 
 def test_append_single_record(preferences, preference):
     capacity = len(preferences) + 1
-    dataset = PreferenceDataset(capacity=capacity, preferences=preferences)
+    dataset = PreferenceDataset(buffer_size=capacity, preferences=preferences)
 
     dataset.append(preference)
 
@@ -66,7 +66,7 @@ def test_append_single_record(preferences, preference):
 
 
 def test_discards_oldest_records_when_capacity_is_reached(preference):
-    dataset = PreferenceDataset(capacity=1, preferences=[preference])
+    dataset = PreferenceDataset(buffer_size=1, preferences=[preference])
     new_preference = BinaryChoiceSetPreference(preference.query, BinaryChoice.RIGHT)
 
     dataset.extend([new_preference])
@@ -75,5 +75,5 @@ def test_discards_oldest_records_when_capacity_is_reached(preference):
 
 
 def test_counts_number_of_preferences_over_lifetime(preferences):
-    dataset = PreferenceDataset(capacity=1, preferences=preferences)
+    dataset = PreferenceDataset(buffer_size=1, preferences=preferences)
     assert dataset.lifetime_preference_count == len(preferences)
