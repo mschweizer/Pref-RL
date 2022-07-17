@@ -23,6 +23,4 @@ class RewardPredictor(Wrapper):
         return float(self.reward_model(input_data))
 
     def _prepare_for_model(self, observation):
-        # TODO: converting the list to a single numpy.ndarray with numpy.array() before converting to a tensor.
-        #  (See Rob's mail)
-        return torch.as_tensor([np.array(observation)], device=self.device)
+        return torch.unsqueeze(torch.as_tensor(np.array(observation), device=self.device), dim=0)
