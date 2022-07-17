@@ -8,6 +8,7 @@ from torch.utils.tensorboard import SummaryWriter
 
 from .choice_model import ChoiceModel
 from .preference_dataset import PreferenceDataset
+from ..utils.logging import create_logger
 
 
 class AbstractRewardModelTrainer(ABC):
@@ -21,6 +22,9 @@ class RewardModelTrainer(AbstractRewardModelTrainer):
     def __init__(self, reward_model, batch_size=64, learning_rate=1e-3, summary_writing_interval=16,
                  dataset_buffer_size=3000):
         AbstractRewardModelTrainer.__init__(self)
+
+        self.logger = self.logger = create_logger("RewardModelTrainer")
+
         self.choice_model = ChoiceModel(reward_model)
         self.optimizer = optim.Adam(self.choice_model.parameters(), lr=learning_rate)
         self.criterion = F.binary_cross_entropy
@@ -30,12 +34,15 @@ class RewardModelTrainer(AbstractRewardModelTrainer):
         self.global_training_step = 0
         self.preferences = PreferenceDataset(buffer_size=dataset_buffer_size)
 
+        self.logger.info("Cuda available: {}".format(str(torch.cuda.is_available())))
         self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
         self.choice_model.to(self.device)
 
-    # TODO: Rename param `pretraining` to `reset_training_steps`
     def train(self, epochs, reset_logging_timesteps_afterwards=False, *args, **kwargs):
-        # TODO: Remove preferences parameter and switch dataset=preferences to dataset=self.preferences
+        self.logger.info(
+            "Start reward model training with {num_prefs} preferences "
+            "for {num_epochs} epochs.".format(num_prefs=len(self.preferences), num_epochs=epochs))
+
         train_loader = torch.utils.data.DataLoader(dataset=self.preferences, batch_size=self.batch_size)
 
         running_loss = 0.
@@ -60,6 +67,8 @@ class RewardModelTrainer(AbstractRewardModelTrainer):
                     running_loss = 0.0
 
                 self.global_training_step += 1
+
+            self.logger.info("Training epochs completed: {completed}/{total}".format(completed=epoch+1, total=epochs))
 
         if reset_logging_timesteps_afterwards:
             # reset global step after every round of pretraining
