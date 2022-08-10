@@ -56,7 +56,6 @@ class PbRLAgent(RLAgent):
         self.reward_model_trainer.train(epochs=self.num_epochs_in_pretraining, reset_logging_timesteps_afterwards=True)
 
     def _send_preference_queries(self, num_queries, pretraining=False):
-        # TODO: Generate num_query_candidates > num_queries for active learning
         query_candidates = self._generate_query_candidates(num_queries, pretraining)
         self.logger.info("{} query candidates generated".format(len(query_candidates)))
         newly_pending_queries = self.preference_querent.query_preferences(query_candidates, num_queries)
