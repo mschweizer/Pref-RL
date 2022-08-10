@@ -5,10 +5,11 @@ import requests
 from pref_rl.preference_collector.binary_choice import BinaryChoice
 from pref_rl.preference_collector.preference import Preference
 from pref_rl.preference_collector.preference_collector import AbstractPreferenceCollector
-
+from pref_rl.utils.logging import create_logger
 
 INCOMPARABLE = -1.
 ERROR_MSG = "Unexpected value for label retrieved from database. "
+INCOMPARABLE_ERROR_MSG = "Query was incomparable. "
 
 
 class HumanPreferenceCollector(AbstractPreferenceCollector):
@@ -16,6 +17,8 @@ class HumanPreferenceCollector(AbstractPreferenceCollector):
     def __init__(self, pref_collect_address):
         super().__init__()
         self.query_endpoint = pref_collect_address + "/preferences/query/"
+        self.logger = create_logger('HumanPreferenceCollector')
+
 
     def collect_preferences(self) -> List:
 
@@ -26,8 +29,11 @@ class HumanPreferenceCollector(AbstractPreferenceCollector):
             retrieved_label = self._retrieve_label(query.id)
 
             if retrieved_label is not None:
-                preference = self._create_preference(query, retrieved_label)
-                just_collected_preferences.extend([preference])
+                try:
+                    preference = self._create_preference(query, retrieved_label)
+                    just_collected_preferences.append(preference)
+                except ValueError as e:
+                    self.logger.debug(str(e))
                 self.pending_queries.remove(query)
 
         return just_collected_preferences
@@ -44,6 +50,10 @@ class HumanPreferenceCollector(AbstractPreferenceCollector):
         except ValueError as e:
             if retrieved_label != INCOMPARABLE:
                 raise ValueError(ERROR_MSG + str(e))
+            elif retrieved_label == INCOMPARABLE:
+                raise ValueError(INCOMPARABLE_ERROR_MSG + str(e))
+            else:
+                raise e
 
     def _retrieve_label(self, query_id):
         answered_query = requests.get(self.query_endpoint + query_id).json()

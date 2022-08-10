@@ -20,7 +20,7 @@ def test_forward_pass(pong_env):
     pong_env.reset()
     obs = pong_env.step(action)[0]
 
-    observation = torch.as_tensor([np.array(obs)])
+    observation = torch.unsqueeze(torch.as_tensor(np.array(obs)), dim=0)
     prediction = reward_model(observation)
 
     assert prediction is not None

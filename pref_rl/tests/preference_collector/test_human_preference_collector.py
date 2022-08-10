@@ -2,7 +2,7 @@ import pytest
 
 from ...preference_collector.binary_choice import BinaryChoice
 from ...preference_collector.human_preference.human_preference_collector import HumanPreferenceCollector, ERROR_MSG, \
-    INCOMPARABLE
+    INCOMPARABLE, INCOMPARABLE_ERROR_MSG
 from ...preference_collector.preference import Preference
 from ...query_generator.query import BinaryChoiceQuery
 
@@ -54,6 +54,24 @@ def test_collects_preference(collector, query, requests_mock):
     requests_mock.get(ADDRESS + "/preferences/query/{}".format(query.id), json={"query_id": query.id, "label": label})
 
     assert Preference(query, BinaryChoice(label)) in collector.collect_preferences()
+
+
+def test_does_not_collect_preference_if_query_was_incomparable(collector, query, requests_mock):
+    collector.pending_queries.append(query)
+    label = -1.0
+    requests_mock.get(ADDRESS + "/preferences/query/{}".format(query.id), json={"query_id": query.id, "label": label})
+
+    assert len(collector.collect_preferences()) == 0
+
+
+def test_does_log_value_error_if_query_was_incomparable(collector, query, requests_mock, caplog):
+    collector.pending_queries.append(query)
+    label = -1.0
+    requests_mock.get(ADDRESS + "/preferences/query/{}".format(query.id), json={"query_id": query.id, "label": label})
+    collector.collect_preferences()
+
+    assert caplog.records[0].levelname == "DEBUG"
+    assert INCOMPARABLE_ERROR_MSG in caplog.records[0].message
 
 
 def test_collected_query_is_removed_from_pending(collector, query, requests_mock):
