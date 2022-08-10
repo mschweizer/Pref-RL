@@ -20,6 +20,7 @@ def create_cli():
     parser.add_argument('--preference_type', default="synthetic", type=str)
     parser.add_argument('--query_segment_length', default=25, type=int)
     parser.add_argument('--pref_collect_addr', default="http://127.0.0.1:8000", type=str)
+    parser.add_argument('--frame_stack', type=int, default=None)
     parser.add_argument('--video_directory', type=str)
     parser.add_argument('--fps', default=20, type=int)
     return parser
@@ -31,7 +32,7 @@ def main():
 
     logger = create_logger("pref_rl")
 
-    env = create_env(args.env_id, termination_penalty=10.)
+    env = create_env(args.env_id, termination_penalty=10., frame_stack_depth=args.frame_stack)
     logger.info("'{}' environment created".format(args.env_id))
 
     if args.preference_type == "human":
