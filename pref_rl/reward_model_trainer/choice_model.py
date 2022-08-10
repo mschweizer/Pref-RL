@@ -27,4 +27,4 @@ class ChoiceModel(nn.Module):
 
     @staticmethod
     def compute_choice_probability(total_rewards):
-        return F.softmax(total_rewards)[:, 0].type(torch.float64)
+        return F.softmax(total_rewards, dim=1)[:, 0].type(torch.float64)
