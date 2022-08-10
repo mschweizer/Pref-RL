@@ -4,7 +4,7 @@ from pref_rl.environment_wrappers.internal.trajectory_observer.buffer import Buf
 
 
 class TrajectoryObserver(Wrapper):
-    def __init__(self, env, trajectory_buffer_size=1024):  # TODO: couple buffer size with steps per RL model update
+    def __init__(self, env, trajectory_buffer_size=1024):
         super().__init__(env)
         self.trajectory_buffer = Buffer(buffer_size=trajectory_buffer_size)
         self._last_observation = None
