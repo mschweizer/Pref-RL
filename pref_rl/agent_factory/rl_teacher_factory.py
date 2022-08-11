@@ -17,8 +17,9 @@ from ..preference_querent.human_preference_querent import HumanPreferenceQuerent
 from ..preference_querent.preference_querent import AbstractPreferenceQuerent
 from ..preference_querent.query_selector.query_selector import RandomQuerySelector
 from ..query_generator.choice_set.choice_set_generator import ChoiceSetGenerator
-from ..query_generator.choice_set.segment.pretraining_segment_sampler import RandomPretrainingSegmentSampler
-from ..query_generator.choice_set.segment.segment_sampler import RandomSegmentSampler
+from ..query_generator.choice_set.segment.pretraining_segment_sampler import RandomPretrainingSegmentSampler, \
+    RandomNoResetPretrainingSegmentSampler
+from ..query_generator.choice_set.segment.segment_sampler import RandomSegmentSampler, RandomNoResetSegmentSampler
 from ..query_generator.query_generator import AbstractQueryGenerator
 from ..query_generator.query_item_selector import RandomItemSelector
 from ..query_schedule.query_schedule import AbstractQuerySchedule, AnnealingQuerySchedule
@@ -41,11 +42,12 @@ class SyntheticRLTeacherFactory(PbRLAgentFactory):
         return RewardModelTrainer(reward_model, dataset_buffer_size=self.dataset_size)
 
     def _create_pretraining_query_generator(self) -> AbstractQueryGenerator:
-        return ChoiceSetGenerator(item_generator=RandomPretrainingSegmentSampler(segment_length=self.segment_length),
+        return ChoiceSetGenerator(item_generator=RandomNoResetPretrainingSegmentSampler(
+            segment_length=self.segment_length),
                                   item_selector=RandomItemSelector())
 
     def _create_query_generator(self) -> AbstractQueryGenerator:
-        return ChoiceSetGenerator(item_generator=RandomSegmentSampler(segment_length=self.segment_length),
+        return ChoiceSetGenerator(item_generator=RandomNoResetSegmentSampler(segment_length=self.segment_length),
                                   item_selector=RandomItemSelector())
 
     def _create_preference_collector(self) -> AbstractPreferenceCollector:

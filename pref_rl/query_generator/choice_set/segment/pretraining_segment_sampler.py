@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 from pref_rl.utils.logging import create_logger
-from .common import RandomSamplingMixin
+from .common import RandomSamplingMixin, RandomNoResetSamplingMixin
 from ...query_item_generator import AbstractQueryItemGenerator
 
 
@@ -38,4 +38,8 @@ class AbstractPretrainingSegmentSampler(AbstractQueryItemGenerator, ABC):
 
 
 class RandomPretrainingSegmentSampler(RandomSamplingMixin, AbstractPretrainingSegmentSampler):
+    pass
+
+
+class RandomNoResetPretrainingSegmentSampler(RandomNoResetSamplingMixin, AbstractPretrainingSegmentSampler):
     pass
