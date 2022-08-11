@@ -55,7 +55,7 @@ class PbRLAgentFactory(ABC):
     def _create_query_schedule_cls(self) -> Type[AbstractQuerySchedule]:
         """ Returns query schedule class. """
 
-    def create_agent(self, env, reward_model_name, save_dir=None, agent_name=None, load_file=None) -> PbRLAgent:
+    def create_agent(self, env, reward_model_name, agent_name=None, load_file=None) -> PbRLAgent:
         reward_model = self._create_reward_model(env, reward_model_name)
         policy_model = self._create_policy_model(
             env, reward_model, load_file=load_file)
