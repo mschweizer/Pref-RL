@@ -62,8 +62,8 @@ class AbstractSegmentSampler(AbstractQueryItemGenerator, ABC):
         return max(1, int(0.3 * trajectory_buffer_length / self.segment_length))
 
     def _sample_segments(self, num_segments, buffer):
-        return [self._sample_segment(buffer, self.segment_length) for _ in range(num_segments)]
+        return [self._sample_segment(buffer) for _ in range(num_segments)]
 
     @abstractmethod
-    def _sample_segment(self, trajectory_buffer, segment_length):
+    def _sample_segment(self, trajectory_buffer):
         pass

@@ -14,7 +14,7 @@ class ConcreteSegmentSampler(AbstractSegmentSampler):
         super().__init__(segment_length)
         self.logger = logging.getLogger()
 
-    def _sample_segment(self, trajectory_buffer, segment_length):
+    def _sample_segment(self, trajectory_buffer):
         return "segment"
 
 
