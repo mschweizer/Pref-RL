@@ -8,8 +8,10 @@ from .....environment_wrappers.internal.trajectory_observer.buffer import Buffer
 from .....environment_wrappers.internal.trajectory_observer.segment import Segment
 from .....environment_wrappers.internal.trajectory_observer.trajectory_observer import TrajectoryObserver
 from .....environment_wrappers.utils import create_env
-from .....query_generation.choice_set_generation.segment.common import RandomNoResetSamplingMixin, EPISODES_TOO_SHORT_MSG
-from .....query_generation.choice_set_generation.segment.segment_sampler import RandomSegmentSampler
+from .....query_generation.choice_set_generation.choice_item_generation.segment_sampling.common import \
+    RandomNoResetSamplingMixin, EPISODES_TOO_SHORT_MSG
+from .....query_generation.choice_set_generation.choice_item_generation.segment_sampling.segment_sampler import \
+    RandomSegmentSampler
 
 
 @pytest.fixture()

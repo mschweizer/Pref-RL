@@ -3,7 +3,8 @@ from unittest.mock import Mock, MagicMock
 
 from .....agents.preference_based.buffered_policy_model import BufferedPolicyModel
 from .....environment_wrappers.internal.trajectory_observer.buffer import Buffer
-from .....query_generation.choice_set_generation.segment.segment_sampler import AbstractSegmentSampler
+from .....query_generation.choice_set_generation.choice_item_generation.segment_sampling.segment_sampler import \
+    AbstractSegmentSampler
 
 
 class ConcreteSegmentSampler(AbstractSegmentSampler):
@@ -37,4 +38,4 @@ def test_sampler_warns_when_buffer_has_fewer_elements_than_desired_segment_lengt
     segment_sampler.generate(policy_model, num_items=10)
 
     assert caplog.records[0].levelname == "WARNING"
-    assert "Trajectory segment sampling failed. " in caplog.records[0].message
+    assert "Trajectory segment_sampling sampling failed. " in caplog.records[0].message

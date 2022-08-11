@@ -3,7 +3,7 @@ from scipy.stats import multinomial
 
 from pref_rl.environment_wrappers.info_dict_keys import TRUE_DONE
 
-EPISODES_TOO_SHORT_MSG = "No episode in the buffer is long enough to sample a segment of length {}."
+EPISODES_TOO_SHORT_MSG = "No episode in the buffer is long enough to sample a segment_sampling of length {}."
 
 
 class RandomSamplingMixin:
@@ -73,5 +73,5 @@ class RandomNoResetSamplingMixin:
 
     @staticmethod
     def _get_episode_start_and_end(episode, episode_ends):
-        episode_start = episode_ends[episode] + 1  # + 1 to avoid sampling a reset at very beginning of segment
+        episode_start = episode_ends[episode] + 1  # + 1 to avoid sampling a reset at very beginning of segment_sampling
         return episode_start, episode_ends[episode + 1]

@@ -1,7 +1,7 @@
 from unittest.mock import Mock
 
 from ....query_generation.choice_set_generation.choice_set_generator import ChoiceSetGenerator
-from pref_rl.query_generation.choice_set_generation.query_item_selector import RandomItemSelector
+from pref_rl.query_generation.choice_set_generation.choice_item_selector import RandomItemSelector
 
 
 def test_generates_correct_number_of_queries():

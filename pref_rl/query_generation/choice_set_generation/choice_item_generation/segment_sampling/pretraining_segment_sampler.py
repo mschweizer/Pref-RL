@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 from pref_rl.utils.logging import create_logger
 from .common import RandomSamplingMixin, RandomNoResetSamplingMixin
-from pref_rl.query_generation.choice_set_generation.query_item_generator import AbstractQueryItemGenerator
+from pref_rl.query_generation.choice_set_generation.choice_item_generation.choice_item_generator import AbstractQueryItemGenerator
 
 
 class AbstractPretrainingSegmentSampler(AbstractQueryItemGenerator, ABC):
@@ -11,10 +11,10 @@ class AbstractPretrainingSegmentSampler(AbstractQueryItemGenerator, ABC):
         self.logger = create_logger("PretrainingSegmentSampler")
 
     def generate(self, policy_model, num_items):
-        self.logger.info("{} segment samples requested".format(num_items))
+        self.logger.info("{} segment_sampling samples requested".format(num_items))
         samples = []
 
-        # Determine number of samples so that the probability of duplicate segment samples is fairly low
+        # Determine number of samples so that the probability of duplicate segment_sampling samples is fairly low
         # Source: https://github.com/nottombrown/rl-teacher/blob/b2c2201e9d2457b13185424a19da7209364f23df/rl_teacher/
         # segment_sampling.py#L76
         trajectory_buffer_length = policy_model.trajectory_buffer.size
@@ -22,7 +22,7 @@ class AbstractPretrainingSegmentSampler(AbstractQueryItemGenerator, ABC):
 
         while len(samples) < num_items:
             self.logger.info(
-                "Collecting rollout of length {} from randomly initialized policy for segment sampling".format(
+                "Collecting rollout of length {} from randomly initialized policy for segment_sampling sampling".format(
                     trajectory_buffer_length))
             policy_model.run(steps=trajectory_buffer_length)
             for _ in range(samples_per_rollout):
