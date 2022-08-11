@@ -11,7 +11,7 @@ class AbstractPretrainingSegmentSampler(AbstractQueryItemGenerator, ABC):
         self.logger = create_logger("PretrainingSegmentSampler")
 
     def generate(self, policy_model, num_items):
-        self.logger.info("{} segment_sampling samples requested".format(num_items))
+        self.logger.info("{} segment samples requested".format(num_items))
         samples = []
 
         # Determine number of samples so that the probability of duplicate segment_sampling samples is fairly low
@@ -22,7 +22,7 @@ class AbstractPretrainingSegmentSampler(AbstractQueryItemGenerator, ABC):
 
         while len(samples) < num_items:
             self.logger.info(
-                "Collecting rollout of length {} from randomly initialized policy for segment_sampling sampling".format(
+                "Collecting rollout of length {} from randomly initialized policy for segment sampling".format(
                     trajectory_buffer_length))
             policy_model.run(steps=trajectory_buffer_length)
             for _ in range(samples_per_rollout):
