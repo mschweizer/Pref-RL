@@ -1,6 +1,6 @@
 from unittest.mock import Mock
 
-from ...preference_collector.synthetic_preference.synthetic_preference_collector import SyntheticPreferenceCollector
+from ...preference_collection.synthetic_preference_collection.synthetic_preference_collector import SyntheticPreferenceCollector
 
 
 def test_answers_all_pending_queries():

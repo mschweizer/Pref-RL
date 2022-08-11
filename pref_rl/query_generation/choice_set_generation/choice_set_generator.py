@@ -1,6 +1,6 @@
 import logging
 
-from ..query import ChoiceQuery
+from pref_rl.preference_data.query import ChoiceQuery
 from ..query_generator import AbstractQueryGenerator
 
 

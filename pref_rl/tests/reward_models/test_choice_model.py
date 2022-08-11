@@ -2,7 +2,7 @@ from unittest.mock import MagicMock
 
 import torch
 
-from pref_rl.reward_model_trainer.choice_model import ChoiceModel
+from pref_rl.reward_model_training.choice_model import ChoiceModel
 
 
 def test_compute_choice_probability_from_rewards():

@@ -1,5 +1,5 @@
-from ..preference_collector.binary_choice import BinaryChoice
-from ..query_generation.query import BinaryChoiceQuery
+from pref_rl.preference_data.binary_choice import BinaryChoice
+from pref_rl.preference_data.query import BinaryChoiceQuery
 
 
 # TODO: Find consistent name for classes Preference, Choice, and Query.

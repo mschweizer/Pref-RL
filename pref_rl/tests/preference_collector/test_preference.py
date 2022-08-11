@@ -1,6 +1,6 @@
-from pref_rl.preference_collector.binary_choice import BinaryChoice
-from pref_rl.preference_collector.preference import Preference
-from pref_rl.query_generation.query import BinaryChoiceQuery
+from pref_rl.preference_data.binary_choice import BinaryChoice
+from pref_rl.preference_data.preference import Preference
+from pref_rl.preference_data.query import BinaryChoiceQuery
 
 
 def test_equal():

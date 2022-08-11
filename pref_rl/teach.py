@@ -1,6 +1,6 @@
 import argparse
 
-from pref_rl.agent_factory.rl_teacher_factory import RLTeacherFactory, SyntheticRLTeacherFactory
+from pref_rl.agent_creation.rl_teacher_factory import RLTeacherFactory, SyntheticRLTeacherFactory
 from pref_rl.environment_wrappers.utils import create_env
 from pref_rl.utils.logging import create_logger
 

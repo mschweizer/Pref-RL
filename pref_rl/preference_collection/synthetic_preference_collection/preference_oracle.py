@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 from ...environment_wrappers.info_dict_keys import PENALIZED_TRUE_REW
-from ..binary_choice import BinaryChoice
+from pref_rl.preference_data.binary_choice import BinaryChoice
 
 
 class AbstractOracle(ABC):

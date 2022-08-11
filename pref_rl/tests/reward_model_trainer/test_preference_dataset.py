@@ -2,9 +2,9 @@ import numpy as np
 import pytest
 import torch.utils.data
 
-from ...preference_collector.binary_choice import BinaryChoice
-from ...preference_collector.preference import BinaryChoiceSetPreference
-from ...reward_model_trainer.preference_dataset import PreferenceDataset, make_discard_warning
+from pref_rl.preference_data.binary_choice import BinaryChoice
+from pref_rl.preference_data.preference import BinaryChoiceSetPreference
+from pref_rl.preference_data.preference_dataset import PreferenceDataset, make_discard_warning
 
 
 @pytest.fixture

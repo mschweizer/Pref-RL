@@ -1,6 +1,6 @@
 from typing import List
 
-from ..preference import Preference
+from pref_rl.preference_data.preference import Preference
 from ..preference_collector import AbstractPreferenceCollector
 
 

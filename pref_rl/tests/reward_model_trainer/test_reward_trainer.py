@@ -2,14 +2,14 @@ from unittest.mock import patch
 
 import torch
 
-from ...reward_model_trainer.reward_model_trainer import RewardModelTrainer
+from ...reward_model_training.reward_model_trainer import RewardModelTrainer
 from ...reward_models.mlp import MlpRewardModel
 
 
 def test_writes_summary(cartpole_env):
     running_loss = 100
 
-    with patch('pref_rl.reward_model_trainer.reward_model_trainer.SummaryWriter'):
+    with patch('pref_rl.reward_model_training.reward_model_trainer.SummaryWriter'):
         reward_trainer = RewardModelTrainer(MlpRewardModel(cartpole_env))
         reward_trainer._write_summary(running_loss, pretraining=False)
 

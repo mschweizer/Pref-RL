@@ -2,9 +2,9 @@ from typing import List
 
 import requests
 
-from pref_rl.preference_collector.binary_choice import BinaryChoice
-from pref_rl.preference_collector.preference import Preference
-from pref_rl.preference_collector.preference_collector import AbstractPreferenceCollector
+from pref_rl.preference_data.binary_choice import BinaryChoice
+from pref_rl.preference_data.preference import Preference
+from pref_rl.preference_collection.preference_collector import AbstractPreferenceCollector
 from pref_rl.utils.logging import create_logger
 
 INCOMPARABLE = -1.

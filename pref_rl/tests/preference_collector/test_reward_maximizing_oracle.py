@@ -2,9 +2,9 @@ import pytest
 
 from ...environment_wrappers.info_dict_keys import PENALIZED_TRUE_REW
 from ...environment_wrappers.internal.trajectory_observer.segment import Segment
-from ...preference_collector.binary_choice import BinaryChoice
-from ...preference_collector.synthetic_preference.preference_oracle import RewardMaximizingOracle
-from ...query_generation.query import ChoiceQuery
+from pref_rl.preference_data.binary_choice import BinaryChoice
+from ...preference_collection.synthetic_preference_collection.preference_oracle import RewardMaximizingOracle
+from pref_rl.preference_data.query import ChoiceQuery
 
 
 def test_raises_assertion_error_when_query_set_size_is_not_2():

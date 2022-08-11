@@ -1,6 +1,6 @@
 from typing import Type
 
-from ..agent_factory.agent_factory import PbRLAgentFactory
+from ..agent_creation.agent_factory import PbRLAgentFactory
 from ..agents.policy_model import PolicyModel
 from ..agents.preference_based.buffered_policy_model import BufferedPolicyModel
 from ..environment_wrappers.internal.reward_monitor import RewardMonitor
@@ -8,10 +8,10 @@ from ..environment_wrappers.internal.reward_predictor import RewardPredictor
 from ..environment_wrappers.internal.reward_standardizer import RewardStandardizer
 from ..environment_wrappers.internal.trajectory_observer.trajectory_observer import TrajectoryObserver, \
     FrameTrajectoryObserver
-from ..preference_collector.human_preference.human_preference_collector import HumanPreferenceCollector
-from ..preference_collector.preference_collector import AbstractPreferenceCollector
-from ..preference_collector.synthetic_preference.preference_oracle import RewardMaximizingOracle
-from ..preference_collector.synthetic_preference.synthetic_preference_collector import SyntheticPreferenceCollector
+from ..preference_collection.human_preference_collection.human_preference_collector import HumanPreferenceCollector
+from ..preference_collection.preference_collector import AbstractPreferenceCollector
+from ..preference_collection.synthetic_preference_collection.preference_oracle import RewardMaximizingOracle
+from ..preference_collection.synthetic_preference_collection.synthetic_preference_collector import SyntheticPreferenceCollector
 from ..preference_querying.dummy_preference_querent import DummyPreferenceQuerent
 from ..preference_querying.human_preference_querent import HumanPreferenceQuerent
 from ..preference_querying.preference_querent import AbstractPreferenceQuerent
@@ -21,8 +21,8 @@ from pref_rl.query_generation.choice_set_generation.choice_item_generation.segme
 from pref_rl.query_generation.choice_set_generation.choice_item_generation.segment_sampling import RandomNoResetSegmentSampler
 from ..query_generation.query_generator import AbstractQueryGenerator
 from pref_rl.query_generation.choice_set_generation.choice_item_selector import RandomItemSelector
-from ..query_schedule.query_schedule import AbstractQuerySchedule, AnnealingQuerySchedule
-from ..reward_model_trainer.reward_model_trainer import RewardModelTrainer
+from ..query_scheduling.query_schedule import AbstractQuerySchedule, AnnealingQuerySchedule
+from ..reward_model_training.reward_model_trainer import RewardModelTrainer
 
 
 class SyntheticRLTeacherFactory(PbRLAgentFactory):

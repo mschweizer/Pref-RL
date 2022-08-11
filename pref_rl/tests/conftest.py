@@ -2,9 +2,9 @@ import pytest
 
 from ..environment_wrappers.internal.trajectory_observer.buffer import Buffer
 from ..environment_wrappers.utils import create_env
-from ..preference_collector.binary_choice import BinaryChoice
-from ..preference_collector.preference import BinaryChoiceSetPreference
-from ..query_generation.query import BinaryChoiceQuery
+from pref_rl.preference_data.binary_choice import BinaryChoice
+from pref_rl.preference_data.preference import BinaryChoiceSetPreference
+from pref_rl.preference_data.query import BinaryChoiceQuery
 
 
 @pytest.fixture()

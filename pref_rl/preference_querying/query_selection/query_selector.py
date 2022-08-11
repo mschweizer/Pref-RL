@@ -4,7 +4,7 @@ import random
 from abc import ABC, abstractmethod
 from typing import List
 
-from ...query_generation.query import Query
+from pref_rl.preference_data.query import Query
 
 
 class AbstractQuerySelector(ABC):

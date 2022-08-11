@@ -7,7 +7,7 @@ import torch.utils.data
 from torch.utils.tensorboard import SummaryWriter
 
 from .choice_model import ChoiceModel
-from .preference_dataset import PreferenceDataset
+from pref_rl.preference_data.preference_dataset import PreferenceDataset
 from ..utils.logging import create_logger
 
 

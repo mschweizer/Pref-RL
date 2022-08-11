@@ -1,4 +1,4 @@
-from pref_rl.query_schedule.query_schedule import AnnealingQuerySchedule
+from pref_rl.query_scheduling.query_schedule import AnnealingQuerySchedule
 
 
 def test_requires_more_than_half_of_preferences_at_half_time():

@@ -2,7 +2,7 @@ import time
 
 from .pbrl_callback import PbStepCallback
 from ..rl_agent import RLAgent
-from ...query_schedule.query_schedule import AbstractQuerySchedule
+from ...query_scheduling.query_schedule import AbstractQuerySchedule
 from ...utils.logging import create_logger
 
 SAVE_POLICY_MODEL_LOG_MSG = "saved policy model to {}/{}"

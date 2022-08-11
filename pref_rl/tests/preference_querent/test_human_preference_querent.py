@@ -5,7 +5,7 @@ import pytest
 
 from pref_rl.preference_querying.human_preference_querent import HumanPreferenceQuerent
 from pref_rl.preference_querying.query_selection.query_selector import RandomQuerySelector
-from pref_rl.query_generation.query import ChoiceQuery
+from pref_rl.preference_data.query import ChoiceQuery
 
 ADDRESS = "http://url"
 

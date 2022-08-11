@@ -1,10 +1,10 @@
 import pytest
 
-from ...preference_collector.binary_choice import BinaryChoice
-from ...preference_collector.human_preference.human_preference_collector import HumanPreferenceCollector, ERROR_MSG, \
+from pref_rl.preference_data.binary_choice import BinaryChoice
+from ...preference_collection.human_preference_collection.human_preference_collector import HumanPreferenceCollector, ERROR_MSG, \
     INCOMPARABLE, INCOMPARABLE_ERROR_MSG
-from ...preference_collector.preference import Preference
-from ...query_generation.query import BinaryChoiceQuery
+from pref_rl.preference_data.preference import Preference
+from pref_rl.preference_data.query import BinaryChoiceQuery
 
 
 ADDRESS = "http://url"

@@ -1,4 +1,4 @@
-from ...query_schedule.query_schedule import ConstantQuerySchedule
+from ...query_scheduling.query_schedule import ConstantQuerySchedule
 
 
 def test_requires_half_of_preferences_at_half_time():
