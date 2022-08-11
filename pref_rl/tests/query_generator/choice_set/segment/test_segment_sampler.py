@@ -3,7 +3,7 @@ from unittest.mock import Mock, MagicMock
 
 from .....agents.preference_based.buffered_policy_model import BufferedPolicyModel
 from .....environment_wrappers.internal.trajectory_observer.buffer import Buffer
-from .....query_generation.choice_set.segment.segment_sampler import AbstractSegmentSampler
+from .....query_generation.choice_set_generation.segment.segment_sampler import AbstractSegmentSampler
 
 
 class ConcreteSegmentSampler(AbstractSegmentSampler):

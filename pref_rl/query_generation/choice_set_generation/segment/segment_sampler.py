@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 from pref_rl.utils.logging import create_logger
 from .common import RandomSamplingMixin, RandomNoResetSamplingMixin
-from pref_rl.query_generation.choice_set.query_item_generator import AbstractQueryItemGenerator
+from pref_rl.query_generation.choice_set_generation.query_item_generator import AbstractQueryItemGenerator
 
 
 class AbstractSegmentSampler(AbstractQueryItemGenerator, ABC):
