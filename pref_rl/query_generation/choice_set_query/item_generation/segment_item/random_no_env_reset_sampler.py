@@ -19,6 +19,7 @@ class RandomNoEnvResetSegmentSampler(AbstractSegmentSampler):
         episode_lengths = self._compute_episode_lengths(episode_end_indexes)
         episode_candidates, episode_candidate_lengths = self._filter_too_short_episodes(episode_lengths, segment_length)
         assert len(episode_candidates) > 0, EPISODES_TOO_SHORT_MSG.format(segment_length)
+        # TODO: fall back to standard random sampler (make random sampler parent class of this sampler -> call super())
         episode = self._sample_episode(episode_candidates, episode_candidate_lengths)
         episode_start_idx, episode_end_idx = self._get_episode_start_and_end(episode, episode_end_indexes)
         start_idx = self._get_random_start_index(episode_start_idx, episode_end_idx, segment_length)
