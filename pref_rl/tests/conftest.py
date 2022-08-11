@@ -4,7 +4,7 @@ from ..environment_wrappers.internal.trajectory_observer.buffer import Buffer
 from ..environment_wrappers.utils import create_env
 from ..preference_collector.binary_choice import BinaryChoice
 from ..preference_collector.preference import BinaryChoiceSetPreference
-from ..query_generator.query import BinaryChoiceQuery
+from ..query_generation.query import BinaryChoiceQuery
 
 
 @pytest.fixture()

@@ -5,7 +5,7 @@ import pytest
 
 from ....agents.preference_based.buffered_policy_model import BufferedPolicyModel
 from ....agents.preference_based.pbrl_agent import PbRLAgent, SAVE_POLICY_MODEL_LOG_MSG
-from ....query_generator.query_generator import AbstractQueryGenerator
+from ....query_generation.query_generator import AbstractQueryGenerator
 
 
 @pytest.fixture()

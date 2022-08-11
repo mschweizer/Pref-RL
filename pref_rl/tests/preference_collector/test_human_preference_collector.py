@@ -4,7 +4,7 @@ from ...preference_collector.binary_choice import BinaryChoice
 from ...preference_collector.human_preference.human_preference_collector import HumanPreferenceCollector, ERROR_MSG, \
     INCOMPARABLE, INCOMPARABLE_ERROR_MSG
 from ...preference_collector.preference import Preference
-from ...query_generator.query import BinaryChoiceQuery
+from ...query_generation.query import BinaryChoiceQuery
 
 
 ADDRESS = "http://url"

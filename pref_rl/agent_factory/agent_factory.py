@@ -5,7 +5,7 @@ from ..agents.policy_model import PolicyModel
 from ..agents.preference_based.pbrl_agent import PbRLAgent
 from ..preference_collector.preference_collector import AbstractPreferenceCollector
 from ..preference_querent.preference_querent import AbstractPreferenceQuerent
-from ..query_generator.query_generator import AbstractQueryGenerator
+from ..query_generation.query_generator import AbstractQueryGenerator
 from ..query_schedule.query_schedule import AbstractQuerySchedule
 from ..reward_model_trainer.reward_model_trainer import RewardModelTrainer
 from ..reward_models.utils import get_model_by_name

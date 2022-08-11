@@ -8,8 +8,8 @@ from .....environment_wrappers.internal.trajectory_observer.buffer import Buffer
 from .....environment_wrappers.internal.trajectory_observer.segment import Segment
 from .....environment_wrappers.internal.trajectory_observer.trajectory_observer import TrajectoryObserver
 from .....environment_wrappers.utils import create_env
-from .....query_generator.choice_set.segment.common import RandomNoResetSamplingMixin, EPISODES_TOO_SHORT_MSG
-from .....query_generator.choice_set.segment.segment_sampler import RandomSegmentSampler
+from .....query_generation.choice_set.segment.common import RandomNoResetSamplingMixin, EPISODES_TOO_SHORT_MSG
+from .....query_generation.choice_set.segment.segment_sampler import RandomSegmentSampler
 
 
 @pytest.fixture()
@@ -87,7 +87,7 @@ def test_segment_sample_is_subsegment_of_buffered_trajectory():
 def test_segment_sample_contains_no_resets(filled_trajectory_buffer):
     sampler = RandomNoResetSamplingMixin()
     reset_results = []
-    for _ in range(20):
+    for _ in range(50):
         was_reset = False
         segment = sampler._sample_segment(filled_trajectory_buffer, segment_length=100)
         for info in segment.infos:

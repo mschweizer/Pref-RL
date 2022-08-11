@@ -1,7 +1,7 @@
 import pytest
 
 from ....environment_wrappers.internal.trajectory_observer.segment import Segment
-from pref_rl.query_generator.choice_set.query_item_selector import RandomItemSelector
+from pref_rl.query_generation.choice_set.query_item_selector import RandomItemSelector
 
 
 @pytest.fixture()

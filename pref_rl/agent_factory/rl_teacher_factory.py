@@ -16,11 +16,11 @@ from ..preference_querent.dummy_preference_querent import DummyPreferenceQuerent
 from ..preference_querent.human_preference_querent import HumanPreferenceQuerent
 from ..preference_querent.preference_querent import AbstractPreferenceQuerent
 from ..preference_querent.query_selector.query_selector import RandomQuerySelector
-from ..query_generator.choice_set.choice_set_generator import ChoiceSetGenerator
-from ..query_generator.choice_set.segment.pretraining_segment_sampler import RandomNoResetPretrainingSegmentSampler
-from ..query_generator.choice_set.segment.segment_sampler import RandomNoResetSegmentSampler
-from ..query_generator.query_generator import AbstractQueryGenerator
-from pref_rl.query_generator.choice_set.query_item_selector import RandomItemSelector
+from ..query_generation.choice_set.choice_set_generator import ChoiceSetGenerator
+from ..query_generation.choice_set.segment.pretraining_segment_sampler import RandomNoResetPretrainingSegmentSampler
+from ..query_generation.choice_set.segment.segment_sampler import RandomNoResetSegmentSampler
+from ..query_generation.query_generator import AbstractQueryGenerator
+from pref_rl.query_generation.choice_set.query_item_selector import RandomItemSelector
 from ..query_schedule.query_schedule import AbstractQuerySchedule, AnnealingQuerySchedule
 from ..reward_model_trainer.reward_model_trainer import RewardModelTrainer
 

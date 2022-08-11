@@ -73,4 +73,5 @@ class RandomNoResetSamplingMixin:
 
     @staticmethod
     def _get_episode_start_and_end(episode, episode_ends):
-        return episode_ends[episode], episode_ends[episode + 1]
+        episode_start = episode_ends[episode] + 1  # + 1 to avoid sampling a reset at very beginning of segment
+        return episode_start, episode_ends[episode + 1]
