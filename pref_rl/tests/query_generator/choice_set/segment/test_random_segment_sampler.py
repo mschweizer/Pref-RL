@@ -145,4 +145,4 @@ def test_get_episode_start_and_end():
     episode_ends = [0, 5, 356, 777, 780, 1024]
     episode = 4
     start_idx, end_idx = sampler._get_episode_start_and_end(episode=episode, episode_ends=episode_ends)
-    assert start_idx == 780 and end_idx == 1024
+    assert start_idx == 781 and end_idx == 1024
