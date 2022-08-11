@@ -5,7 +5,7 @@ import cv2
 import numpy as np
 import requests
 
-from pref_rl.preference_querent.preference_querent import AbstractPreferenceQuerent
+from pref_rl.preference_querying.preference_querent import AbstractPreferenceQuerent
 
 
 class HumanPreferenceQuerent(AbstractPreferenceQuerent):

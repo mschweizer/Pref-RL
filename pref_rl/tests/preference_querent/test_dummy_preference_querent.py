@@ -1,5 +1,5 @@
-from ...preference_querent.dummy_preference_querent import DummyPreferenceQuerent
-from ...preference_querent.query_selector.query_selector import RandomQuerySelector
+from ...preference_querying.dummy_preference_querent import DummyPreferenceQuerent
+from ...preference_querying.query_selection.query_selector import RandomQuerySelector
 
 
 def test_queries_correct_number_of_queries():
