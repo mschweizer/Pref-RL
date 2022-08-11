@@ -1,6 +1,6 @@
 import gym
 
-from ...agents.policy_model import PolicyModel
+from ...agents.policy.model import PolicyModel
 from ...agents.rl_agent import RLAgent
 
 

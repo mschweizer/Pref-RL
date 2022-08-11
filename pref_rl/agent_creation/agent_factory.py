@@ -1,13 +1,13 @@
 from abc import ABC, abstractmethod
 from typing import Type
 
-from ..agents.policy_model import PolicyModel
-from ..agents.preference_based.pbrl_agent import PbRLAgent
-from ..preference_collection.preference_collector import AbstractPreferenceCollector
-from ..preference_querying.preference_querent import AbstractPreferenceQuerent
-from ..query_generation.query_generator import AbstractQueryGenerator
-from ..query_scheduling.query_schedule import AbstractQuerySchedule
-from ..reward_model_training.reward_model_trainer import RewardModelTrainer
+from ..agents.policy import PolicyModel
+from pref_rl.agents.pbrl_agent import PbRLAgent
+from ..preference_collection.collector import AbstractPreferenceCollector
+from ..preference_querying.querent import AbstractPreferenceQuerent
+from ..query_generation.generator import AbstractQueryGenerator
+from ..query_scheduling.schedule import AbstractQuerySchedule
+from ..reward_model_training.trainer import RewardModelTrainer
 from ..reward_models.utils import get_model_by_name
 
 

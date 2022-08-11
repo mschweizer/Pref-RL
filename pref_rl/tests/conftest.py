@@ -1,6 +1,6 @@
 import pytest
 
-from ..environment_wrappers.internal.trajectory_observer.buffer import Buffer
+from ..environment_wrappers.internal.trajectory_observation.buffer import Buffer
 from ..environment_wrappers.utils import create_env
 from pref_rl.preference_data.binary_choice import BinaryChoice
 from pref_rl.preference_data.preference import BinaryChoiceSetPreference
