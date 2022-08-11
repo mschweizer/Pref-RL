@@ -9,9 +9,9 @@ SAVE_POLICY_MODEL_LOG_MSG = "saved policy model to {}/{}"
 
 
 class PbRLAgent(RLAgent):
-    def __init__(self, policy_model, pretraining_query_generator, query_generator, preference_querent,
-                 preference_collector, reward_model_trainer, reward_model, query_schedule_cls, pb_step_freq,
-                 reward_train_freq, num_epochs_in_pretraining=8, num_epochs_in_training=16, agent_name="pbrl-agent"):
+    def __init__(self, policy_model, query_generator, preference_querent, preference_collector, reward_model_trainer,
+                 reward_model, query_schedule_cls, pb_step_freq, reward_train_freq, num_epochs_in_pretraining=8,
+                 num_epochs_in_training=16, agent_name="pbrl-agent"):
 
         self.logger = create_logger('PbRLAgent')
 
@@ -20,7 +20,6 @@ class PbRLAgent(RLAgent):
         self.query_schedule_cls: type[AbstractQuerySchedule] = query_schedule_cls
         self.query_schedule = None
 
-        self.pretraining_query_generator = pretraining_query_generator
         self.query_generator = query_generator
         self.preference_querent = preference_querent
         self.preference_collector = preference_collector
@@ -56,7 +55,7 @@ class PbRLAgent(RLAgent):
         self.reward_model_trainer.train(epochs=self.num_epochs_in_pretraining, reset_logging_timesteps_afterwards=True)
 
     def _send_preference_queries(self, num_queries, pretraining=False):
-        query_candidates = self._generate_query_candidates(num_queries, pretraining)
+        query_candidates = self._generate_query_candidates(num_queries)
         self.logger.info("{} query candidates generated".format(len(query_candidates)))
         newly_pending_queries = self.preference_querent.query_preferences(query_candidates, num_queries)
         self.preference_collector.pending_queries.extend(newly_pending_queries)
@@ -64,11 +63,8 @@ class PbRLAgent(RLAgent):
             new=len(newly_pending_queries),
             total=len(self.preference_collector.pending_queries)))
 
-    def _generate_query_candidates(self, num_queries, pretraining):
-        if pretraining:
-            query_candidates = self.pretraining_query_generator.generate_queries(self.policy_model, num_queries)
-        else:
-            query_candidates = self.query_generator.generate_queries(self.policy_model, num_queries)
+    def _generate_query_candidates(self, num_queries):
+        query_candidates = self.query_generator.generate_queries(self.policy_model, num_queries)
         return query_candidates
 
     def _collect_preferences(self, wait_until_all_collected=False):

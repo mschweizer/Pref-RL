@@ -1,7 +1,13 @@
 import numpy as np
 
+from .sampler import AbstractSegmentSampler
+from pref_rl.utils.logging import create_logger
 
-class RandomSamplingMixin:
+
+class RandomSegmentSampler(AbstractSegmentSampler):
+    def __init__(self, segment_length):
+        super().__init__(segment_length)
+        self.logger = create_logger('RandomSegmentSampler')
 
     def _sample_segment(self, trajectory_buffer, segment_length):
         start_idx = self._get_random_start_index(len(trajectory_buffer), segment_length)

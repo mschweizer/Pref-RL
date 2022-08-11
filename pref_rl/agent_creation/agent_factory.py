@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import Type
 
-from ..agents.policy import PolicyModel
-from pref_rl.agents.pbrl_agent import PbRLAgent
+from ..agents.policy.model import PolicyModel
+from ..agents.pbrl_agent import PbRLAgent
 from ..preference_collection.collector import AbstractPreferenceCollector
 from ..preference_querying.querent import AbstractPreferenceQuerent
 from ..query_generation.generator import AbstractQueryGenerator
@@ -36,10 +36,6 @@ class PbRLAgentFactory(ABC):
         """ Returns reward model trainer. """
 
     @abstractmethod
-    def _create_pretraining_query_generator(self) -> AbstractQueryGenerator:
-        """ Returns query generator for pretraining. """
-
-    @abstractmethod
     def _create_query_generator(self) -> AbstractQueryGenerator:
         """ Returns query generator for main training. """
 
@@ -59,14 +55,12 @@ class PbRLAgentFactory(ABC):
         reward_model = self._create_reward_model(env, reward_model_name)
         policy_model = self._create_policy_model(
             env, reward_model, load_file=load_file)
-        pretraining_query_generator = self._create_pretraining_query_generator()
         query_generator = self._create_query_generator()
         preference_collector = self._create_preference_collector()
         preference_querent = self._create_preference_querent()
         reward_model_trainer = self._create_reward_model_trainer(reward_model)
         query_schedule_cls = self._create_query_schedule_cls()
 
-        return PbRLAgent(policy_model, pretraining_query_generator, query_generator, preference_querent,
-                         preference_collector, reward_model_trainer, reward_model, query_schedule_cls,
-                         self.pb_step_freq, self.reward_training_freq, self.num_epochs_in_pretraining,
-                         self.num_epochs_in_training, agent_name)
+        return PbRLAgent(policy_model, query_generator, preference_querent, preference_collector, reward_model_trainer,
+                         reward_model, query_schedule_cls, self.pb_step_freq, self.reward_training_freq,
+                         self.num_epochs_in_pretraining, self.num_epochs_in_training, agent_name)

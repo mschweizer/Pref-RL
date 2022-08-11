@@ -10,32 +10,18 @@ from pref_rl.query_generation.generator import AbstractQueryGenerator
 
 @pytest.fixture()
 def agent(cartpole_env):
-    return PbRLAgent(policy_model=MagicMock(), pretraining_query_generator=MagicMock(spec=AbstractQueryGenerator),
-                     query_generator=MagicMock(), preference_querent=MagicMock(), preference_collector=MagicMock(),
-                     reward_model_trainer=MagicMock(), reward_model=MagicMock(), query_schedule_cls=MagicMock(),
-                     pb_step_freq=100, reward_train_freq=100)
+    return PbRLAgent(policy_model=MagicMock(), query_generator=MagicMock(), preference_querent=MagicMock(),
+                     preference_collector=MagicMock(), reward_model_trainer=MagicMock(), reward_model=MagicMock(),
+                     query_schedule_cls=MagicMock(), pb_step_freq=100, reward_train_freq=100)
 
 
 def test_should_derive_reward_training_frequency_from_pb_step_freq_if_not_provided(agent):
     pb_step_freq = 100
-    agent = PbRLAgent(policy_model=MagicMock(), pretraining_query_generator=MagicMock(spec=AbstractQueryGenerator),
-                      query_generator=MagicMock(), preference_querent=MagicMock(), preference_collector=MagicMock(),
-                      reward_model_trainer=MagicMock(), reward_model=MagicMock(), query_schedule_cls=MagicMock(),
-                      pb_step_freq=pb_step_freq, reward_train_freq=None)
+    agent = PbRLAgent(policy_model=MagicMock(), query_generator=MagicMock(), preference_querent=MagicMock(),
+                      preference_collector=MagicMock(), reward_model_trainer=MagicMock(), reward_model=MagicMock(),
+                      query_schedule_cls=MagicMock(), pb_step_freq=pb_step_freq, reward_train_freq=None)
 
     assert agent.reward_train_freq == 8 * pb_step_freq
-
-
-def test_should_use_pretraining_query_generator_for_pretraining(agent):
-    agent._generate_query_candidates(num_queries=1, pretraining=True)
-    assert agent.pretraining_query_generator.generate_queries.called
-    assert not agent.query_generator.generate_queries.called
-
-
-def test_should_use_query_generator_for_training(agent):
-    agent._generate_query_candidates(num_queries=1, pretraining=False)
-    assert agent.query_generator.generate_queries.called
-    assert not agent.pretraining_query_generator.generate_queries.called
 
 
 def test_is_training_step_after_correct_number_of_steps(agent):
@@ -93,9 +79,8 @@ def test_pb_learn(agent):
 
 def test_saves_policy_model_with_correct_name(cartpole_env, tmpdir):
     agent_name = "pbrl_agent"
-    agent = PbRLAgent(policy_model=BufferedPolicyModel(cartpole_env, train_freq=10),
-                      pretraining_query_generator=MagicMock(spec=AbstractQueryGenerator),
-                      query_generator=MagicMock(), preference_querent=MagicMock(), preference_collector=MagicMock(),
+    agent = PbRLAgent(policy_model=BufferedPolicyModel(cartpole_env, train_freq=10), query_generator=MagicMock(),
+                      preference_querent=MagicMock(), preference_collector=MagicMock(),
                       reward_model_trainer=MagicMock(), reward_model=MagicMock(), query_schedule_cls=MagicMock(),
                       pb_step_freq=100, reward_train_freq=100, agent_name="pbrl_agent")
     agent.save_policy_model(str(tmpdir) + "/")
