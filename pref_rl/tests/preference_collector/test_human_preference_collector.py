@@ -43,9 +43,10 @@ def test_raises_value_error_when_creating_preference_if_value_is_invalid(collect
     assert ERROR_MSG in e.value.args[0]
 
 
-def test_creates_no_preference_if_query_is_incomparable(collector, query):
-    preference = collector._create_preference(query, INCOMPARABLE)
-    assert preference is None
+def test_raises_value_error_if_query_is_incomparable(collector, query):
+    with pytest.raises(ValueError) as e:
+        collector._create_preference(query, INCOMPARABLE)
+    assert INCOMPARABLE_ERROR_MSG in e.value.args[0]
 
 
 def test_collects_preference(collector, query, requests_mock):
