@@ -16,13 +16,13 @@ from ..preference_querying.dummy_querent import DummyPreferenceQuerent
 from ..preference_querying.human_querent import HumanPreferenceQuerent
 from ..preference_querying.querent import AbstractPreferenceQuerent
 from ..preference_querying.query_selection.selector import RandomQuerySelector
-from ..query_generation.choice_set_query.generator import ChoiceSetGenerator
+from ..query_generation.choice_set_query.alternative_generation.segment_alternative.no_env_reset_sampler import \
+    NoEnvResetSegmentSampler
+from ..query_generation.choice_set_query.generator import RandomChoiceSetQueryGenerator
 from ..query_generation.generator import AbstractQueryGenerator
 from ..query_generation.choice_set_query.item_selector import RandomItemSelector
 from ..query_scheduling.schedule import AbstractQuerySchedule, AnnealingQuerySchedule
 from ..reward_model_training.trainer import RewardModelTrainer
-from ..query_generation.choice_set_query.item_generation.segment_item.random_no_env_reset_sampler import \
-    RandomNoEnvResetSegmentSampler
 
 
 class SyntheticRLTeacherFactory(PbRLAgentFactory):
@@ -41,8 +41,8 @@ class SyntheticRLTeacherFactory(PbRLAgentFactory):
         return RewardModelTrainer(reward_model, dataset_buffer_size=self.dataset_size)
 
     def _create_query_generator(self) -> AbstractQueryGenerator:
-        return ChoiceSetGenerator(item_generator=RandomNoEnvResetSegmentSampler(segment_length=self.segment_length),
-                                  item_selector=RandomItemSelector())
+        return RandomChoiceSetQueryGenerator(
+            alternative_generator=NoEnvResetSegmentSampler(segment_length=self.segment_length))
 
     def _create_preference_collector(self) -> AbstractPreferenceCollector:
         return SyntheticPreferenceCollector(oracle=RewardMaximizingOracle())

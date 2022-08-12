@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.stats import multinomial
 
-from .random_sampler import RandomSegmentSampler
+from .sampler import SegmentSampler
 from .....environment_wrappers.info_dict_keys import TRUE_DONE
 from .....utils.logging import create_logger
 
@@ -9,10 +9,10 @@ EPISODES_TOO_SHORT_MSG = "No episode in the buffer is long enough to sample a se
                          "Falling back to standard random segment sampling."
 
 
-class RandomNoEnvResetSegmentSampler(RandomSegmentSampler):
+class NoEnvResetSegmentSampler(SegmentSampler):
     def __init__(self, segment_length):
         super().__init__(segment_length)
-        self.logger = create_logger('RandomNoResetSegmentSampler')
+        self.logger = create_logger('NoEnvResetSegmentSampler')
 
     def _sample_segment(self, trajectory_buffer):
         episode_indexes = self._get_episode_indexes(trajectory_buffer)
@@ -62,7 +62,8 @@ class RandomNoEnvResetSegmentSampler(RandomSegmentSampler):
 
     def _sample_episode(self, episode_candidates, episode_indexes):
         episode_lengths = \
-            [ep_len for i, ep_len in enumerate(self._compute_episode_lengths(episode_indexes)) if i in episode_candidates]
+            [ep_len for i, ep_len in enumerate(self._compute_episode_lengths(episode_indexes)) if
+             i in episode_candidates]
         episode = self._sample_episode_idx(episode_candidates, episode_lengths)
         return self._get_episode_start_and_end(episode, episode_indexes)
 
