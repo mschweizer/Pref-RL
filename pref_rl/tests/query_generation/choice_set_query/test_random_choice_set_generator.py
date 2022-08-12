@@ -3,7 +3,7 @@ from unittest.mock import Mock
 import pytest
 
 from ....environment_wrappers.internal.trajectory_observation.segment import Segment
-from ....query_generation.choice_set_query.generator import RandomChoiceSetQueryGenerator
+from ....query_generation.choice_set_query.random_generator import RandomChoiceSetQueryGenerator
 
 
 @pytest.fixture()

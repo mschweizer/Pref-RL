@@ -18,7 +18,7 @@ from ..preference_querying.querent import AbstractPreferenceQuerent
 from ..preference_querying.query_selection.selector import RandomQuerySelector
 from ..query_generation.choice_set_query.alternative_generation.segment_alternative.no_env_reset_sampler import \
     NoEnvResetSegmentSampler
-from ..query_generation.choice_set_query.generator import RandomChoiceSetQueryGenerator
+from ..query_generation.choice_set_query.random_generator import RandomChoiceSetQueryGenerator
 from ..query_generation.generator import AbstractQueryGenerator
 from ..query_scheduling.schedule import AbstractQuerySchedule, AnnealingQuerySchedule
 from ..reward_model_training.trainer import RewardModelTrainer
