@@ -1,33 +1,52 @@
 import logging
+import random
+from abc import ABC, abstractmethod
+from typing import List, Tuple
 
-from pref_rl.preference_data.query import ChoiceQuery
 from ..generator import AbstractQueryGenerator
+from ...preference_data.query import ChoiceQuery
 
 
-class ChoiceSetGenerator(AbstractQueryGenerator):
-    def __init__(self, item_generator, item_selector, items_per_query=2):
-        self.item_generator = item_generator
-        self.item_selector = item_selector
-        self.items_per_query = items_per_query
+class AbstractChoiceSetQueryGenerator(AbstractQueryGenerator, ABC):
+    def __init__(self, alternative_generator, alternatives_per_choice_set=2):
+        self.alternative_generator = alternative_generator
+        self.alternatives_per_choice_set = alternatives_per_choice_set
 
     def generate_queries(self, policy_model, num_queries):
-        num_items = self._calculate_num_items(num_queries)
-        items = self.item_generator.generate(policy_model, num_items)
-        queries = self._generate_queries(items, num_queries)
-        return queries
-
-    def _generate_queries(self, items, num_queries):
+        num_alternatives = self._calculate_num_alternatives(num_queries)
+        alternatives = self.alternative_generator.generate(policy_model, num_alternatives)
+        choice_sets = self.select_choice_sets(num_queries, self.alternatives_per_choice_set, alternatives)
         queries = []
-        for _ in range(num_queries):
+        for choice_set in choice_sets:
             try:
-                query = ChoiceQuery(choice_set=self.item_selector.select_items(items, num_items=self.items_per_query))
+                query = ChoiceQuery(choice_set)
                 queries.append(query)
             except AssertionError as e:
                 logging.warning(str(e))
         return queries
 
-    def _calculate_num_items(self, num_queries):
-        if num_queries / self.items_per_query > 20:
-            return int(num_queries / self.items_per_query)
+    def _calculate_num_alternatives(self, num_queries):
+        if num_queries / self.alternatives_per_choice_set > 20:
+            return int(num_queries / self.alternatives_per_choice_set)
         else:
-            return int(num_queries * self.items_per_query)
+            return int(num_queries * self.alternatives_per_choice_set)
+
+    @abstractmethod
+    def select_choice_sets(self, num_choice_sets: int, num_alternatives_per_choice_set: int, alternatives) \
+            -> List[Tuple]:
+        raise NotImplementedError
+
+
+class RandomChoiceSetQueryGenerator(AbstractChoiceSetQueryGenerator):
+    def select_choice_sets(self, num_choice_sets: int, num_alternatives_per_choice_set: int, alternatives) \
+            -> List[Tuple]:
+        return [self._select_alternatives(alternatives, num_alternatives_per_choice_set)
+                for _ in range(num_choice_sets)]
+
+    @staticmethod
+    def _select_alternatives(alternatives, num_alternatives) -> Tuple:
+        try:
+            return tuple(random.sample(alternatives, num_alternatives))
+        except ValueError as e:
+            logging.warning(str(e) + " Returning empty sample.")
+            return tuple()

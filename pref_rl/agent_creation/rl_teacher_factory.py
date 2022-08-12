@@ -1,17 +1,17 @@
 from typing import Type
 
 from ..agent_creation.agent_factory import PbRLAgentFactory
-from ..agents.policy.model import PolicyModel
 from ..agents.policy.buffered_model import BufferedPolicyModel
+from ..agents.policy.model import PolicyModel
 from ..environment_wrappers.internal.reward_monitor import RewardMonitor
 from ..environment_wrappers.internal.reward_predictor import RewardPredictor
 from ..environment_wrappers.internal.reward_standardizer import RewardStandardizer
 from ..environment_wrappers.internal.trajectory_observation.observer import TrajectoryObserver, \
     FrameTrajectoryObserver
-from ..preference_collection.human.collector import HumanPreferenceCollector
 from ..preference_collection.collector import AbstractPreferenceCollector
-from ..preference_collection.synthetic.oracle import RewardMaximizingOracle
+from ..preference_collection.human.collector import HumanPreferenceCollector
 from ..preference_collection.synthetic.collector import SyntheticPreferenceCollector
+from ..preference_collection.synthetic.oracle import RewardMaximizingOracle
 from ..preference_querying.dummy_querent import DummyPreferenceQuerent
 from ..preference_querying.human_querent import HumanPreferenceQuerent
 from ..preference_querying.querent import AbstractPreferenceQuerent
@@ -20,7 +20,6 @@ from ..query_generation.choice_set_query.alternative_generation.segment_alternat
     NoEnvResetSegmentSampler
 from ..query_generation.choice_set_query.generator import RandomChoiceSetQueryGenerator
 from ..query_generation.generator import AbstractQueryGenerator
-from ..query_generation.choice_set_query.item_selector import RandomItemSelector
 from ..query_scheduling.schedule import AbstractQuerySchedule, AnnealingQuerySchedule
 from ..reward_model_training.trainer import RewardModelTrainer
 

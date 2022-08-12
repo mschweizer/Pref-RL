@@ -6,8 +6,8 @@ from .....environment_wrappers.info_dict_keys import TRUE_DONE
 from .....environment_wrappers.internal.trajectory_observation.buffer import Buffer
 from .....environment_wrappers.internal.trajectory_observation.observer import TrajectoryObserver
 from .....environment_wrappers.utils import create_env
-from .....query_generation.choice_set_query.item_generation.segment_item.random_no_env_reset_sampler import \
-    RandomNoEnvResetSegmentSampler, EPISODES_TOO_SHORT_MSG
+from .....query_generation.choice_set_query.alternative_generation.segment_alternative.no_env_reset_sampler import \
+    NoEnvResetSegmentSampler, EPISODES_TOO_SHORT_MSG
 
 
 @pytest.fixture()
@@ -25,7 +25,7 @@ def filled_trajectory_buffer():
 
 
 def test_segment_sample_contains_no_resets(filled_trajectory_buffer):
-    sampler = RandomNoEnvResetSegmentSampler(segment_length=20)
+    sampler = NoEnvResetSegmentSampler(segment_length=20)
     reset_results = []
     for _ in range(50):
         was_reset = False
@@ -39,7 +39,7 @@ def test_segment_sample_contains_no_resets(filled_trajectory_buffer):
 
 def test_segment_sampler_warns_if_no_episode_is_long_enough(filled_trajectory_buffer, caplog):
     segment_length = 100
-    sampler = RandomNoEnvResetSegmentSampler(segment_length)
+    sampler = NoEnvResetSegmentSampler(segment_length)
     for info in filled_trajectory_buffer.infos:
         info[TRUE_DONE] = True
 
@@ -50,7 +50,7 @@ def test_segment_sampler_warns_if_no_episode_is_long_enough(filled_trajectory_bu
 
 
 def test_gets_all_episode_ends():
-    sampler = RandomNoEnvResetSegmentSampler(segment_length=10)
+    sampler = NoEnvResetSegmentSampler(segment_length=10)
 
     done_infos = [{TRUE_DONE: False}, {TRUE_DONE: True}, {TRUE_DONE: True}, {TRUE_DONE: False}, {TRUE_DONE: False}]
     trajectory_buffer = MagicMock(spec_set=Buffer, **{"__len__.return_value": len(done_infos)})
@@ -62,27 +62,27 @@ def test_gets_all_episode_ends():
 
 
 def test_compute_episode_lengths():
-    sampler = RandomNoEnvResetSegmentSampler(segment_length=10)
+    sampler = NoEnvResetSegmentSampler(segment_length=10)
     episode_ends = [0, 5, 356, 777, 780, 1024]
     episode_lengths = sampler._compute_episode_lengths(episode_ends)
     assert episode_lengths == [5, 351, 421, 3, 244]
 
 
 def test_filter_too_short_episodes():
-    sampler = RandomNoEnvResetSegmentSampler(segment_length=10)
+    sampler = NoEnvResetSegmentSampler(segment_length=10)
     episode_ends = [0, 5, 356, 777, 780, 1024]
     assert sampler._get_sufficiently_long_episodes(episode_ends) == [1, 2, 4]
 
 
 def test_sample_episode():
-    sampler = RandomNoEnvResetSegmentSampler(segment_length=10)
+    sampler = NoEnvResetSegmentSampler(segment_length=10)
     episode_candidates = [3, 4, 5]
     episode_index = sampler._sample_episode_idx(episode_candidates=episode_candidates, episode_lengths=[100, 100, 100])
     assert episode_index in episode_candidates
 
 
 def test_get_episode_start_and_end():
-    sampler = RandomNoEnvResetSegmentSampler(segment_length=10)
+    sampler = NoEnvResetSegmentSampler(segment_length=10)
     episode_indexes = [0, 5, 356, 777, 780, 1024]
     episode = 4
     start_idx, end_idx = sampler._get_episode_start_and_end(episode=episode, episode_indexes=episode_indexes)

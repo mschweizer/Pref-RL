@@ -1,13 +1,16 @@
 from unittest.mock import Mock
 
-from ....query_generation.choice_set_query.generator import ChoiceSetGenerator
-from pref_rl.query_generation.choice_set_query.item_selector import RandomItemSelector
+from ....query_generation.choice_set_query.generator import AbstractChoiceSetQueryGenerator
+
+
+class ConcreteChoiceSetQueryGenerator(AbstractChoiceSetQueryGenerator):
+    def select_choice_sets(self, num_choice_sets: int, num_alternatives_per_choice_set: int, alternatives):
+        return [("segment_1", "segment_2"), ("segment_1", "segment_2"), ("segment_1", "segment_2")]
 
 
 def test_generates_correct_number_of_queries():
-    item_generator = Mock()
-    item_selector = Mock(**{'select_items.return_value': ["segment_1", "segment_2"]})
-    choice_set_generator = ChoiceSetGenerator(item_generator, item_selector, items_per_query=2)
+    alternative_generator = Mock()
+    choice_set_generator = ConcreteChoiceSetQueryGenerator(alternative_generator, alternatives_per_choice_set=2)
     num_queries = 3
 
     queries = choice_set_generator.generate_queries(policy_model=Mock(), num_queries=num_queries)
@@ -16,13 +19,9 @@ def test_generates_correct_number_of_queries():
 
 
 def test_choice_sets_have_correct_size():
-    item_generator = Mock()
-    item_generator.generate = Mock(return_value=[1, 2, 3, 4, 5, 6])
-
-    item_selector = RandomItemSelector()
+    alternative_generator = Mock()
     items_per_query = 2
-
-    choice_set_generator = ChoiceSetGenerator(item_generator, item_selector, items_per_query)
+    choice_set_generator = ConcreteChoiceSetQueryGenerator(alternative_generator, items_per_query)
 
     queries = choice_set_generator.generate_queries(policy_model=Mock(), num_queries=1)
 
@@ -32,14 +31,15 @@ def test_choice_sets_have_correct_size():
 def test_calculate_num_items():
     items_per_query = 2
     num_queries = 500
-    query_generator = ChoiceSetGenerator(item_selector=Mock(), item_generator=Mock(), items_per_query=items_per_query)
-    num_samples = query_generator._calculate_num_items(num_queries=num_queries)
+    query_generator = ConcreteChoiceSetQueryGenerator(alternative_generator=Mock(),
+                                                      alternatives_per_choice_set=items_per_query)
+    num_samples = query_generator._calculate_num_alternatives(num_queries=num_queries)
     assert num_samples == num_queries / items_per_query
 
 
 def test_calculate_num_items_for_one_query():
     num_query_items = 2
-    query_generator = ChoiceSetGenerator(item_selector=Mock(), item_generator=Mock(),
-                                         items_per_query=num_query_items)
-    num_samples = query_generator._calculate_num_items(num_queries=1)
+    query_generator = ConcreteChoiceSetQueryGenerator(alternative_generator=Mock(),
+                                                      alternatives_per_choice_set=num_query_items)
+    num_samples = query_generator._calculate_num_alternatives(num_queries=1)
     assert num_samples == num_query_items
