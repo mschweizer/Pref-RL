@@ -6,6 +6,8 @@ import numpy as np
 from .random_generator import RandomChoiceSetQueryGenerator
 from ...utils.logging import create_logger
 
+SAMPLING_RESULT_MSG = "Sampled alternative {}/{} as choice alternative {}/{}"
+
 MOSTLY_NEW_ALTERNATIVES_MSG = "There are mostly new alternatives (> 80%) in the buffer."
 
 BUFFER_TOO_SMALL_MSG = "The item buffer of size {size} is too small to fit {new_alternatives} new alternatives. " \
@@ -57,12 +59,15 @@ class BufferedChoiceSetQueryGenerator(RandomChoiceSetQueryGenerator):
         reversed_probabilities.reverse()
         return probabilities, reversed_probabilities
 
-    @staticmethod
-    def _select_alternative(alternatives, i, probabilities, reversed_probabilities):
+    def _select_alternative(self, alternatives, i, probabilities, reversed_probabilities):
         if i % 2 == 0:
-            selected_alternative = np.random.choice(alternatives, p=probabilities)
+            idx = np.random.choice(range(len(alternatives)), p=probabilities)
+            selected_alternative = alternatives[idx]
+            self.logger.debug(SAMPLING_RESULT_MSG.format(idx, len(alternatives), i, self.alternatives_per_choice_set))
         else:
+            idx = np.random.choice(range(len(alternatives)), p=reversed_probabilities)
             selected_alternative = np.random.choice(alternatives, p=reversed_probabilities)
+            self.logger.debug(SAMPLING_RESULT_MSG.format(idx, len(alternatives), i, self.alternatives_per_choice_set))
         return selected_alternative
 
     def _select_only_from_new(self, alternatives, num_choice_sets):

@@ -7,7 +7,7 @@ def create_logger(location):
     logger.setLevel(logging.DEBUG)
 
     ch = logging.StreamHandler()
-    ch.setLevel(logging.INFO)
+    ch.setLevel(logging.DEBUG)
 
     formatter = logging.Formatter('%(levelname)s [%(name)s] - %(message)s')
     ch.setFormatter(formatter)

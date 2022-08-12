@@ -25,7 +25,13 @@ class NoEnvResetSegmentSampler(SegmentSampler):
             self.logger.warn(EPISODES_TOO_SHORT_MSG.format(self.segment_length))
             segment_start_idx = super()._get_random_start_index(start=0, end=len(trajectory_buffer))
 
-        return trajectory_buffer.get_segment(start=segment_start_idx, stop=segment_start_idx + self.segment_length)
+        segment = trajectory_buffer.get_segment(start=segment_start_idx, stop=segment_start_idx + self.segment_length)
+        self._log_num_env_resets(segment)
+        return segment
+
+    def _log_num_env_resets(self, segment):
+        num_env_resets = len([info[TRUE_DONE] for info in segment.infos if info[TRUE_DONE]])
+        self.logger.debug("{} environment resets in segment".format(num_env_resets))
 
     def _get_random_start_index(self, start, end):
         high = max(end - self.segment_length + 1, start + 1)
