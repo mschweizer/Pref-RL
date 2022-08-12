@@ -67,7 +67,8 @@ class NoEnvResetSegmentSampler(SegmentSampler):
         episode = self._sample_episode_idx(episode_candidates, episode_lengths)
         return self._get_episode_start_and_end(episode, episode_indexes)
 
-    def _sample_episode_idx(self, episode_candidates, episode_lengths):
+    @staticmethod
+    def _sample_episode_idx(episode_candidates, episode_lengths):
         weights = np.divide(episode_lengths, sum(episode_lengths))
         episode = episode_candidates[np.where(multinomial.rvs(n=1, p=weights) == 1)[0].item()]
         return episode

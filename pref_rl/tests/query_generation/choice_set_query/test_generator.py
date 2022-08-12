@@ -1,15 +1,21 @@
-from unittest.mock import Mock
+from unittest.mock import Mock, MagicMock
+
+import pytest
 
 from ....query_generation.choice_set_query.generator import AbstractChoiceSetQueryGenerator
 
 
 class ConcreteChoiceSetQueryGenerator(AbstractChoiceSetQueryGenerator):
-    def select_choice_sets(self, num_choice_sets: int, num_alternatives_per_choice_set: int, alternatives):
-        return [("segment_1", "segment_2"), ("segment_1", "segment_2"), ("segment_1", "segment_2")]
+    def _select_alternatives(self, alternatives):
+        return "segment_1", "segment_2"
 
 
-def test_generates_correct_number_of_queries():
-    alternative_generator = Mock()
+@pytest.fixture()
+def alternative_generator():
+    return MagicMock(**{"generate.return_value": [1, 2, 3, 4, 5, 6]})
+
+
+def test_generates_correct_number_of_queries(alternative_generator):
     choice_set_generator = ConcreteChoiceSetQueryGenerator(alternative_generator, alternatives_per_choice_set=2)
     num_queries = 3
 
@@ -18,8 +24,7 @@ def test_generates_correct_number_of_queries():
     assert len(queries) == num_queries
 
 
-def test_choice_sets_have_correct_size():
-    alternative_generator = Mock()
+def test_choice_sets_have_correct_size(alternative_generator):
     items_per_query = 2
     choice_set_generator = ConcreteChoiceSetQueryGenerator(alternative_generator, items_per_query)
 

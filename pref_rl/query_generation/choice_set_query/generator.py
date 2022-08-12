@@ -14,7 +14,7 @@ class AbstractChoiceSetQueryGenerator(AbstractQueryGenerator, ABC):
     def generate_queries(self, policy_model, num_queries):
         num_alternatives = self._calculate_num_alternatives(num_queries)
         alternatives = self.alternative_generator.generate(policy_model, num_alternatives)
-        choice_sets = self.select_choice_sets(num_queries, self.alternatives_per_choice_set, alternatives)
+        choice_sets = self.select_choice_sets(num_queries, alternatives)
         queries = []
         for choice_set in choice_sets:
             try:
@@ -30,7 +30,11 @@ class AbstractChoiceSetQueryGenerator(AbstractQueryGenerator, ABC):
         else:
             return int(num_queries * self.alternatives_per_choice_set)
 
-    @abstractmethod
-    def select_choice_sets(self, num_choice_sets: int, num_alternatives_per_choice_set: int, alternatives) \
+    def select_choice_sets(self, num_choice_sets: int, alternatives) \
             -> List[Tuple]:
+        return [self._select_alternatives(alternatives)
+                for _ in range(num_choice_sets)]
+
+    @abstractmethod
+    def _select_alternatives(self, alternatives) -> Tuple:
         raise NotImplementedError

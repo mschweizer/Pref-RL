@@ -7,7 +7,7 @@ NUM_SEGMENTS_REQUESTED_MSG = "{} segment samples requested"
 
 START_SAMPLING_MSG = "Collecting rollout of length {} from current policy for segment sampling"
 
-PROGRESS_MSG = "{sampled} segments sampled - {outstanding_segments} segments and {outstanding_steps} policy steps left"
+PROGRESS_MSG = "{sampled} segments sampled [{outstanding_segments} segments / {outstanding_steps} policy steps left]"
 
 
 class SegmentSampler(AbstractAlternativeGenerator):
