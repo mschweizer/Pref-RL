@@ -16,7 +16,7 @@ def segment_samples():
 def test_selected_segments_are_from_segment_samples(segment_samples):
     generator = RandomChoiceSetQueryGenerator(alternative_generator=Mock())
 
-    choice_sets = generator.select_choice_sets(num_choice_sets=1, alternatives=segment_samples)
+    choice_sets = generator._select_choice_sets(num_choice_sets=1, alternatives=segment_samples)
 
     for segment in choice_sets[0]:
         assert segment in segment_samples
@@ -26,6 +26,6 @@ def test_selects_right_number_of_segments(segment_samples):
     generator = RandomChoiceSetQueryGenerator(alternative_generator=Mock())
     num_segments = 2
 
-    choice_sets = generator.select_choice_sets(num_choice_sets=1, alternatives=segment_samples)
+    choice_sets = generator._select_choice_sets(num_choice_sets=1, alternatives=segment_samples)
 
     assert len(choice_sets[0]) == num_segments

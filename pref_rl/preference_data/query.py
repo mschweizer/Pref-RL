@@ -6,7 +6,7 @@ class Query:
         self.id = str(uuid.uuid4())  # TODO: Add env and experiment prefix
 
 
-class ChoiceQuery(Query):
+class ChoiceSetQuery(Query):
     def __init__(self, choice_set):
         assert len(choice_set) > 1, "A choice set must have at least two elements."
         super().__init__()
@@ -19,7 +19,7 @@ class ChoiceQuery(Query):
         return self.choice_set[key]
 
 
-class BinaryChoiceQuery(ChoiceQuery):
+class BinaryChoiceSetQuery(ChoiceSetQuery):
     def __init__(self, choice_set):
         assert len(choice_set) == 2, "The choice set of a binary choice must have exactly two alternatives."
-        super(BinaryChoiceQuery, self).__init__(choice_set)
+        super(BinaryChoiceSetQuery, self).__init__(choice_set)

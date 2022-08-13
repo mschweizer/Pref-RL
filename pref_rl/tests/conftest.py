@@ -4,7 +4,7 @@ from ..environment_wrappers.internal.trajectory_observation.buffer import Buffer
 from ..environment_wrappers.utils import create_env
 from pref_rl.preference_data.binary_choice import BinaryChoice
 from pref_rl.preference_data.preference import BinaryChoiceSetPreference
-from pref_rl.preference_data.query import BinaryChoiceQuery
+from pref_rl.preference_data.query import BinaryChoiceSetQuery
 
 
 @pytest.fixture()
@@ -31,6 +31,6 @@ def preference(env):
         action = env.action_space.sample()
         observation, reward, done, info = env.step(action)
         buffer.append_step(observation, action, reward, done, info)
-    query = BinaryChoiceQuery(choice_set=[buffer.get_segment(0, segment_length),
-                                          buffer.get_segment(segment_length, 2 * segment_length)])
+    query = BinaryChoiceSetQuery(choice_set=[buffer.get_segment(0, segment_length),
+                                             buffer.get_segment(segment_length, 2 * segment_length)])
     return BinaryChoiceSetPreference(query, BinaryChoice.LEFT)

@@ -1,5 +1,5 @@
 from pref_rl.preference_data.binary_choice import BinaryChoice
-from pref_rl.preference_data.query import BinaryChoiceQuery
+from pref_rl.preference_data.query import BinaryChoiceSetQuery
 
 
 # TODO: Find consistent name for classes Preference, Choice, and Query.
@@ -17,6 +17,6 @@ class Preference:
 
 class BinaryChoiceSetPreference(Preference):
     def __init__(self, query, choice):
-        assert isinstance(query, BinaryChoiceQuery)
+        assert isinstance(query, BinaryChoiceSetQuery)
         assert isinstance(choice, BinaryChoice)
         super(BinaryChoiceSetPreference, self).__init__(query, choice)

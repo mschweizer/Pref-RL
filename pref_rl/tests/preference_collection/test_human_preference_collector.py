@@ -4,7 +4,7 @@ from pref_rl.preference_data.binary_choice import BinaryChoice
 from ...preference_collection.human.collector import HumanPreferenceCollector, ERROR_MSG, \
     INCOMPARABLE, INCOMPARABLE_ERROR_MSG
 from pref_rl.preference_data.preference import Preference
-from pref_rl.preference_data.query import BinaryChoiceQuery
+from pref_rl.preference_data.query import BinaryChoiceSetQuery
 
 
 ADDRESS = "http://url"
@@ -17,7 +17,7 @@ def collector():
 
 @pytest.fixture()
 def query():
-    return BinaryChoiceQuery(["segment_1", "segment_2"])
+    return BinaryChoiceSetQuery(["segment_1", "segment_2"])
 
 
 def test_retrieves_label_from_endpoint(collector, query, requests_mock):

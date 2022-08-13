@@ -5,7 +5,7 @@ import pytest
 
 from pref_rl.preference_querying.human_querent import HumanPreferenceQuerent
 from pref_rl.preference_querying.query_selection.selector import RandomQuerySelector
-from pref_rl.preference_data.query import ChoiceQuery
+from pref_rl.preference_data.query import ChoiceSetQuery
 
 ADDRESS = "http://url"
 
@@ -20,7 +20,7 @@ def segment():
 
 @pytest.fixture()
 def query(segment):
-    return ChoiceQuery(choice_set=[segment, segment])
+    return ChoiceSetQuery(choice_set=[segment, segment])
 
 
 @pytest.fixture()
