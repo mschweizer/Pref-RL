@@ -3,8 +3,7 @@ from typing import List
 import numpy as np
 
 from ..generator import AbstractAlternativeGenerator
-from .....agents.policy.buffered_model import BufferedPolicyModel
-from .....environment_wrappers.internal.trajectory_observation.buffer import Buffer
+from .....agents.policy.buffered_model import ObservedPolicyModel, VecBuffer
 from .....environment_wrappers.internal.trajectory_observation.segment import Segment
 from .....utils.logging import create_logger
 
@@ -24,7 +23,7 @@ class SegmentSampler(AbstractAlternativeGenerator):
         self.segment_length = segment_length
         self.logger = create_logger("SegmentSampler")
 
-    def generate(self, policy_model: BufferedPolicyModel, num_alternatives: int) -> List[Segment]:
+    def generate(self, policy_model: ObservedPolicyModel, num_alternatives: int) -> List[Segment]:
         """
         :param policy_model: The policy model that is used to generate the alternatives.
         :param num_alternatives: The number of alternatives that are generated.
@@ -76,12 +75,12 @@ class SegmentSampler(AbstractAlternativeGenerator):
         # segment_sampling.py#L76
         return max(1, int(0.3 * trajectory_buffer_length / self.segment_length))
 
-    def _sample_segments(self, num_segments: int, buffer: Buffer) -> List[Segment]:
+    def _sample_segments(self, num_segments: int, buffer: VecBuffer) -> List[Segment]:
         return [self._sample_segment(buffer) for _ in range(num_segments)]
 
-    def _sample_segment(self, trajectory_buffer: Buffer) -> Segment:
+    def _sample_segment(self, trajectory_buffer: VecBuffer) -> Segment:
         start_idx = self._get_random_start_index(0, len(trajectory_buffer))
-        return trajectory_buffer.get_segment(start=start_idx, stop=start_idx + self.segment_length)
+        return trajectory_buffer.get_segment(start=start_idx, end=start_idx + self.segment_length)
 
     def _get_random_start_index(self, start: int, end: int) -> int:
         low = start

@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, Mock
 
 import pytest
 
-from .....agents.policy.buffered_model import BufferedPolicyModel
+from .....agents.policy.buffered_model import ObservedPolicyModel
 from .....environment_wrappers.internal.trajectory_observation.buffer import Buffer
 from .....environment_wrappers.internal.trajectory_observation.observer import TrajectoryObserver
 from .....environment_wrappers.internal.trajectory_observation.segment import Segment
@@ -26,7 +26,7 @@ def policy_model():
         obs, act, rew, done, info = 1, 1, 1, 1, {}
         buffer.append_step(obs, act, rew, done, info)
 
-    policy_model = Mock(spec_set=BufferedPolicyModel)
+    policy_model = Mock()
     policy_model.trajectory_buffer = buffer
 
     return policy_model
@@ -40,7 +40,7 @@ def segment_sampler():
 def test_samples_correct_number_of_segments(cartpole_env):
     segment_sampler = SegmentSampler(segment_length=1)
     num_segments = 10
-    policy_model = BufferedPolicyModel(TrajectoryObserver(cartpole_env, trajectory_buffer_size=1000), train_freq=5)
+    policy_model = ObservedPolicyModel(TrajectoryObserver(cartpole_env, trajectory_buffer_size=1000), train_freq=5)
 
     samples = segment_sampler.generate(policy_model, num_segments)
 
@@ -104,7 +104,7 @@ def test_segment_sample_is_subsegment_of_buffered_trajectory():
         obs, act, rew, done, info = i, 1, 1, 1, {}
         buffer.append_step(obs, act, rew, done, info)
 
-    policy_model = Mock(spec_set=BufferedPolicyModel)
+    policy_model = Mock()
     policy_model.trajectory_buffer = buffer
 
     segment_sampler = SegmentSampler(segment_length=2)

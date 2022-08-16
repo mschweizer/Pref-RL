@@ -53,8 +53,7 @@ class PbRLAgentFactory(ABC):
 
     def create_agent(self, env, reward_model_name, agent_name=None, load_file=None) -> PbRLAgent:
         reward_model = self._create_reward_model(env, reward_model_name)
-        policy_model = self._create_policy_model(
-            env, reward_model, load_file=load_file)
+        policy_model = self._create_policy_model(env, reward_model, load_file=load_file)
         query_generator = self._create_query_generator()
         preference_collector = self._create_preference_collector()
         preference_querent = self._create_preference_querent()

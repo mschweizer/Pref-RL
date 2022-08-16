@@ -2,6 +2,7 @@ from unittest.mock import MagicMock, PropertyMock
 
 import pytest
 
+from .....agents.policy.buffered_model import VecBuffer
 from .....environment_wrappers.info_dict_keys import TRUE_DONE
 from .....environment_wrappers.internal.trajectory_observation.buffer import Buffer
 from .....environment_wrappers.internal.trajectory_observation.observer import TrajectoryObserver
@@ -29,7 +30,7 @@ def test_segment_sample_contains_no_resets(filled_trajectory_buffer):
     reset_results = []
     for _ in range(50):
         was_reset = False
-        segment = sampler._sample_segment(filled_trajectory_buffer)
+        segment = sampler._sample_segment(VecBuffer(atomic_buffers=[filled_trajectory_buffer]))
         for info in segment.infos:
             if info[TRUE_DONE]:
                 was_reset = True
@@ -43,7 +44,7 @@ def test_segment_sampler_warns_if_no_episode_is_long_enough(filled_trajectory_bu
     for info in filled_trajectory_buffer.infos:
         info[TRUE_DONE] = True
 
-    sampler._sample_segment(filled_trajectory_buffer)
+    sampler._sample_segment(VecBuffer(atomic_buffers=[filled_trajectory_buffer]))
 
     assert caplog.records[0].levelname == "WARNING"
     assert EPISODES_TOO_SHORT_MSG.format(segment_length) in caplog.records[0].message

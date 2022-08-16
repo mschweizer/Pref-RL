@@ -4,6 +4,7 @@ import numpy as np
 from scipy.stats import multinomial
 
 from .sampler import SegmentSampler
+from .....agents.policy.buffered_model import VecBuffer
 from .....environment_wrappers.info_dict_keys import TRUE_DONE
 from .....environment_wrappers.internal.trajectory_observation.buffer import Buffer
 from .....environment_wrappers.internal.trajectory_observation.segment import Segment
@@ -25,8 +26,9 @@ class NoEnvResetSegmentSampler(SegmentSampler):
         super().__init__(segment_length)
         self.logger = create_logger('NoEnvResetSegmentSampler')
 
-    def _sample_segment(self, trajectory_buffer: Buffer) -> Segment:
-        episode_indexes = self._get_episode_indexes(trajectory_buffer)
+    def _sample_segment(self, trajectory_buffer: VecBuffer) -> Segment:
+        buffer = self._get_random_buffer(trajectory_buffer)
+        episode_indexes = self._get_episode_indexes(buffer)
         eligible_episodes = self._get_sufficiently_long_episodes(episode_indexes)
 
         if len(eligible_episodes) > 0:
@@ -36,9 +38,13 @@ class NoEnvResetSegmentSampler(SegmentSampler):
             self.logger.warn(EPISODES_TOO_SHORT_MSG.format(self.segment_length))
             segment_start_idx = super()._get_random_start_index(start=0, end=len(trajectory_buffer))
 
-        segment = trajectory_buffer.get_segment(start=segment_start_idx, stop=segment_start_idx + self.segment_length)
+        segment = trajectory_buffer.get_segment(start=segment_start_idx, end=segment_start_idx + self.segment_length)
         self._log_num_env_resets(segment)
         return segment
+
+    @staticmethod
+    def _get_random_buffer(trajectory_buffer: VecBuffer) -> Buffer:
+        return trajectory_buffer.buffers[np.random.randint(trajectory_buffer.n_buffers)]
 
     def _log_num_env_resets(self, segment: Segment) -> None:
         num_env_resets = len([info[TRUE_DONE] for info in segment.infos if info[TRUE_DONE]])

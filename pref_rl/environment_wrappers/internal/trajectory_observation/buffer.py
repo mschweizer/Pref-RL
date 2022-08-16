@@ -1,6 +1,6 @@
 from collections import deque
 
-from pref_rl.environment_wrappers.internal.trajectory_observation.segment import Segment, FrameSegment
+from .segment import Segment, FrameSegment
 
 
 class Buffer:
@@ -18,12 +18,12 @@ class Buffer:
         self.dones.append(done)
         self.infos.append(info)
 
-    def get_segment(self, start, stop):
-        return Segment(list(self.observations)[start: stop],
-                       list(self.actions)[start: stop],
-                       list(self.rewards)[start: stop],
-                       list(self.dones)[start: stop],
-                       list(self.infos)[start: stop])
+    def get_segment(self, start, end):
+        return Segment(list(self.observations)[start: end],
+                       list(self.actions)[start: end],
+                       list(self.rewards)[start: end],
+                       list(self.dones)[start: end],
+                       list(self.infos)[start: end])
 
     def __len__(self):
         return len(self.observations)
@@ -42,10 +42,10 @@ class FrameBuffer(Buffer):
         super().append_step(observation, action, reward, done, info)
         self.frames.append(frame)
 
-    def get_segment(self, start, stop):
-        return FrameSegment(list(self.observations)[start: stop],
-                            list(self.actions)[start: stop],
-                            list(self.rewards)[start: stop],
-                            list(self.dones)[start: stop],
-                            list(self.infos)[start: stop],
-                            list(self.frames)[start: stop])
+    def get_segment(self, start, end):
+        return FrameSegment(list(self.observations)[start: end],
+                            list(self.actions)[start: end],
+                            list(self.rewards)[start: end],
+                            list(self.dones)[start: end],
+                            list(self.infos)[start: end],
+                            list(self.frames)[start: end])

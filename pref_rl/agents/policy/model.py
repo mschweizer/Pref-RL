@@ -1,11 +1,16 @@
+import copy
 import os
 
 from stable_baselines3 import A2C
+from stable_baselines3.common.vec_env import SubprocVecEnv, DummyVecEnv
 
 
 class PolicyModel:
-    def __init__(self, env, train_freq, load_file=None):
-        self.env = env
+    def __init__(self, env, train_freq, load_file=None, n_envs=1):
+        if n_envs > 1:
+            self.env = SubprocVecEnv(env_fns=[lambda: copy.deepcopy(env) for _ in range(n_envs)], start_method="spawn")
+        else:
+            self.env = DummyVecEnv(env_fns=[lambda: env])
         if load_file is not None:
             self.rl_algo = A2C.load(load_file, env=env)
         else:

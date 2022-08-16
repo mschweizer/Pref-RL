@@ -1,12 +1,10 @@
 from typing import Type
 
 from ..agent_creation.agent_factory import PbRLAgentFactory
-from ..agents.policy.buffered_model import BufferedPolicyModel
+from ..agents.policy.buffered_model import ObservedPolicyModel
 from ..agents.policy.model import PolicyModel
 from ..environment_wrappers.internal.reward_predictor import RewardPredictor
 from ..environment_wrappers.internal.reward_standardizer import RewardStandardizer
-from ..environment_wrappers.internal.trajectory_observation.observer import TrajectoryObserver, \
-    FrameTrajectoryObserver
 from ..preference_collection.collector import AbstractPreferenceCollector
 from ..preference_collection.human.collector import HumanPreferenceCollector
 from ..preference_collection.synthetic.collector import SyntheticPreferenceCollector
@@ -33,7 +31,9 @@ class SyntheticRLTeacherFactory(PbRLAgentFactory):
         self.policy_train_freq = policy_train_freq
 
     def _create_policy_model(self, env, reward_model, **kwargs) -> PolicyModel:
-        return BufferedPolicyModel(env=self._wrap_env(env, reward_model), train_freq=self.policy_train_freq)
+        return ObservedPolicyModel(env=self._wrap_env(env, reward_model),
+                                   train_freq=self.policy_train_freq,
+                                   trajectory_buffer_size=max(self.pb_step_freq, self.policy_train_freq))
 
     def _create_reward_model_trainer(self, reward_model) -> RewardModelTrainer:
         return RewardModelTrainer(reward_model, dataset_buffer_size=self.dataset_size)
@@ -79,9 +79,8 @@ class RLTeacherFactory(SyntheticRLTeacherFactory):
                                       video_output_directory=self.video_directory,
                                       frames_per_second=self.fps)
 
-    def _wrap_env(self, env, reward_model):
-        env = FrameTrajectoryObserver(env, trajectory_buffer_size=max(self.pb_step_freq, self.policy_train_freq))
-        env = RewardPredictor(env, reward_model)
-        env = RewardStandardizer(env)
-        env = RewardMonitor(env)
-        return env
+    def _create_policy_model(self, env, reward_model, **kwargs) -> PolicyModel:
+        return ObservedPolicyModel(env=self._wrap_env(env, reward_model),
+                                   train_freq=self.policy_train_freq,
+                                   trajectory_buffer_size=max(self.pb_step_freq, self.policy_train_freq),
+                                   human_obs=True)
