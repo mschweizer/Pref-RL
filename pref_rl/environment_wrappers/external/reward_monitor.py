@@ -6,7 +6,6 @@ from stable_baselines3.common.monitor import Monitor
 from ..info_dict_keys import TRUE_REW, TRUE_DONE
 
 
-# TODO: Make external wrapper
 class RewardMonitor(Monitor):
     def __init__(self, env: gym.Env):
         super().__init__(env)

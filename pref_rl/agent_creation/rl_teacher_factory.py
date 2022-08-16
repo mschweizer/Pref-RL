@@ -3,7 +3,6 @@ from typing import Type
 from ..agent_creation.agent_factory import PbRLAgentFactory
 from ..agents.policy.buffered_model import BufferedPolicyModel
 from ..agents.policy.model import PolicyModel
-from ..environment_wrappers.internal.reward_monitor import RewardMonitor
 from ..environment_wrappers.internal.reward_predictor import RewardPredictor
 from ..environment_wrappers.internal.reward_standardizer import RewardStandardizer
 from ..environment_wrappers.internal.trajectory_observation.observer import TrajectoryObserver, \
@@ -52,11 +51,10 @@ class SyntheticRLTeacherFactory(PbRLAgentFactory):
     def _create_query_schedule_cls(self) -> Type[AbstractQuerySchedule]:
         return AnnealingQuerySchedule
 
-    def _wrap_env(self, env, reward_model):
-        env = TrajectoryObserver(env, trajectory_buffer_size=max(self.pb_step_freq, self.policy_train_freq))
+    @staticmethod
+    def _wrap_env(env, reward_model):
         env = RewardPredictor(env, reward_model)
         env = RewardStandardizer(env)
-        env = RewardMonitor(env)
         return env
 
 

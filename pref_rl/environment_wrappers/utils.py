@@ -4,6 +4,7 @@ from gym.envs.atari import AtariEnv
 from stable_baselines3.common.atari_wrappers import AtariWrapper
 
 from .external.indirect_feedback_remover import IndirectFeedbackRemover
+from .external.reward_monitor import RewardMonitor
 from .external.visual_feedback_remover import VisualFeedbackRemover
 
 
@@ -20,6 +21,7 @@ def add_external_env_wrappers(env, termination_penalty, frame_stack_depth=4):
     env = IndirectFeedbackRemover(env, termination_penalty)
     if frame_stack_depth:
         env = gym.wrappers.FrameStack(env, num_stack=frame_stack_depth)
+    env = RewardMonitor(env)
     return env
 
 
