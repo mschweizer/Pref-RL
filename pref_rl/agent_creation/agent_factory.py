@@ -8,7 +8,7 @@ from ..preference_querying.querent import AbstractPreferenceQuerent
 from ..query_generation.generator import AbstractQueryGenerator
 from ..query_scheduling.schedule import AbstractQuerySchedule
 from ..reward_model_training.trainer import RewardModelTrainer
-from ..reward_models.utils import get_model_by_name
+from ..reward_models.utils import get_model_cls_by_name
 
 
 class PbRLAgentFactory(ABC):
@@ -24,11 +24,11 @@ class PbRLAgentFactory(ABC):
     @staticmethod
     def _create_reward_model(env, reward_model_name):
         """ Returns reward model. """
-        reward_model_cls = get_model_by_name(reward_model_name)
+        reward_model_cls = get_model_cls_by_name(reward_model_name)
         return reward_model_cls(env)
 
     @abstractmethod
-    def _create_policy_model(self, env, reward_model, load_file=None) -> PolicyModel:
+    def _create_policy_model(self, env, reward_model, load_file=None, n_envs=1) -> PolicyModel:
         """ Returns policy model. """
 
     @abstractmethod
@@ -51,9 +51,9 @@ class PbRLAgentFactory(ABC):
     def _create_query_schedule_cls(self) -> Type[AbstractQuerySchedule]:
         """ Returns query schedule class. """
 
-    def create_agent(self, env, reward_model_name, agent_name=None, load_file=None) -> PbRLAgent:
+    def create_agent(self, env, reward_model_name, agent_name=None, load_file=None, n_envs=1) -> PbRLAgent:
         reward_model = self._create_reward_model(env, reward_model_name)
-        policy_model = self._create_policy_model(env, reward_model, load_file=load_file)
+        policy_model = self._create_policy_model(env, reward_model, load_file=load_file, n_envs=n_envs)
         query_generator = self._create_query_generator()
         preference_collector = self._create_preference_collector()
         preference_querent = self._create_preference_querent()
