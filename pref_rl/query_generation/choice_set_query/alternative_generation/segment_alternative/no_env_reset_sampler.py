@@ -44,7 +44,7 @@ class NoEnvResetSegmentSampler(SegmentSampler):
 
     @staticmethod
     def _get_random_buffer(trajectory_buffer: VecBuffer) -> Buffer:
-        return trajectory_buffer.buffers[np.random.randint(trajectory_buffer.n_buffers)]
+        return trajectory_buffer.get_buffer(np.random.randint(trajectory_buffer.n_buffers))
 
     def _log_num_env_resets(self, segment: Segment) -> None:
         num_env_resets = len([info[TRUE_DONE] for info in segment.infos if info[TRUE_DONE]])

@@ -27,10 +27,11 @@ def filled_trajectory_buffer():
 
 def test_segment_sample_contains_no_resets(filled_trajectory_buffer):
     sampler = NoEnvResetSegmentSampler(segment_length=20)
+    vec_buffer = VecBuffer(vec_env=MagicMock(**{'get_attr("trajectory_buffer").return_value': [filled_trajectory_buffer]}))
     reset_results = []
     for _ in range(50):
         was_reset = False
-        segment = sampler._sample_segment(VecBuffer(atomic_buffers=[filled_trajectory_buffer]))
+        segment = sampler._sample_segment(vec_buffer)
         for info in segment.infos:
             if info[TRUE_DONE]:
                 was_reset = True

@@ -49,13 +49,13 @@ def test_samples_correct_number_of_segments(cartpole_env):
 
 def test_no_rollout_necessary_if_buffer_sufficiently_filled(segment_sampler):
     buffer = MagicMock(spec_set=Buffer, **{"__len__.return_value": 200})
-    necessary_steps = segment_sampler._calculate_necessary_rollout_steps(num_items=10, buffer_length=len(buffer))
+    necessary_steps = segment_sampler._calculate_necessary_rollout_steps(num_items=10, buffer=len(buffer))
     assert necessary_steps == 0
 
 
 def test_calculates_correct_number_of_necessary_rollout_steps(segment_sampler):
     buffer = MagicMock(spec_set=Buffer, **{"__len__.return_value": 0})
-    necessary_steps = segment_sampler._calculate_necessary_rollout_steps(num_items=10, buffer_length=len(buffer))
+    necessary_steps = segment_sampler._calculate_necessary_rollout_steps(num_items=10, buffer=len(buffer))
     assert necessary_steps == 30
 
 
