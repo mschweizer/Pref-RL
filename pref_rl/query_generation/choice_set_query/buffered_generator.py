@@ -28,7 +28,6 @@ class BufferedChoiceSetQueryGenerator(RandomChoiceSetQueryGenerator):
         """
         super(BufferedChoiceSetQueryGenerator, self).__init__(alternative_generator, alternatives_per_choice_set)
         self.buffer = deque(maxlen=buffer_size)
-        self.logger = create_logger(self.__class__.__name__)
 
     def _select_choice_sets(self, num_choice_sets: int, new_alternatives) -> List[Tuple]:
         self.buffer.extend(new_alternatives)
