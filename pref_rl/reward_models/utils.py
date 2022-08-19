@@ -1,7 +1,7 @@
 _model_registry = {}
 
 
-def get_model_by_name(name):
+def get_model_cls_by_name(name):
     """
     Based on stablebaslines3
     """
