@@ -51,7 +51,7 @@ def main():
                                             num_epochs_in_training=args.training_epochs,
                                             segment_length=args.query_segment_length)
 
-    agent = factory.create_agent(env=env, reward_model_name="Mlp")
+    agent = factory.create_agent(env=env, reward_model_name="Mlp", n_envs=3)
 
     logger.info("preference-based reinforcement learning with \n "
                 "{rl_steps} rl steps, \n "
