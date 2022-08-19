@@ -30,10 +30,11 @@ class SyntheticRLTeacherFactory(PbRLAgentFactory):
         self.segment_length = segment_length
         self.policy_train_freq = policy_train_freq
 
-    def _create_policy_model(self, env, reward_model, **kwargs) -> PolicyModel:
+    def _create_policy_model(self, env, reward_model, load_file=None, n_envs=1) -> PolicyModel:
         return ObservedPolicyModel(env=self._wrap_env(env, reward_model),
                                    train_freq=self.policy_train_freq,
-                                   trajectory_buffer_size=max(self.pb_step_freq, self.policy_train_freq))
+                                   trajectory_buffer_size=max(self.pb_step_freq, self.policy_train_freq),
+                                   n_envs=n_envs)
 
     def _create_reward_model_trainer(self, reward_model) -> RewardModelTrainer:
         return RewardModelTrainer(reward_model, dataset_buffer_size=self.dataset_size)
@@ -79,8 +80,9 @@ class RLTeacherFactory(SyntheticRLTeacherFactory):
                                       video_output_directory=self.video_directory,
                                       frames_per_second=self.fps)
 
-    def _create_policy_model(self, env, reward_model, **kwargs) -> PolicyModel:
+    def _create_policy_model(self, env, reward_model, load_file=None, n_envs=1) -> PolicyModel:
         return ObservedPolicyModel(env=self._wrap_env(env, reward_model),
                                    train_freq=self.policy_train_freq,
                                    trajectory_buffer_size=max(self.pb_step_freq, self.policy_train_freq),
-                                   human_obs=True)
+                                   human_obs=True,
+                                   n_envs=n_envs)
