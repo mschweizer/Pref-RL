@@ -2,7 +2,7 @@ import argparse
 
 from pref_rl.agent_creation.rl_teacher_factory import RLTeacherFactory, SyntheticRLTeacherFactory
 from pref_rl.environment_wrappers.utils import create_env
-from pref_rl.utils.logging import create_logger
+from pref_rl.utils.logging import get_or_create_logger
 
 
 def create_cli():
@@ -30,7 +30,7 @@ def main():
     parser = create_cli()
     args = parser.parse_args()
 
-    logger = create_logger("pref_rl")
+    logger = get_or_create_logger("pref_rl")
 
     env = create_env(args.env_id, termination_penalty=10., frame_stack_depth=args.frame_stack)
     logger.info("'{}' environment created".format(args.env_id))

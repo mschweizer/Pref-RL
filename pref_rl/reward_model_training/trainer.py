@@ -8,7 +8,7 @@ from torch.utils.tensorboard import SummaryWriter
 
 from .choice_model import ChoiceModel
 from pref_rl.preference_data.preference_dataset import PreferenceDataset
-from ..utils.logging import create_logger
+from ..utils.logging import get_or_create_logger
 
 
 class AbstractRewardModelTrainer(ABC):
@@ -23,7 +23,7 @@ class RewardModelTrainer(AbstractRewardModelTrainer):
                  dataset_buffer_size=3000):
         AbstractRewardModelTrainer.__init__(self)
 
-        self.logger = self.logger = create_logger("RewardModelTrainer")
+        self.logger = self.logger = get_or_create_logger("RewardModelTrainer")
 
         self.choice_model = ChoiceModel(reward_model)
         self.optimizer = optim.Adam(self.choice_model.parameters(), lr=learning_rate)

@@ -5,7 +5,7 @@ import requests
 from pref_rl.preference_data.binary_choice import BinaryChoice
 from pref_rl.preference_data.preference import Preference
 from pref_rl.preference_collection.collector import AbstractPreferenceCollector
-from pref_rl.utils.logging import create_logger
+from pref_rl.utils.logging import get_or_create_logger
 
 INCOMPARABLE = -1.
 ERROR_MSG = "Unexpected value for label retrieved from database. "
@@ -17,7 +17,7 @@ class HumanPreferenceCollector(AbstractPreferenceCollector):
     def __init__(self, pref_collect_address):
         super().__init__()
         self.query_endpoint = pref_collect_address + "/preferences/query/"
-        self.logger = create_logger('HumanPreferenceCollector')
+        self.logger = get_or_create_logger('HumanPreferenceCollector')
 
 
     def collect_preferences(self) -> List:

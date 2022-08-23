@@ -3,7 +3,7 @@ import time
 from .pbrl_callback import PbStepCallback
 from pref_rl.agents.rl_agent import RLAgent
 from pref_rl.query_scheduling.schedule import AbstractQuerySchedule
-from pref_rl.utils.logging import create_logger
+from pref_rl.utils.logging import get_or_create_logger
 
 SAVE_POLICY_MODEL_LOG_MSG = "saved policy model to {}/{}"
 
@@ -13,7 +13,7 @@ class PbRLAgent(RLAgent):
                  reward_model, query_schedule_cls, pb_step_freq, reward_train_freq, num_epochs_in_pretraining=8,
                  num_epochs_in_training=16, agent_name="pbrl-agent"):
 
-        self.logger = create_logger('PbRLAgent')
+        self.logger = get_or_create_logger('PbRLAgent')
 
         super(PbRLAgent, self).__init__(policy_model)
 
