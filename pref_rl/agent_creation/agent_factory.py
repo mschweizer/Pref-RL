@@ -8,7 +8,7 @@ from ..preference_querying.querent import AbstractPreferenceQuerent
 from ..query_generation.generator import AbstractQueryGenerator
 from ..query_scheduling.schedule import AbstractQuerySchedule
 from ..reward_model_training.trainer import RewardModelTrainer
-from ..reward_models.utils import get_model_by_name
+from ..reward_modeling.utils import get_model_by_name
 
 
 class PbRLAgentFactory(ABC):
