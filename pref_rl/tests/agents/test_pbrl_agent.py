@@ -3,7 +3,7 @@ from unittest.mock import MagicMock, Mock
 
 import pytest
 
-from pref_rl.agents.pbrl_agent import PbRLAgent, SAVE_POLICY_MODEL_LOG_MSG
+from pref_rl.agents.pbrl.agent import PbRLAgent, SAVE_POLICY_MODEL_LOG_MSG
 from pref_rl.agents.policy.buffered_model import ObservedPolicyModel
 
 
