@@ -1,6 +1,6 @@
 import argparse
 
-from pref_rl.agent_creation.rl_teacher_factory import RLTeacherFactory, SyntheticRLTeacherFactory
+from pref_rl.agents.pbrl.rl_teacher import RLTeacher, SyntheticRLTeacher
 from pref_rl.environment_wrappers.utils import create_env
 from pref_rl.utils.logging import get_or_create_logger
 
@@ -36,22 +36,34 @@ def main():
     logger.info("'{}' environment created".format(args.env_id))
 
     if args.preference_type == "human":
-        factory = RLTeacherFactory(policy_train_freq=args.policy_train_freq, pb_step_freq=args.pb_step_freq,
-                                   reward_train_freq=args.reward_train_freq,
-                                   num_epochs_in_pretraining=args.pretraining_epochs,
-                                   num_epochs_in_training=args.training_epochs,
-                                   pref_collect_address=args.pref_collect_addr, video_directory=args.video_directory,
-                                   video_segment_length=args.query_segment_length,
-                                   frames_per_second=args.fps)
+        agent = RLTeacher(env,
+                          reward_model_type=args.reward_model,
+                          pb_step_freq=args.pb_step_freq,
+                          policy_train_freq=args.policy_train_freq,
+                          reward_train_freq=args.reward_train_freq,
+                          query_schedule_type="Annealing",
+                          trajectory_buffer_size=2000,
+                          query_segment_length=args.query_segment_length,
+                          query_buffer_size=100,
+                          dataset_size=5000,
+                          pref_collect_address=args.pref_collect_addr,
+                          video_dir=args.video_directory,
+                          fps=args.fps,
+                          num_epochs_in_pretraining=args.pretraining_epochs,
+                          num_epochs_in_training=args.training_epochs)
     else:
-        factory = SyntheticRLTeacherFactory(policy_train_freq=args.policy_train_freq,
-                                            pb_step_freq=args.pb_step_freq,
-                                            reward_train_freq=args.reward_train_freq,
-                                            num_epochs_in_pretraining=args.pretraining_epochs,
-                                            num_epochs_in_training=args.training_epochs,
-                                            segment_length=args.query_segment_length)
-
-    agent = factory.create_agent(env=env, reward_model_name="Mlp")
+        agent = SyntheticRLTeacher(env,
+                                   reward_model_type=args.reward_model,
+                                   pb_step_freq=args.pb_step_freq,
+                                   policy_train_freq=args.policy_train_freq,
+                                   reward_train_freq=args.reward_train_freq,
+                                   query_schedule_type="Annealing",
+                                   trajectory_buffer_size=2000,
+                                   query_segment_length=args.query_segment_length,
+                                   query_buffer_size=100,
+                                   dataset_size=5000,
+                                   num_epochs_in_pretraining=args.pretraining_epochs,
+                                   num_epochs_in_training=args.training_epochs)
 
     logger.info("preference-based reinforcement learning with \n "
                 "{rl_steps} rl steps, \n "

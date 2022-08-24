@@ -1,6 +1,7 @@
 import time
+from typing import Type
 
-from .pbrl_callback import PbStepCallback
+from pref_rl.agents.pbrl.callback import PbStepCallback
 from pref_rl.agents.rl_agent import RLAgent
 from pref_rl.query_scheduling.schedule import AbstractQuerySchedule
 from pref_rl.utils.logging import get_or_create_logger
@@ -17,7 +18,7 @@ class PbRLAgent(RLAgent):
 
         super(PbRLAgent, self).__init__(policy_model)
 
-        self.query_schedule_cls: type[AbstractQuerySchedule] = query_schedule_cls
+        self.query_schedule_cls: Type[AbstractQuerySchedule] = query_schedule_cls
         self.query_schedule = None
 
         self.query_generator = query_generator
