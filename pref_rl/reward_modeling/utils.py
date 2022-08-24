@@ -8,7 +8,7 @@ def get_model_cls_by_name(name):
     if name not in _model_registry:
         raise KeyError(
             f"Error: unknown model type {name},"
-            f"the only registered model type are: {list(_model_registry.keys())}!"
+            f"the only registered model types are: {list(_model_registry.keys())}!"
         )
     return _model_registry[name]
 

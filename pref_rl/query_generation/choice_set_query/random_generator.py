@@ -3,7 +3,7 @@ from typing import Tuple, List
 
 from .alternative_generation.generator import AbstractAlternativeGenerator
 from .generator import AbstractChoiceSetQueryGenerator
-from ...utils.logging import create_logger
+from ...utils.logging import get_or_create_logger
 
 
 class RandomChoiceSetQueryGenerator(AbstractChoiceSetQueryGenerator):
@@ -15,7 +15,7 @@ class RandomChoiceSetQueryGenerator(AbstractChoiceSetQueryGenerator):
         :param alternatives_per_choice_set: The number of alternatives contained in each choice set.
         """
         super().__init__(alternative_generator, alternatives_per_choice_set)
-        self.logger = create_logger(self.__class__.__name__)
+        self.logger = get_or_create_logger(self.__class__.__name__)
 
     def _select_alternatives(self, alternatives: List) -> Tuple:
         try:

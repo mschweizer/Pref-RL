@@ -3,7 +3,7 @@ from unittest.mock import patch
 import torch
 
 from ...reward_model_training.trainer import RewardModelTrainer
-from ...reward_models.mlp import MlpRewardModel
+from ...reward_modeling.mlp import MlpRewardModel
 
 
 def test_writes_summary(cartpole_env):

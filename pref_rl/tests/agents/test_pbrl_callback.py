@@ -2,7 +2,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from pref_rl.agents.pbrl_callback import PbStepCallback
+from pref_rl.agents.pbrl.callback import PbStepCallback
 
 
 @pytest.fixture()

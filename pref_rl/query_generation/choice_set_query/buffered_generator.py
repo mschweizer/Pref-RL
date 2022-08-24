@@ -5,7 +5,7 @@ import numpy as np
 
 from .alternative_generation.generator import AbstractAlternativeGenerator
 from .random_generator import RandomChoiceSetQueryGenerator
-from ...utils.logging import create_logger
+from ...utils.logging import get_or_create_logger
 
 SAMPLING_RESULT_MSG = "Sampled alternative {}/{} as choice alternative {}/{}"
 
@@ -28,6 +28,7 @@ class BufferedChoiceSetQueryGenerator(RandomChoiceSetQueryGenerator):
         """
         super(BufferedChoiceSetQueryGenerator, self).__init__(alternative_generator, alternatives_per_choice_set)
         self.buffer = deque(maxlen=buffer_size)
+        self.logger = get_or_create_logger(self.__class__.__name__)
 
     def _select_choice_sets(self, num_choice_sets: int, new_alternatives) -> List[Tuple]:
         self.buffer.extend(new_alternatives)

@@ -1,17 +1,18 @@
 import logging
 
 
-# TODO: Modify to get_or_create_logger
-def create_logger(location):
-    logger = logging.getLogger(location)
+def get_or_create_logger(name, log_level=logging.WARNING):
+    logger = logging.getLogger(name)
     logger.setLevel(logging.DEBUG)
 
-    ch = logging.StreamHandler()
-    ch.setLevel(logging.DEBUG)
+    existing_handlers = [handler for handler in logger.handlers if handler.level == log_level]
+    if not existing_handlers:
+        ch = logging.StreamHandler()
+        ch.setLevel(log_level)
 
-    formatter = logging.Formatter('%(levelname)s [%(name)s] - %(message)s')
-    ch.setFormatter(formatter)
+        formatter = logging.Formatter('%(levelname)s [%(name)s] - %(message)s')
+        ch.setFormatter(formatter)
 
-    logger.addHandler(ch)
+        logger.addHandler(ch)
 
     return logger

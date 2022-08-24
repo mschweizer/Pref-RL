@@ -5,7 +5,7 @@ import numpy as np
 from ..generator import AbstractAlternativeGenerator
 from .....agents.policy.buffered_model import ObservedPolicyModel, VecBuffer
 from .....environment_wrappers.internal.trajectory_observation.segment import Segment
-from .....utils.logging import create_logger
+from .....utils.logging import get_or_create_logger
 
 NUM_SEGMENTS_REQUESTED_MSG = "{} segment samples requested"
 
@@ -21,7 +21,7 @@ class SegmentSampler(AbstractAlternativeGenerator):
         :param segment_length: The length each sampled trajectory segment.
         """
         self.segment_length = segment_length
-        self.logger = create_logger("SegmentSampler")
+        self.logger = get_or_create_logger("SegmentSampler")
 
     def generate(self, policy_model: ObservedPolicyModel, num_alternatives: int) -> List[Segment]:
         """

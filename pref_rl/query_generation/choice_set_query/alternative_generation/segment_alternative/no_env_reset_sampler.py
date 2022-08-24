@@ -8,7 +8,7 @@ from .....agents.policy.buffered_model import VecBuffer
 from .....environment_wrappers.info_dict_keys import TRUE_DONE
 from .....environment_wrappers.internal.trajectory_observation.buffer import Buffer
 from .....environment_wrappers.internal.trajectory_observation.segment import Segment
-from .....utils.logging import create_logger
+from .....utils.logging import get_or_create_logger
 
 EPISODES_TOO_SHORT_MSG = "No episode in the buffer is long enough to sample a segment of length {}. " \
                          "Falling back to standard random segment sampling."
@@ -24,7 +24,7 @@ class NoEnvResetSegmentSampler(SegmentSampler):
         :param segment_length: The length each sampled trajectory segment.
         """
         super().__init__(segment_length)
-        self.logger = create_logger('NoEnvResetSegmentSampler')
+        self.logger = get_or_create_logger('NoEnvResetSegmentSampler')
 
     def _sample_segment(self, trajectory_buffer: VecBuffer) -> Segment:
         buffer = self._get_random_buffer(trajectory_buffer)
