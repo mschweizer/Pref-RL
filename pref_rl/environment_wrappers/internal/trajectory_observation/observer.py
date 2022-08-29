@@ -1,6 +1,6 @@
 from gym import Wrapper
 
-from pref_rl.environment_wrappers.internal.trajectory_observation.buffer import Buffer, FrameBuffer
+from pref_rl.query_generation.choice_set_query.alternative_generation.segment_alternative.buffer import Buffer
 
 
 class TrajectoryObserver(Wrapper):
@@ -19,25 +19,6 @@ class TrajectoryObserver(Wrapper):
         new_observation, reward, new_done, info = super().step(action)
 
         self.trajectory_buffer.append_step(self._last_observation, action, reward, self._last_done, info)
-
-        self._last_observation = new_observation
-        self._last_done = new_done
-
-        return new_observation, reward, new_done, info
-
-
-class FrameTrajectoryObserver(TrajectoryObserver):
-    def __init__(self, env, trajectory_buffer_size=128):
-        super().__init__(env)
-        self.trajectory_buffer = FrameBuffer(buffer_size=trajectory_buffer_size)
-
-    def step(self, action):
-        _last_image = self.env.render(mode='rgb_array')
-
-        new_observation, reward, new_done, info = super().step(action)
-
-        self.trajectory_buffer.append_frame_step(
-            self._last_observation, action, reward, self._last_done, info, _last_image)
 
         self._last_observation = new_observation
         self._last_done = new_done

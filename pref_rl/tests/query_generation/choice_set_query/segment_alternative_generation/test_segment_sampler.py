@@ -3,16 +3,16 @@ from unittest.mock import MagicMock, Mock
 
 import pytest
 
-from .....agents.policy.buffered_model import ObservedPolicyModel
-from .....environment_wrappers.internal.trajectory_observation.buffer import Buffer
+from .....agents.policy.model import PolicyModel
+from .....query_generation.choice_set_query.alternative_generation.segment_alternative.buffer import Buffer
 from .....environment_wrappers.internal.trajectory_observation.observer import TrajectoryObserver
-from .....environment_wrappers.internal.trajectory_observation.segment import Segment
+from pref_rl.query_generation.choice_set_query.alternative_generation.segment_alternative.segment import Segment
 from .....query_generation.choice_set_query.alternative_generation.segment_alternative.sampler import SegmentSampler
 
 
 class ConcreteSegmentSampler(SegmentSampler):
-    def __init__(self, segment_length):
-        super().__init__(segment_length)
+    def __init__(self, segment_length=25, image_obs=False):
+        super().__init__(segment_length, image_obs)
         self.logger = logging.getLogger()
 
     def _sample_segment(self, trajectory_buffer):
@@ -40,22 +40,16 @@ def segment_sampler():
 def test_samples_correct_number_of_segments(cartpole_env):
     segment_sampler = SegmentSampler(segment_length=1)
     num_segments = 10
-    policy_model = ObservedPolicyModel(TrajectoryObserver(cartpole_env, trajectory_buffer_size=1000), train_freq=5)
+    policy_model = PolicyModel(TrajectoryObserver(cartpole_env, trajectory_buffer_size=1000), train_freq=5)
 
     samples = segment_sampler.generate(policy_model, num_segments)
 
     assert len(samples) == num_segments
 
 
-def test_no_rollout_necessary_if_buffer_sufficiently_filled(segment_sampler):
-    buffer = MagicMock(spec_set=Buffer, **{"__len__.return_value": 200})
-    necessary_steps = segment_sampler._calculate_necessary_rollout_steps(num_items=10, buffer=len(buffer))
-    assert necessary_steps == 0
-
-
 def test_calculates_correct_number_of_necessary_rollout_steps(segment_sampler):
     buffer = MagicMock(spec_set=Buffer, **{"__len__.return_value": 0})
-    necessary_steps = segment_sampler._calculate_necessary_rollout_steps(num_items=10, buffer=len(buffer))
+    necessary_steps = segment_sampler._calculate_necessary_rollout_steps(num_items=10)
     assert necessary_steps == 30
 
 
@@ -124,3 +118,10 @@ def test_segment_sample_is_subsegment_of_buffered_trajectory():
         return True
 
     assert is_subsegment(samples[0])
+
+
+def test_collect_rollouts(cartpole_env):
+    sampler = ConcreteSegmentSampler(image_obs=True)
+    policy_model = PolicyModel(cartpole_env, num_envs=2, train_freq=5)
+    buffer = sampler._collect_rollouts(policy_model, rollout_steps=10)
+    pass

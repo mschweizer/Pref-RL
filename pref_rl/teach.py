@@ -63,7 +63,8 @@ def main():
                                    query_buffer_size=100,
                                    dataset_size=5000,
                                    num_epochs_in_pretraining=args.pretraining_epochs,
-                                   num_epochs_in_training=args.training_epochs)
+                                   num_epochs_in_training=args.training_epochs,
+                                   num_envs=1)
 
     logger.info("preference-based reinforcement learning with \n "
                 "{rl_steps} rl steps, \n "

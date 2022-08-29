@@ -9,7 +9,11 @@ class RewardPredictor(Wrapper):
     def __init__(self, env, reward_model):
         super().__init__(env)
         self.reward_model = reward_model
-        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        if torch.cuda.is_available():
+            self.device = torch.device('cuda')
+            self.reward_model.cuda()
+        else:
+            self.device = torch.device('cpu')
 
     def step(self, action):
         observation, reward, done, info = self.env.step(action)

@@ -7,7 +7,7 @@ import requests
 
 from .querent import AbstractPreferenceQuerent
 from .query_selection.selector import AbstractQuerySelector
-from ..environment_wrappers.internal.trajectory_observation.segment import FrameSegment
+from pref_rl.query_generation.choice_set_query.alternative_generation.segment_alternative.segment import FrameSegment
 from ..preference_data.query import Query, BinaryChoiceSetQuery
 
 

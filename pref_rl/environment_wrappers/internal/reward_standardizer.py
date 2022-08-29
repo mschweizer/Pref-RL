@@ -4,6 +4,7 @@ import gym
 import numpy as np
 
 
+# TODO: Use VecNormalize Wrapper instead?
 class RewardStandardizer(gym.RewardWrapper):
     def __init__(self, env, desired_std=.05, update_interval=30000, buffer_size=3000):
         super().__init__(env)

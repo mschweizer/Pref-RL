@@ -1,7 +1,7 @@
 import logging
 
 
-def get_or_create_logger(name, log_level=logging.WARNING):
+def get_or_create_logger(name, log_level=logging.INFO):
     logger = logging.getLogger(name)
     logger.setLevel(logging.DEBUG)
 

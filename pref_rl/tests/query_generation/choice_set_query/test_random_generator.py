@@ -2,7 +2,7 @@ from unittest.mock import Mock
 
 import pytest
 
-from ....environment_wrappers.internal.trajectory_observation.segment import Segment
+from pref_rl.query_generation.choice_set_query.alternative_generation.segment_alternative.segment import Segment
 from ....query_generation.choice_set_query.random_generator import RandomChoiceSetQueryGenerator
 
 

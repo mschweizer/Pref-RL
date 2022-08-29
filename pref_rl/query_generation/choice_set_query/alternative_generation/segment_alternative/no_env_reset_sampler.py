@@ -4,10 +4,9 @@ import numpy as np
 from scipy.stats import multinomial
 
 from .sampler import SegmentSampler
-from .....agents.policy.buffered_model import VecBuffer
+from .buffer import VecBuffer, Buffer
 from .....environment_wrappers.info_dict_keys import TRUE_DONE
-from .....environment_wrappers.internal.trajectory_observation.buffer import Buffer
-from .....environment_wrappers.internal.trajectory_observation.segment import Segment
+from pref_rl.query_generation.choice_set_query.alternative_generation.segment_alternative.segment import Segment
 from .....utils.logging import get_or_create_logger
 
 EPISODES_TOO_SHORT_MSG = "No episode in the buffer is long enough to sample a segment of length {}. " \
@@ -26,9 +25,8 @@ class NoEnvResetSegmentSampler(SegmentSampler):
         super().__init__(segment_length)
         self.logger = get_or_create_logger('NoEnvResetSegmentSampler')
 
-    def _sample_segment(self, trajectory_buffer: VecBuffer) -> Segment:
-        buffer = self._get_random_buffer(trajectory_buffer)
-        episode_indexes = self._get_episode_indexes(buffer)
+    def _sample_segment(self, trajectory_buffer: Buffer) -> Segment:
+        episode_indexes = self._get_episode_indexes(trajectory_buffer)
         eligible_episodes = self._get_sufficiently_long_episodes(episode_indexes)
 
         if len(eligible_episodes) > 0:
@@ -41,10 +39,6 @@ class NoEnvResetSegmentSampler(SegmentSampler):
         segment = trajectory_buffer.get_segment(start=segment_start_idx, end=segment_start_idx + self.segment_length)
         self._log_num_env_resets(segment)
         return segment
-
-    @staticmethod
-    def _get_random_buffer(trajectory_buffer: VecBuffer) -> Buffer:
-        return trajectory_buffer.get_buffer(np.random.randint(trajectory_buffer.n_buffers))
 
     def _log_num_env_resets(self, segment: Segment) -> None:
         num_env_resets = len([info[TRUE_DONE] for info in segment.infos if info[TRUE_DONE]])
