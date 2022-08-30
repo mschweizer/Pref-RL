@@ -14,10 +14,10 @@ class PolicyModel:
         else:
             self.env = DummyVecEnv(env_fns=[lambda: env])
         if load_file is not None:
-            self.rl_algo = A2C.load(load_file, env=env)
+            self.rl_algo = A2C.load(load_file, env=self.env)
         else:
             # TODO: parametrize verbose=True (also in if clause)
-            self.rl_algo = A2C('MlpPolicy', env=env, n_steps=train_freq, tensorboard_log="runs", verbose=True)
+            self.rl_algo = A2C('MlpPolicy', env=self.env, n_steps=train_freq, tensorboard_log="runs", verbose=True)
 
     def learn(self, *args, **kwargs):
         return self.rl_algo.learn(*args, **kwargs)
