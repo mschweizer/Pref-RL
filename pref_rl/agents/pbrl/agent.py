@@ -1,10 +1,10 @@
 import time
 from typing import Type
 
-from pref_rl.agents.pbrl.callback import PbStepCallback
-from pref_rl.agents.rl_agent import RLAgent
-from pref_rl.query_scheduling.schedule import AbstractQuerySchedule
-from pref_rl.utils.logging import get_or_create_logger
+from .callback import PbStepCallback
+from ..rl_agent import RLAgent
+from ...query_scheduling.schedule import AbstractQuerySchedule
+from ...utils.logging import get_or_create_logger
 
 SAVE_POLICY_MODEL_LOG_MSG = "saved policy model to {}/{}"
 
@@ -51,11 +51,11 @@ class PbRLAgent(RLAgent):
         self._train(num_training_timesteps)
 
     def _pretrain(self, num_preferences):
-        self._send_preference_queries(num_preferences, pretraining=True)
+        self._send_preference_queries(num_preferences)
         self._collect_preferences(wait_until_all_collected=True)
         self.reward_model_trainer.train(epochs=self.num_epochs_in_pretraining, reset_logging_timesteps_afterwards=True)
 
-    def _send_preference_queries(self, num_queries, pretraining=False):
+    def _send_preference_queries(self, num_queries):
         query_candidates = self._generate_query_candidates(num_queries)
         self.logger.info("{} query candidates generated".format(len(query_candidates)))
         newly_pending_queries = self.preference_querent.query_preferences(query_candidates, num_queries)

@@ -1,5 +1,4 @@
 import uuid
-from typing import List
 
 
 class Query:
@@ -11,7 +10,7 @@ class Query:
 
 
 class ChoiceSetQuery(Query):
-    def __init__(self, choice_set: List):
+    def __init__(self, choice_set: tuple):
         """
         A choice set query is a special type of preference query that asks the user to make a choice among a (finite)
         set of alternatives.
@@ -29,7 +28,7 @@ class ChoiceSetQuery(Query):
 
 
 class BinaryChoiceSetQuery(ChoiceSetQuery):
-    def __init__(self, choice_set: List):
+    def __init__(self, choice_set: tuple):
         """
         A binary choice set query has exactly two alternatives in the choice set.
         :param choice_set: The set of alternatives the user chooses from.
