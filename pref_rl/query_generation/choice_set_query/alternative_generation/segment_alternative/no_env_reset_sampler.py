@@ -3,10 +3,10 @@ from typing import List, Tuple
 import numpy as np
 from scipy.stats import multinomial
 
+from .trajectory_segment import TrajectorySegment
+from .rollout_container import RolloutContainer
 from .sampler import SegmentSampler
-from .buffer import VecBuffer, Buffer
 from .....environment_wrappers.info_dict_keys import TRUE_DONE
-from pref_rl.query_generation.choice_set_query.alternative_generation.segment_alternative.segment import Segment
 from .....utils.logging import get_or_create_logger
 
 EPISODES_TOO_SHORT_MSG = "No episode in the buffer is long enough to sample a segment of length {}. " \
@@ -25,8 +25,8 @@ class NoEnvResetSegmentSampler(SegmentSampler):
         super().__init__(segment_length)
         self.logger = get_or_create_logger('NoEnvResetSegmentSampler')
 
-    def _sample_segment(self, trajectory_buffer: Buffer) -> Segment:
-        episode_indexes = self._get_episode_indexes(trajectory_buffer)
+    def _sample_segment(self, trajectory: RolloutContainer) -> TrajectorySegment:
+        episode_indexes = self._get_episode_indexes(trajectory)
         eligible_episodes = self._get_sufficiently_long_episodes(episode_indexes)
 
         if len(eligible_episodes) > 0:
@@ -34,13 +34,13 @@ class NoEnvResetSegmentSampler(SegmentSampler):
             segment_start_idx = self._get_random_start_index(episode_start_idx, episode_end_idx)
         else:
             self.logger.warn(EPISODES_TOO_SHORT_MSG.format(self.segment_length))
-            segment_start_idx = super()._get_random_start_index(start=0, end=len(trajectory_buffer))
+            segment_start_idx = super()._get_random_start_index(start=0, end=len(trajectory))
 
-        segment = trajectory_buffer.get_segment(start=segment_start_idx, end=segment_start_idx + self.segment_length)
+        segment = trajectory.get_segment(start=segment_start_idx, end=segment_start_idx + self.segment_length)
         self._log_num_env_resets(segment)
         return segment
 
-    def _log_num_env_resets(self, segment: Segment) -> None:
+    def _log_num_env_resets(self, segment: TrajectorySegment) -> None:
         num_env_resets = len([info[TRUE_DONE] for info in segment.infos if info[TRUE_DONE]])
         self.logger.debug("{} environment resets in segment".format(num_env_resets))
 
@@ -52,7 +52,7 @@ class NoEnvResetSegmentSampler(SegmentSampler):
     def _compute_episode_lengths(episode_indexes: List[int]) -> List[int]:
         return [episode_indexes[i] - episode_indexes[i - 1] for i in range(1, len(episode_indexes))]
 
-    def _get_episode_indexes(self, trajectory_buffer: Buffer) -> List[int]:
+    def _get_episode_indexes(self, trajectory_buffer: RolloutContainer) -> List[int]:
         indexes = []
         for i, info in enumerate(trajectory_buffer.infos):
             if info[TRUE_DONE]:
@@ -61,7 +61,7 @@ class NoEnvResetSegmentSampler(SegmentSampler):
         return indexes
 
     @staticmethod
-    def _add_buffer_start_and_end(episode_end_indexes: List[int], trajectory_buffer: Buffer) -> List[int]:
+    def _add_buffer_start_and_end(episode_end_indexes: List[int], trajectory_buffer: RolloutContainer) -> List[int]:
         indexes = episode_end_indexes.copy()
         if (len(trajectory_buffer) - 1) not in episode_end_indexes:
             indexes.append(len(trajectory_buffer) - 1)

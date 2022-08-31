@@ -1,37 +1,22 @@
 from unittest.mock import MagicMock, PropertyMock
 
-import pytest
-
-from .....query_generation.choice_set_query.alternative_generation.segment_alternative.buffer import VecBuffer, Buffer
+from .....agents.policy.model import PolicyModel
 from .....environment_wrappers.info_dict_keys import TRUE_DONE
-from .....environment_wrappers.internal.trajectory_observation.observer import TrajectoryObserver
 from .....environment_wrappers.utils import create_env
+from .....query_generation.choice_set_query.alternative_generation.segment_alternative.rollout_container import RolloutContainer
 from .....query_generation.choice_set_query.alternative_generation.segment_alternative.no_env_reset_sampler import \
     NoEnvResetSegmentSampler, EPISODES_TOO_SHORT_MSG
 
 
-@pytest.fixture()
-def filled_trajectory_buffer():
-    buffer_size = 1024
-    env = create_env("MountainCar-v0", termination_penalty=10., frame_stack_depth=4)
-    env = TrajectoryObserver(env, trajectory_buffer_size=buffer_size)
-
-    env.reset()
-    for _ in range(buffer_size):
-        action = env.action_space.sample()
-        env.step(action)
-
-    return env.trajectory_buffer
-
-
-def test_segment_sample_contains_no_resets(filled_trajectory_buffer):
+def test_segment_sample_contains_no_resets():
     sampler = NoEnvResetSegmentSampler(segment_length=20)
-    vec_buffer = VecBuffer(
-        vec_env=MagicMock(**{'get_attr("trajectory_buffer").return_value': [filled_trajectory_buffer]}))
+    env = create_env("MountainCar-v0", termination_penalty=10., frame_stack_depth=4)
+    rollout_buffer = sampler._collect_rollouts(PolicyModel(env=env, train_freq=5), rollout_steps=1024)
+
     reset_results = []
     for _ in range(50):
         was_reset = False
-        segment = sampler._sample_segment(vec_buffer)
+        segment = sampler._sample_segment(rollout_buffer)
         for info in segment.infos:
             if info[TRUE_DONE]:
                 was_reset = True
@@ -39,13 +24,15 @@ def test_segment_sample_contains_no_resets(filled_trajectory_buffer):
     assert all(not reset for reset in reset_results)
 
 
-def test_segment_sampler_warns_if_no_episode_is_long_enough(filled_trajectory_buffer, caplog):
+def test_segment_sampler_warns_if_no_episode_is_long_enough(caplog):
     segment_length = 100
     sampler = NoEnvResetSegmentSampler(segment_length)
-    for info in filled_trajectory_buffer.infos:
+    env = create_env("MountainCar-v0", termination_penalty=10., frame_stack_depth=4)
+    rollout_buffer = sampler._collect_rollouts(PolicyModel(env=env, train_freq=5), rollout_steps=1024)
+    for info in rollout_buffer.infos:
         info[TRUE_DONE] = True
 
-    sampler._sample_segment(VecBuffer())
+    sampler._sample_segment(rollout_buffer)
 
     assert caplog.records[0].levelname == "WARNING"
     assert EPISODES_TOO_SHORT_MSG.format(segment_length) in caplog.records[0].message
@@ -55,7 +42,7 @@ def test_gets_all_episode_ends():
     sampler = NoEnvResetSegmentSampler(segment_length=10)
 
     done_infos = [{TRUE_DONE: False}, {TRUE_DONE: True}, {TRUE_DONE: True}, {TRUE_DONE: False}, {TRUE_DONE: False}]
-    trajectory_buffer = MagicMock(spec_set=Buffer, **{"__len__.return_value": len(done_infos)})
+    trajectory_buffer = MagicMock(spec_set=RolloutContainer, **{"__len__.return_value": len(done_infos)})
     type(trajectory_buffer).infos = PropertyMock(return_value=done_infos)
 
     done_indexes = sampler._get_episode_indexes(trajectory_buffer)

@@ -7,7 +7,7 @@ import requests
 
 from .querent import AbstractPreferenceQuerent
 from .query_selection.selector import AbstractQuerySelector
-from pref_rl.query_generation.choice_set_query.alternative_generation.segment_alternative.segment import FrameSegment
+from pref_rl.query_generation.choice_set_query.alternative_generation.segment_alternative.trajectory_segment import FrameTrajectorySegment
 from ..preference_data.query import Query, BinaryChoiceSetQuery
 
 
@@ -42,7 +42,7 @@ class HumanPreferenceQuerent(AbstractPreferenceQuerent):
 
         return selected_queries
 
-    def _write_segment_video(self, segment: FrameSegment, name: str) -> None:
+    def _write_segment_video(self, segment: FrameTrajectorySegment, name: str) -> None:
 
         output_file_name = f'{self.video_output_dir}{name}.webm'
         frame_shape = self._get_frame_shape(segment)
@@ -55,7 +55,7 @@ class HumanPreferenceQuerent(AbstractPreferenceQuerent):
         video_writer.release()
 
     @staticmethod
-    def _get_frame_shape(segment: FrameSegment) -> Tuple[int, int]:
+    def _get_frame_shape(segment: FrameTrajectorySegment) -> Tuple[int, int]:
         single_frame = np.array(segment.frames[0])
         return single_frame.shape[1], single_frame.shape[0]
 

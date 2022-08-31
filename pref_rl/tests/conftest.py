@@ -1,6 +1,6 @@
 import pytest
 
-from ..query_generation.choice_set_query.alternative_generation.segment_alternative.buffer import Buffer
+from ..query_generation.choice_set_query.alternative_generation.segment_alternative.rollout_container import RolloutContainer
 from ..environment_wrappers.utils import create_env
 from pref_rl.preference_data.binary_choice import BinaryChoice
 from pref_rl.preference_data.preference import BinaryChoiceSetPreference
@@ -25,7 +25,7 @@ def pong_env():
 @pytest.fixture()
 def preference(env):
     segment_length = 6
-    buffer = Buffer(buffer_size=50)
+    buffer = RolloutContainer()
     env.reset()
     for i in range(segment_length * 2):
         action = env.action_space.sample()

@@ -24,6 +24,8 @@ class RewardPredictor(Wrapper):
 
     def reward(self, observation):
         input_data = self._prepare_for_model(observation)
+        # TODO: activate evaluation mode for model,
+        #  see https://pytorch.org/docs/stable/generated/torch.nn.Module.html?highlight=train#torch.nn.Module.train
         return float(self.reward_model(input_data))
 
     def _prepare_for_model(self, observation):

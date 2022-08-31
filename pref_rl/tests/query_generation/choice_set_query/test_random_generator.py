@@ -2,15 +2,15 @@ from unittest.mock import Mock
 
 import pytest
 
-from pref_rl.query_generation.choice_set_query.alternative_generation.segment_alternative.segment import Segment
+from pref_rl.query_generation.choice_set_query.alternative_generation.segment_alternative.trajectory_segment import TrajectorySegment
 from ....query_generation.choice_set_query.random_generator import RandomChoiceSetQueryGenerator
 
 
 @pytest.fixture()
 def segment_samples():
-    return [Segment(observations=[1], actions=[1], rewards=[1], dones=[1], infos=[1]),
-            Segment(observations=[2], actions=[2], rewards=[2], dones=[2], infos=[2]),
-            Segment(observations=[3], actions=[3], rewards=[3], dones=[3], infos=[3])]
+    return [TrajectorySegment(observations=[1], actions=[1], rewards=[1], dones=[1], infos=[1]),
+            TrajectorySegment(observations=[2], actions=[2], rewards=[2], dones=[2], infos=[2]),
+            TrajectorySegment(observations=[3], actions=[3], rewards=[3], dones=[3], infos=[3])]
 
 
 def test_selected_segments_are_from_segment_samples(segment_samples):

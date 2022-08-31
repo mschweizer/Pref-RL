@@ -1,7 +1,7 @@
 import pytest
 
 from ...environment_wrappers.info_dict_keys import PENALIZED_TRUE_REW
-from pref_rl.query_generation.choice_set_query.alternative_generation.segment_alternative.segment import Segment
+from pref_rl.query_generation.choice_set_query.alternative_generation.segment_alternative.trajectory_segment import TrajectorySegment
 from pref_rl.preference_data.binary_choice import BinaryChoice
 from ...preference_collection.synthetic.oracle import RewardMaximizingOracle
 from pref_rl.preference_data.query import ChoiceSetQuery
@@ -16,10 +16,10 @@ def test_raises_assertion_error_when_query_set_size_is_not_2():
 
 
 def test_prefers_higher_reward():
-    segment_1 = Segment(observations=[1, 1], actions=[1, 1], rewards=[1, 1], dones=[1, 1],
-                        infos=[{PENALIZED_TRUE_REW: 0}, {PENALIZED_TRUE_REW: 0}])
-    segment_2 = Segment(observations=[1, 1], actions=[1, 1], rewards=[1, 1], dones=[1, 1],
-                        infos=[{PENALIZED_TRUE_REW: 25}, {PENALIZED_TRUE_REW: 25}])
+    segment_1 = TrajectorySegment(observations=[1, 1], actions=[1, 1], rewards=[1, 1], dones=[1, 1],
+                                  infos=[{PENALIZED_TRUE_REW: 0}, {PENALIZED_TRUE_REW: 0}])
+    segment_2 = TrajectorySegment(observations=[1, 1], actions=[1, 1], rewards=[1, 1], dones=[1, 1],
+                                  infos=[{PENALIZED_TRUE_REW: 25}, {PENALIZED_TRUE_REW: 25}])
     query = ChoiceSetQuery(choice_set=[segment_1, segment_2])
 
     oracle = RewardMaximizingOracle()

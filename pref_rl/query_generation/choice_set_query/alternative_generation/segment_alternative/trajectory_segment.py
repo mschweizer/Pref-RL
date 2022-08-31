@@ -1,7 +1,7 @@
 import numpy as np
 
 
-class Segment:
+class TrajectorySegment:
     def __init__(self, observations, actions, rewards, dones, infos):
         self.observations = np.array(observations)
         self.actions = np.array(actions)
@@ -20,7 +20,7 @@ class Segment:
                 "info": self.infos[idx]}
 
 
-class FrameSegment(Segment):
+class FrameTrajectorySegment(TrajectorySegment):
     def __init__(self, observations, actions, rewards, dones, infos, frames):
         super().__init__(observations, actions, rewards, dones, infos)
         self.frames = np.array(frames)
