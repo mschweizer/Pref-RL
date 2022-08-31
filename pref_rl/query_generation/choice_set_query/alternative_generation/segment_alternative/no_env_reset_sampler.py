@@ -14,15 +14,17 @@ EPISODES_TOO_SHORT_MSG = "No episode in the buffer is long enough to sample a se
 
 
 class NoEnvResetSegmentSampler(SegmentSampler):
-    def __init__(self, segment_length: int):
+    def __init__(self, segment_length: int, image_obs=False):
         """
         Segments sampled with this segment sampler do cut across multiple episodes and thus do not include environment
         resets. This is helpful, for example, because videos rendered from such segments appear more natural and are
         easier to evaluate.
         Note: Strictly speaking, agent do not have access to the information on whether an episode has ended.
         :param segment_length: The length each sampled trajectory segment.
+        :param image_obs: Whether the sampled segments should include image observations in addition to the standard
+        observation.
         """
-        super().__init__(segment_length)
+        super().__init__(segment_length, image_obs)
         self.logger = get_or_create_logger('NoEnvResetSegmentSampler')
 
     def _sample_segment(self, trajectory: RolloutContainer) -> TrajectorySegment:
