@@ -13,6 +13,7 @@ class PbRLAgent(RLAgent):
     def __init__(self, policy_model, query_generator, preference_querent, preference_collector, reward_model_trainer,
                  reward_model, query_schedule_cls, pb_step_freq, reward_train_freq, num_epochs_in_pretraining=8,
                  num_epochs_in_training=16, agent_name="pbrl-agent"):
+        # TODO: make pb_step_freq, reward_train_freq etc... params of pb_learn?
 
         self.logger = get_or_create_logger('PbRLAgent')
 

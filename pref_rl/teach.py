@@ -23,6 +23,7 @@ def create_cli():
     parser.add_argument('--frame_stack', type=int, default=None)
     parser.add_argument('--video_directory', type=str)
     parser.add_argument('--fps', default=20, type=int)
+    parser.add_argument('--num_envs', default=1, type=int)
     return parser
 
 
@@ -42,7 +43,7 @@ def main():
                           query_buffer_size=100, dataset_size=5000, pref_collect_address=args.pref_collect_addr,
                           video_dir=args.video_directory, fps=args.fps,
                           num_epochs_in_pretraining=args.pretraining_epochs,
-                          num_epochs_in_training=args.training_epochs)
+                          num_epochs_in_training=args.training_epochs, num_envs=args.num_envs)
     else:
         agent = SyntheticRLTeacher(env,
                                    reward_model_type=args.reward_model,
@@ -55,7 +56,7 @@ def main():
                                    dataset_size=5000,
                                    num_epochs_in_pretraining=args.pretraining_epochs,
                                    num_epochs_in_training=args.training_epochs,
-                                   num_envs=1)
+                                   num_envs=args.num_envs)
 
     logger.info("preference-based reinforcement learning with \n "
                 "{rl_steps} rl steps, \n "

@@ -41,7 +41,7 @@ class RLTeacher(PbRLAgent):
     def __init__(self, env, reward_model_type, pb_step_freq, policy_train_freq=5, reward_train_freq=None,
                  query_schedule_type="Annealing", query_segment_length=25, query_buffer_size=100, dataset_size=5000,
                  pref_collect_address="url", video_dir="local", fps=20, num_epochs_in_pretraining=8,
-                 num_epochs_in_training=16):
+                 num_epochs_in_training=16, num_envs=1):
         reward_model = get_model_cls_by_name(reward_model_type)(env=env)
         policy_model = PolicyModel(env=env, reward_model=reward_model, train_freq=policy_train_freq, num_envs=num_envs)
 
