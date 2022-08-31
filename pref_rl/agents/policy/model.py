@@ -6,18 +6,20 @@ from stable_baselines3.common.vec_env import SubprocVecEnv, DummyVecEnv
 
 
 class PolicyModel:
-    def __init__(self, env, train_freq, load_file=None, num_envs=1):
+    def __init__(self, env, train_freq, load_file=None, num_envs=1, stable_baselines_verbose=False):
         self.atomic_env = env
+
         if num_envs > 1:
             self.env = \
                 SubprocVecEnv(env_fns=[lambda: copy.deepcopy(env) for _ in range(num_envs)], start_method="spawn")
         else:
             self.env = DummyVecEnv(env_fns=[lambda: env])
+
         if load_file is not None:
-            self.rl_algo = A2C.load(load_file, env=self.env)
+            self.rl_algo = A2C.load(load_file, env=self.env, verbose=stable_baselines_verbose)
         else:
-            # TODO: parametrize verbose=True (also in if clause)
-            self.rl_algo = A2C('MlpPolicy', env=self.env, n_steps=train_freq, tensorboard_log="runs", verbose=True)
+            self.rl_algo = A2C('MlpPolicy', env=self.env, n_steps=train_freq, tensorboard_log="runs",
+                               verbose=stable_baselines_verbose)
 
     def learn(self, *args, **kwargs):
         return self.rl_algo.learn(*args, **kwargs)

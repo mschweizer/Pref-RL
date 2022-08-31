@@ -58,7 +58,6 @@ def main():
                                    policy_train_freq=args.policy_train_freq,
                                    reward_train_freq=args.reward_train_freq,
                                    query_schedule_type="Annealing",
-                                   trajectory_buffer_size=2000,
                                    query_segment_length=args.query_segment_length,
                                    query_buffer_size=100,
                                    dataset_size=5000,
