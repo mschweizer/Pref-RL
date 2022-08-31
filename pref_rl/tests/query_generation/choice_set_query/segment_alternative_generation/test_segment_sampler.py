@@ -3,15 +3,18 @@ from unittest.mock import MagicMock
 import pytest
 
 from .....agents.policy.model import PolicyModel
-from .....query_generation.choice_set_query.alternative_generation.segment_alternative.sampler import SegmentSampler
-from .....query_generation.choice_set_query.alternative_generation.segment_alternative.trajectory_segment import TrajectorySegment
-from .....query_generation.choice_set_query.alternative_generation.segment_alternative.rollout_container import RolloutContainer, \
+from .....query_generation.choice_set_query.alternative_generation.segment_alternative.rollout_container import \
+    RolloutContainer, \
     FrameRolloutContainer
+from .....query_generation.choice_set_query.alternative_generation.segment_alternative.sampler import SegmentSampler
+from .....query_generation.choice_set_query.alternative_generation.segment_alternative.trajectory_segment import \
+    TrajectorySegment
+from .....reward_modeling.mlp import MlpRewardModel
 
 
 @pytest.fixture()
 def policy_model(cartpole_env):
-    return PolicyModel(env=cartpole_env, train_freq=5)
+    return PolicyModel(env=cartpole_env, reward_model=MlpRewardModel(cartpole_env), train_freq=5)
 
 
 @pytest.fixture()
@@ -21,7 +24,7 @@ def segment_sampler():
 
 def test_samples_correct_number_of_segments(cartpole_env, segment_sampler):
     num_segments = 10
-    policy_model = PolicyModel(cartpole_env, train_freq=5)
+    policy_model = PolicyModel(cartpole_env, MlpRewardModel(cartpole_env), train_freq=5)
 
     samples = segment_sampler.generate(policy_model, num_segments)
 

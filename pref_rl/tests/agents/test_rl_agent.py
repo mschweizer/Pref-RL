@@ -6,7 +6,7 @@ from ...agents.rl_agent import RLAgent
 
 def test_agent_chooses_action(cartpole_env):
     obs = cartpole_env.reset()
-    agent = RLAgent(PolicyModel(cartpole_env, train_freq=5))
+    agent = RLAgent(PolicyModel(cartpole_env, None, train_freq=5))
     action = agent.choose_action(obs)
     assert action is not None
 
@@ -14,8 +14,8 @@ def test_agent_chooses_action(cartpole_env):
 def test_agent_chooses_valid_action(cartpole_env):
     mountaincar_env = gym.make('MountainCar-v0')
 
-    cartpole_agent = RLAgent(PolicyModel(cartpole_env, train_freq=5))
-    mountaincar_agent = RLAgent(PolicyModel(mountaincar_env, train_freq=5))
+    cartpole_agent = RLAgent(PolicyModel(cartpole_env, None, train_freq=5))
+    mountaincar_agent = RLAgent(PolicyModel(mountaincar_env, None, train_freq=5))
 
     cartpole_observation = cartpole_env.reset()
     mountaincar_observation = mountaincar_env.reset()

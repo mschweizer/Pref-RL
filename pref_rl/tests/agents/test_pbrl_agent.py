@@ -78,7 +78,7 @@ def test_pb_learn(agent):
 
 def test_saves_policy_model_with_correct_name(cartpole_env, tmpdir):
     agent_name = "pbrl_agent"
-    agent = PbRLAgent(policy_model=PolicyModel(cartpole_env, train_freq=10), query_generator=MagicMock(),
+    agent = PbRLAgent(policy_model=PolicyModel(cartpole_env, None, train_freq=10), query_generator=MagicMock(),
                       preference_querent=MagicMock(), preference_collector=MagicMock(),
                       reward_model_trainer=MagicMock(), reward_model=MagicMock(), query_schedule_cls=MagicMock(),
                       pb_step_freq=100, reward_train_freq=100, agent_name="pbrl_agent")

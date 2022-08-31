@@ -6,12 +6,14 @@ from .....environment_wrappers.utils import create_env
 from .....query_generation.choice_set_query.alternative_generation.segment_alternative.rollout_container import RolloutContainer
 from .....query_generation.choice_set_query.alternative_generation.segment_alternative.no_env_reset_sampler import \
     NoEnvResetSegmentSampler, EPISODES_TOO_SHORT_MSG
+from .....reward_modeling.mlp import MlpRewardModel
 
 
 def test_segment_sample_contains_no_resets():
     sampler = NoEnvResetSegmentSampler(segment_length=20)
     env = create_env("MountainCar-v0", termination_penalty=10., frame_stack_depth=4)
-    rollout_buffer = sampler._collect_rollouts(PolicyModel(env=env, train_freq=5), rollout_steps=1024)
+    rollout_buffer = sampler._collect_rollouts(PolicyModel(env=env, reward_model=MlpRewardModel(env), train_freq=5),
+                                               rollout_steps=1024)
 
     reset_results = []
     for _ in range(50):
@@ -28,7 +30,8 @@ def test_segment_sampler_warns_if_no_episode_is_long_enough(caplog):
     segment_length = 100
     sampler = NoEnvResetSegmentSampler(segment_length)
     env = create_env("MountainCar-v0", termination_penalty=10., frame_stack_depth=4)
-    rollout_buffer = sampler._collect_rollouts(PolicyModel(env=env, train_freq=5), rollout_steps=1024)
+    rollout_buffer = sampler._collect_rollouts(PolicyModel(env=env, reward_model=MlpRewardModel(env), train_freq=5),
+                                               rollout_steps=1024)
     for info in rollout_buffer.infos:
         info[TRUE_DONE] = True
 

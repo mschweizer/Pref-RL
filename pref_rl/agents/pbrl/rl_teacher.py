@@ -1,7 +1,5 @@
 from .agent import PbRLAgent
 from ..policy.model import PolicyModel
-from ...environment_wrappers.internal.reward_predictor import RewardPredictor
-from ...environment_wrappers.internal.reward_standardizer import RewardStandardizer
 from ...preference_collection.human.collector import HumanPreferenceCollector
 from ...preference_collection.synthetic.collector import SyntheticPreferenceCollector
 from ...preference_collection.synthetic.oracle import RewardMaximizingOracle
@@ -18,13 +16,13 @@ from ...reward_modeling.utils import get_model_cls_by_name
 
 class SyntheticRLTeacher(PbRLAgent):
 
-    def __init__(self, env, reward_model_type, pb_step_freq, policy_train_freq=5, reward_train_freq=None,
+    def __init__(self, env, reward_model_type="Mlp", pb_step_freq=1024, policy_train_freq=5, reward_train_freq=None,
                  query_schedule_type="Annealing", query_segment_length=25, query_buffer_size=100, dataset_size=5000,
                  num_epochs_in_pretraining=8, num_epochs_in_training=16, num_envs=1):
         reward_model = get_model_cls_by_name(reward_model_type)(env=env)
         # TODO: reward_model.cuda() if cuda is available
-        policy_model = PolicyModel(env=self._apply_internal_wrappers(env, reward_model), train_freq=policy_train_freq,
-                                   num_envs=num_envs)
+        policy_model = PolicyModel(env=env, reward_model=reward_model,
+                                   train_freq=policy_train_freq, num_envs=num_envs)
 
         query_schedule_cls = get_schedule_by_name(query_schedule_type)
         query_generator = BufferedChoiceSetQueryGenerator(
@@ -38,12 +36,6 @@ class SyntheticRLTeacher(PbRLAgent):
                          reward_model, query_schedule_cls, pb_step_freq, reward_train_freq, num_epochs_in_pretraining,
                          num_epochs_in_training)
 
-    @staticmethod
-    def _apply_internal_wrappers(env, reward_model):
-        env = RewardPredictor(env, reward_model)
-        env = RewardStandardizer(env)
-        return env
-
 
 class RLTeacher(PbRLAgent):
     def __init__(self, env, reward_model_type, pb_step_freq, policy_train_freq=5, reward_train_freq=None,
@@ -51,7 +43,7 @@ class RLTeacher(PbRLAgent):
                  pref_collect_address="url", video_dir="local", fps=20, num_epochs_in_pretraining=8,
                  num_epochs_in_training=16):
         reward_model = get_model_cls_by_name(reward_model_type)(env=env)
-        policy_model = PolicyModel(env=self._apply_internal_wrappers(env, reward_model), train_freq=policy_train_freq)
+        policy_model = PolicyModel(env=env, reward_model=reward_model, train_freq=policy_train_freq, num_envs=num_envs)
 
         query_schedule_cls = get_schedule_by_name(query_schedule_type)
         query_generator = BufferedChoiceSetQueryGenerator(
@@ -67,9 +59,3 @@ class RLTeacher(PbRLAgent):
         super().__init__(policy_model, query_generator, preference_querent, preference_collector, reward_model_trainer,
                          reward_model, query_schedule_cls, pb_step_freq, reward_train_freq, num_epochs_in_pretraining,
                          num_epochs_in_training)
-
-    @staticmethod
-    def _apply_internal_wrappers(env, reward_model):
-        env = RewardPredictor(env, reward_model)
-        env = RewardStandardizer(env)
-        return env
